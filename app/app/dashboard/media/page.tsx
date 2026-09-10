@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -71,6 +72,7 @@ function getMediaIcon(type: string) {
 }
 
 export default function MediaPage() {
+  const router = useRouter();
   const [media, setMedia] = useState<Media[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,10 +106,10 @@ export default function MediaPage() {
     if (!file) return;
     setUploading(true);
     try {
-      await api.uploadMedia(file);
+      const uploaded = await api.uploadMedia(file);
       setUploadOpen(false);
       setFile(null);
-      await fetchMedia();
+      router.push(`/app/dashboard/media/${uploaded.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload media');
     } finally {

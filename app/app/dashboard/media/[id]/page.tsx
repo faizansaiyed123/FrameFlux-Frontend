@@ -23,7 +23,10 @@ import {
   XCircle,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { MediaProcessing } from '@/components/dashboard/MediaProcessing';
 import { EditorWorkspace } from '@/components/dashboard/editor/EditorWorkspace';
+import { AudioWorkspace } from '@/components/dashboard/editor/AudioWorkspace';
+import { ImageWorkspace } from '@/components/dashboard/editor/ImageWorkspace';
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
   pending: { icon: Clock, color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', label: 'Pending' },
@@ -74,6 +77,10 @@ export default function MediaDetailPage() {
       setMedia(mediaData);
       setStatus(statusData);
       setError(null);
+
+      if (mediaData.mime_type.startsWith('video/') || mediaData.mime_type.startsWith('audio/') || mediaData.mime_type.startsWith('image/')) {
+        setActiveTab('processing');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load media');
     } finally {
@@ -342,7 +349,18 @@ export default function MediaDetailPage() {
           </div>
         </TabsContent>
         <TabsContent value="processing" className="space-y-6">
-          <EditorWorkspace media={media} onBack={fetchMedia} onProcessed={fetchMedia} />
+          {media.mime_type.startsWith('video/') && (
+            <EditorWorkspace media={media} onBack={fetchMedia} onProcessed={fetchMedia} />
+          )}
+          {media.mime_type.startsWith('audio/') && (
+            <AudioWorkspace media={media} onBack={fetchMedia} onProcessed={fetchMedia} />
+          )}
+          {media.mime_type.startsWith('image/') && (
+            <ImageWorkspace media={media} onBack={fetchMedia} onProcessed={fetchMedia} />
+          )}
+          {!media.mime_type.startsWith('video/') && !media.mime_type.startsWith('audio/') && !media.mime_type.startsWith('image/') && (
+            <MediaProcessing mediaId={mediaId} onProcessed={fetchMedia} />
+          )}
         </TabsContent>
         <TabsContent value="metadata" className="space-y-6">
           <Card className="border-zinc-200 dark:border-zinc-800">
