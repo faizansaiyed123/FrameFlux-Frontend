@@ -27,9 +27,13 @@ class ApiClient {
     options: RequestInit = {}
   ): Promise<T> {
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    };
+  ...options.headers,
+};
+
+if (!(options.body instanceof FormData)) {
+  (headers as Record<string, string>)['Content-Type'] = 'application/json';
+}
+
 
     if (this.token) {
       (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`;
