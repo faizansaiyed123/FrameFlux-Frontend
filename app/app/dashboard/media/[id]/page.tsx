@@ -23,6 +23,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { EditorWorkspace } from '@/components/dashboard/editor/EditorWorkspace';
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
   pending: { icon: Clock, color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', label: 'Pending' },
@@ -40,6 +41,17 @@ function formatFileSize(bytes: number): string {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 export default function MediaDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -51,6 +63,7 @@ export default function MediaDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [downloading, setDownloading] = useState(false);
 
   const fetchMedia = useCallback(async () => {
     try {
@@ -73,6 +86,23 @@ export default function MediaDetailPage() {
     fetchMedia();
   }, [fetchMedia]);
 
+  useEffect(() => {
+    if (!media || media.processing_status !== 'processing' && media.processing_status !== 'queued') {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      try {
+        const progressData = await api.getMediaProgress(mediaId);
+        setStatus(progressData);
+      } catch {
+        // silent poll failure
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [media, mediaId]);
+
   const handleProcess = async () => {
     setProcessing(true);
     try {
@@ -82,6 +112,32 @@ export default function MediaDetailPage() {
       setError(err instanceof Error ? err.message : 'Failed to process media');
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleDownloadOriginal = async () => {
+    if (!media) return;
+    setDownloading(true);
+    try {
+      const blob = await api.getMediaFile(mediaId);
+      downloadBlob(blob, media.original_filename);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to download file');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const handleDownloadProcessed = async () => {
+    if (!media || !media.processed_filename) return;
+    setDownloading(true);
+    try {
+      const blob = await api.getProcessedMedia(mediaId);
+      downloadBlob(blob, media.processed_filename);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to download processed file');
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -265,12 +321,20 @@ export default function MediaDetailPage() {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline" disabled={media.processing_status !== 'completed'}>
-                  <Download className="mr-2 h-4 w-4" />
+                <Button className="w-full justify-start" variant="outline" disabled={media.processing_status !== 'completed' || downloading} onClick={handleDownloadOriginal}>
+                  {downloading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="mr-2 h-4 w-4" />
+                  )}
                   Download Original
                 </Button>
-                <Button className="w-full justify-start" variant="outline" disabled={!media.processed_filename}>
-                  <Download className="mr-2 h-4 w-4" />
+                <Button className="w-full justify-start" variant="outline" disabled={!media.processed_filename || downloading} onClick={handleDownloadProcessed}>
+                  {downloading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="mr-2 h-4 w-4" />
+                  )}
                   Download Processed
                 </Button>
               </CardContent>
@@ -278,14 +342,7 @@ export default function MediaDetailPage() {
           </div>
         </TabsContent>
         <TabsContent value="processing" className="space-y-6">
-          <Card className="border-zinc-200 dark:border-zinc-800">
-            <CardHeader>
-              <CardTitle>Processing Operations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Processing operations coming soon.</p>
-            </CardContent>
-          </Card>
+          <EditorWorkspace media={media} onBack={fetchMedia} onProcessed={fetchMedia} />
         </TabsContent>
         <TabsContent value="metadata" className="space-y-6">
           <Card className="border-zinc-200 dark:border-zinc-800">

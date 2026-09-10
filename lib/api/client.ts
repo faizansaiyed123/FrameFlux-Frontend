@@ -354,6 +354,18 @@ if (!(options.body instanceof FormData)) {
     }>(`/media/${id}/status`);
   }
 
+  async getMediaProgress(id: string) {
+    return this.request<{
+      media_id: string;
+      status: 'pending' | 'queued' | 'processing' | 'completed' | 'failed';
+      progress: number;
+      stage: string | null;
+      job_id: string | null;
+      processed_filename: string | null;
+      error: string | null;
+    }>(`/media/${id}/progress`);
+  }
+
   async processMedia(id: string) {
     return this.request<{
       media_id: string;

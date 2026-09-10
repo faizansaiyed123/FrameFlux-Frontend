@@ -52,6 +52,17 @@ export default function JobsPage() {
     fetchJobs();
   }, [fetchJobs]);
 
+  useEffect(() => {
+    const hasActiveJobs = jobs.some((job) => job.status === 'queued' || job.status === 'processing' || job.status === 'running');
+    if (!hasActiveJobs) return;
+
+    const interval = setInterval(() => {
+      fetchJobs();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [jobs, fetchJobs]);
+
   const filtered = jobs.filter((job) => {
     if (filter !== 'all' && job.status !== filter) return false;
     if (search && !job.job_id.toLowerCase().includes(search.toLowerCase())) return false;
