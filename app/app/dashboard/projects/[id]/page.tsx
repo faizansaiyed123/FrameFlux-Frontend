@@ -5,9 +5,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
-import type { Project, Media, ProjectProcessingStatusResponse } from '@/types/api';
+import type { Project, Media, ProjectProcessingStatusResponse, ProjectFolder, ProjectWorkflowSummary, ProjectHistoryEntry } from '@/types/api';
 import {
   ArrowLeft,
   Loader2,
@@ -18,6 +21,9 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  FolderOpen,
+  Workflow,
+  History,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -43,6 +49,11 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [folders, setFolders] = useState<ProjectFolder[]>([]);
+  const [workflows, setWorkflows] = useState<ProjectWorkflowSummary[]>([]);
+  const [history, setHistory] = useState<ProjectHistoryEntry[]>([]);
+  const [folderName, setFolderName] = useState('');
+  const [folderDialogOpen, setFolderDialogOpen] = useState(false);
 
   const fetchProject = useCallback(async () => {
     try {
@@ -62,10 +73,29 @@ export default function ProjectDetailPage() {
     }
   }, [projectId]);
 
+  const fetchExtras = useCallback(async () => {
+    try {
+      const [foldersData, workflowsData, historyData] = await Promise.all([
+        api.listProjectFolders(projectId).catch(() => []),
+        api.listProjectWorkflows(projectId).catch(() => []),
+        api.listProjectHistory(projectId).catch(() => []),
+      ]);
+      setFolders(foldersData);
+      setWorkflows(workflowsData);
+      setHistory(historyData);
+    } catch {
+      // silent
+    }
+  }, [projectId]);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProject();
   }, [fetchProject]);
+
+  useEffect(() => {
+    fetchExtras();
+  }, [fetchExtras]);
 
   const handleProcess = async () => {
     setProcessing(true);
@@ -76,6 +106,19 @@ export default function ProjectDetailPage() {
       setError(err instanceof Error ? err.message : 'Failed to process project');
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleCreateFolder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!folderName.trim()) return;
+    try {
+      await api.createProjectFolder(projectId, folderName.trim());
+      setFolderDialogOpen(false);
+      setFolderName('');
+      fetchExtras();
+    } catch {
+      // silent
     }
   };
 
@@ -197,7 +240,9 @@ export default function ProjectDetailPage() {
       <Tabs defaultValue="media" className="space-y-6">
         <TabsList>
           <TabsTrigger value="media">Media ({media.length})</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="folders">Folders ({folders.length})</TabsTrigger>
+          <TabsTrigger value="workflows">Workflows ({workflows.length})</TabsTrigger>
+          <TabsTrigger value="history">History ({history.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="media" className="space-y-4">
           {media.length === 0 ? (
@@ -238,18 +283,102 @@ export default function ProjectDetailPage() {
             </div>
           )}
         </TabsContent>
-        <TabsContent value="settings">
-          <Card className="border-zinc-200 dark:border-zinc-800">
-            <CardHeader>
-              <CardTitle>Project Settings</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">Project settings coming soon.</p>
-            </CardContent>
-          </Card>
+        <TabsContent value="folders" className="space-y-4">
+          <div className="flex justify-end">
+            <Button size="sm" onClick={() => setFolderDialogOpen(true)} className="gap-2">
+              <FolderOpen className="h-4 w-4" />
+              New Folder
+            </Button>
+          </div>
+          {folders.length === 0 ? (
+            <Card className="border-zinc-200 dark:border-zinc-800">
+              <CardContent className="p-6 text-center">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">No folders yet.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {folders.map((folder) => (
+                <Card key={folder.id} className="border-zinc-200 dark:border-zinc-800">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                      <FolderOpen className="h-5 w-5" />
+                    </div>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{folder.name}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+        <TabsContent value="workflows" className="space-y-4">
+          {workflows.length === 0 ? (
+            <Card className="border-zinc-200 dark:border-zinc-800">
+              <CardContent className="p-6 text-center">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">No workflows linked to this project.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {workflows.map((wf) => (
+                <Card key={wf.id} className="border-zinc-200 dark:border-zinc-800">
+                  <CardContent className="p-4 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                      <Workflow className="h-5 w-5" />
+                    </div>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{wf.name}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+        <TabsContent value="history" className="space-y-4">
+          {history.length === 0 ? (
+            <Card className="border-zinc-200 dark:border-zinc-800">
+              <CardContent className="p-6 text-center">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">No history yet.</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {history.map((entry) => (
+                <Card key={entry.id} className="border-zinc-200 dark:border-zinc-800">
+                  <CardContent className="p-4 flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                      <History className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 capitalize">{entry.operation}</p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        {entry.status} • {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
+
+      <Dialog open={folderDialogOpen} onOpenChange={setFolderDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Folder</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleCreateFolder} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="folderName">Folder Name</Label>
+              <Input id="folderName" value={folderName} onChange={(e) => setFolderName(e.target.value)} required />
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setFolderDialogOpen(false)}>Cancel</Button>
+              <Button type="submit">Create</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
-
