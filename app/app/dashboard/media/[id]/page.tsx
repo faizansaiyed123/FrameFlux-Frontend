@@ -7,9 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
-import type { Media, MediaProcessingStatusResponse } from '@/types/api';
+import type { Media, MediaProcessingStatusResponse, MediaVersion, ShareResponse } from '@/types/api';
 import {
   ArrowLeft,
   Film,
@@ -21,12 +24,23 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  Share2,
+  Trash2,
+  Copy,
+  History,
+  Settings2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { MediaProcessing } from '@/components/dashboard/MediaProcessing';
 import { EditorWorkspace } from '@/components/dashboard/editor/EditorWorkspace';
 import { AudioWorkspace } from '@/components/dashboard/editor/AudioWorkspace';
 import { ImageWorkspace } from '@/components/dashboard/editor/ImageWorkspace';
+import { CompressForm } from '@/components/dashboard/media/CompressForm';
+import { AudioExtractForm } from '@/components/dashboard/media/AudioExtractForm';
+import { ThumbnailForm } from '@/components/dashboard/media/ThumbnailForm';
+import { PreviewForm } from '@/components/dashboard/media/PreviewForm';
+import { SubtitleForm } from '@/components/dashboard/media/SubtitleForm';
+import { MediaInfoSection } from '@/components/dashboard/media/MediaInfoSection';
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
   pending: { icon: Clock, color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', label: 'Pending' },
@@ -67,6 +81,12 @@ export default function MediaDetailPage() {
   const [processing, setProcessing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [downloading, setDownloading] = useState(false);
+  const [versions, setVersions] = useState<MediaVersion[]>([]);
+  const [versionsLoading, setVersionsLoading] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [sharePassword, setSharePassword] = useState('');
+  const [shares, setShares] = useState<ShareResponse[]>([]);
+  const [shareLoading, setShareLoading] = useState(false);
 
   const fetchMedia = useCallback(async () => {
     try {
@@ -110,6 +130,38 @@ export default function MediaDetailPage() {
     return () => clearInterval(interval);
   }, [media, mediaId]);
 
+  const fetchVersions = useCallback(async () => {
+    setVersionsLoading(true);
+    try {
+      const data = await api.listMediaVersions(mediaId);
+      setVersions(data);
+    } catch {
+      // silent
+    } finally {
+      setVersionsLoading(false);
+    }
+  }, [mediaId]);
+
+  const fetchShares = useCallback(async () => {
+    setShareLoading(true);
+    try {
+      const data = await api.listShares();
+      setShares(data.filter(s => s.media_id === mediaId));
+    } catch {
+      // silent
+    } finally {
+      setShareLoading(false);
+    }
+  }, [mediaId]);
+
+  useEffect(() => {
+    fetchVersions();
+  }, [fetchVersions]);
+
+  useEffect(() => {
+    fetchShares();
+  }, [fetchShares]);
+
   const handleProcess = async () => {
     setProcessing(true);
     try {
@@ -145,6 +197,17 @@ export default function MediaDetailPage() {
       setError(err instanceof Error ? err.message : 'Failed to download processed file');
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleCreateShare = async () => {
+    try {
+      await api.createShare({ media_id: mediaId, password: sharePassword || undefined, allow_download: true });
+      setShareDialogOpen(false);
+      setSharePassword('');
+      fetchShares();
+    } catch {
+      // silent
     }
   };
 
@@ -275,6 +338,9 @@ export default function MediaDetailPage() {
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="processing">Processing</TabsTrigger>
+          <TabsTrigger value="tools">Tools</TabsTrigger>
+          <TabsTrigger value="versions">Versions</TabsTrigger>
+          <TabsTrigger value="sharing">Sharing</TabsTrigger>
           <TabsTrigger value="metadata">Metadata</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-6">
@@ -362,6 +428,131 @@ export default function MediaDetailPage() {
             <MediaProcessing mediaId={mediaId} onProcessed={fetchMedia} />
           )}
         </TabsContent>
+        <TabsContent value="tools" className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Compression */}
+            <Card className="border-zinc-200 dark:border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-base">Compress Media</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CompressForm mediaId={mediaId} onProcessed={fetchMedia} />
+              </CardContent>
+            </Card>
+
+            {/* Audio Extraction */}
+            {media.mime_type.startsWith('video/') && (
+              <Card className="border-zinc-200 dark:border-zinc-800">
+                <CardHeader>
+                  <CardTitle className="text-base">Extract Audio</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <AudioExtractForm mediaId={mediaId} />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Thumbnail */}
+            <Card className="border-zinc-200 dark:border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-base">Generate Thumbnail</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ThumbnailForm mediaId={mediaId} />
+              </CardContent>
+            </Card>
+
+            {/* Preview */}
+            <Card className="border-zinc-200 dark:border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-base">Generate Preview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <PreviewForm mediaId={mediaId} />
+              </CardContent>
+            </Card>
+
+            {/* Subtitles */}
+            {media.mime_type.startsWith('video/') && (
+              <Card className="border-zinc-200 dark:border-zinc-800">
+                <CardHeader>
+                  <CardTitle className="text-base">Subtitles</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <SubtitleForm mediaId={mediaId} />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Media Info */}
+            <Card className="border-zinc-200 dark:border-zinc-800">
+              <CardHeader>
+                <CardTitle className="text-base">Media Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MediaInfoSection mediaId={mediaId} />
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+        <TabsContent value="versions" className="space-y-6">
+          <Card className="border-zinc-200 dark:border-zinc-800">
+            <CardHeader>
+              <CardTitle>File Versions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {versionsLoading ? (
+                <div className="h-32 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded" />
+              ) : versions.length === 0 ? (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">No versions yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {versions.map((version) => (
+                    <div key={version.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                      <div>
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Version {version.version_number}: {version.label}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {version.processing_status} • {formatDistanceToNow(new Date(version.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="sharing" className="space-y-6">
+          <Card className="border-zinc-200 dark:border-zinc-800">
+            <CardHeader>
+              <CardTitle>Share Links</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Button onClick={() => setShareDialogOpen(true)} className="gap-2">
+                <Share2 className="h-4 w-4" />
+                Create Share Link
+              </Button>
+              {shareLoading ? (
+                <div className="h-32 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded" />
+              ) : shares.length === 0 ? (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">No share links yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {shares.map((share) => (
+                    <div key={share.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50 truncate">{share.token}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                          {share.is_active ? 'Active' : 'Disabled'} • {share.allow_download ? 'Download allowed' : 'View only'}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="metadata" className="space-y-6">
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader>
@@ -400,6 +591,30 @@ export default function MediaDetailPage() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Share Link</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="password">Password (optional)</Label>
+              <Input
+                id="password"
+                type="text"
+                placeholder="Leave empty for public access"
+                value={sharePassword}
+                onChange={(e) => setSharePassword(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShareDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleCreateShare}>Create Link</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
