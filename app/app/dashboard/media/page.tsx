@@ -87,7 +87,10 @@ export default function MediaPage() {
 
   const fetchMedia = useCallback(async () => {
     try {
-      const data = await api.listMedia();
+      const data = await api.listMedia({
+        search: search || undefined,
+        media_type: filter !== 'all' ? filter : undefined,
+      });
       setMedia(data);
       setError(null);
     } catch (err) {
@@ -95,7 +98,7 @@ export default function MediaPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [search, filter]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
