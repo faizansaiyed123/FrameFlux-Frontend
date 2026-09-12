@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +31,28 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let objectUrl: string | null = null;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setError('');
+
+    api.getMediaFile(media.id)
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        setImageUrl(objectUrl);
+      })
+      .catch(() => {
+        setError('Unable to load image preview.');
+      });
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [media.id]);
 
   const handleProcess = useCallback(async () => {
     setProcessing(true);
@@ -91,7 +113,7 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>
-          <Button onClick={handleProcess} disabled={processing}>
+          <Button onClick={handleProcess} disabled={processing} className="bg-indigo-600 hover:bg-indigo-700">
             {processing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -109,15 +131,23 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-8">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`/api/media/${media.id}/file`}
-            alt={media.original_filename}
-            className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
-          />
+          {imageUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={imageUrl}
+              alt={media.original_filename}
+              className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
+              onError={() => setError('Unable to load image preview.')}
+            />
+          ) : (
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin text-indigo-400 mx-auto mb-3" />
+              <p className="text-xs text-zinc-400">Loading image...</p>
+            </div>
+          )}
         </div>
 
-        <div className="w-80 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
+        <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-3">Transform</h2>
             <div className="space-y-4">
@@ -203,7 +233,7 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
       </div>
 
       {error && (
-        <div className="fixed bottom-4 right-4">
+        <div className="fixed bottom-4 right-4 z-50">
           <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
@@ -211,7 +241,7 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
         </div>
       )}
       {success && (
-        <div className="fixed bottom-4 right-4">
+        <div className="fixed bottom-4 right-4 z-50">
           <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>

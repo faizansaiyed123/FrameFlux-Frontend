@@ -13,7 +13,6 @@ import {
   SkipForward,
   Volume2,
   VolumeX,
-  Maximize,
   Undo,
   Redo,
   Loader2,
@@ -41,6 +40,7 @@ interface EditorWorkspaceProps {
 
 export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(media.duration || 0);
@@ -64,6 +64,28 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
   const [history, setHistory] = useState<Clip[][]>([clips]);
   const [historyIndex, setHistoryIndex] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [loadingVideo, setLoadingVideo] = useState(true);
+
+  useEffect(() => {
+    let objectUrl: string | null = null;
+
+    api.getMediaFile(media.id)
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        setVideoUrl(objectUrl);
+        setLoadingVideo(false);
+      })
+      .catch(() => {
+        setError('Unable to load video preview. The file format may not be supported by your browser.');
+        setLoadingVideo(false);
+      });
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [media.id]);
 
   const historyRef = useRef(history);
   const historyIndexRef = useRef(historyIndex);
@@ -137,8 +159,16 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
 
   const handleLoadedMetadata = useCallback(() => {
     if (!videoRef.current) return;
-    setDuration(videoRef.current.duration || media.duration || 0);
-  }, [media.duration]);
+    const videoDuration = videoRef.current.duration || media.duration || 0;
+    setDuration(videoDuration);
+    if (clips.length === 1 && clips[0].duration !== videoDuration) {
+      setClips((prev) => prev.map((c) => (c.id === media.id ? { ...c, end: videoDuration, duration: videoDuration } : c)));
+    }
+  }, [media.duration, media.id, clips]);
+
+  const handleVideoError = useCallback(() => {
+    setError('Unable to load video preview. The file format may not be supported by your browser.');
+  }, []);
 
   const handleSplit = useCallback(() => {
     if (!selectedClipId || currentTime <= 0) return;
@@ -175,7 +205,8 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       setSelectedClipId(null);
       return next;
     });
-  }, [selectedClipId, pushHistory]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedClipId]);
 
   const handleProcess = useCallback(async () => {
     setProcessing(true);
@@ -183,20 +214,16 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
     setSuccess('');
 
     try {
+      const selectedClip = clips.find((c) => c.id === selectedClipId);
+
       if (activeTool === 'split') {
-        const selectedClip = clips.find((c) => c.id === selectedClipId);
-        if (selectedClip) {
-          await api.splitMedia(media.id, [currentTime]);
-        }
-      } else if (activeTool === 'edit') {
-        const selectedClip = clips.find((c) => c.id === selectedClipId);
-        if (selectedClip) {
-          await api.editMedia(media.id, {
-            operation: 'trim',
-            start: selectedClip.start,
-            end: selectedClip.end,
-          });
-        }
+        await api.splitMedia(media.id, [currentTime]);
+      } else if (activeTool === 'edit' && selectedClip) {
+        await api.editMedia(media.id, {
+          operation: 'trim',
+          start: selectedClip.start,
+          end: selectedClip.end,
+        });
       } else if (activeTool === 'transform') {
         await api.transformMedia(media.id, {
           operation: 'speed',
@@ -213,6 +240,11 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
           font_size: 24,
           opacity: 1,
         });
+      } else if (activeTool === 'merge' && clips.length >= 2) {
+        const mediaIds = clips.map((c) => c.mediaId);
+        await api.mergeMedia(media.id, mediaIds);
+      } else if (activeTool === 'clips') {
+        await api.keepClips(media.id, clips.map((c) => ({ start: c.start, end: c.end })));
       }
 
       setSuccess('Processing started. This may take a few minutes.');
@@ -228,6 +260,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
+      {/* Top Zone: Preview & Global Controls */}
       <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onBack}>
@@ -237,26 +270,26 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
             <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px] sm:max-w-[400px]">
               {media.original_filename}
             </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Editor</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Video Editor</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0}>
+          <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0} title="Undo">
             <Undo className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={redo} disabled={historyIndex >= history.length - 1}>
+          <Button variant="ghost" size="icon" onClick={redo} disabled={historyIndex >= history.length - 1} title="Redo">
             <Redo className="h-4 w-4" />
           </Button>
-          <Button onClick={handleProcess} disabled={processing || !activeTool}>
+          <Button onClick={handleProcess} disabled={processing || !activeTool} className="bg-indigo-600 hover:bg-indigo-700">
             {processing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
+                Exporting...
               </>
             ) : (
               <>
                 <Play className="mr-2 h-4 w-4" />
-                Process
+                Export
               </>
             )}
           </Button>
@@ -264,35 +297,58 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="flex flex-1 flex-col">
-          <div className="flex-1 bg-black flex items-center justify-center">
-            <video
-              ref={videoRef}
-              src={`/api/media/${media.id}/file`}
-              className="max-h-full max-w-full"
-              onTimeUpdate={handleTimeUpdate}
-              onLoadedMetadata={handleLoadedMetadata}
-              onEnded={() => setIsPlaying(false)}
-            />
+        {/* Middle Zone: Preview + Timeline */}
+        <div className="flex flex-1 flex-col min-w-0">
+          {/* Preview Area */}
+          <div className="flex-1 bg-black flex items-center justify-center relative min-h-0">
+            {loadingVideo && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
+                <div className="text-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-indigo-400 mx-auto mb-3" />
+                  <p className="text-xs text-zinc-300">Loading preview...</p>
+                </div>
+              </div>
+            )}
+            {videoUrl && !error ? (
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                className="max-h-full max-w-full"
+                onTimeUpdate={handleTimeUpdate}
+                onLoadedMetadata={handleLoadedMetadata}
+                onEnded={() => setIsPlaying(false)}
+                onError={handleVideoError}
+                playsInline
+              />
+            ) : null}
+            {error && !loadingVideo && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+                <div className="text-center p-6">
+                  <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+                  <p className="text-sm text-red-300">{error}</p>
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* Playback Controls */}
           <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" onClick={() => handleSeek(Math.max(0, currentTime - 5))}>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => handleSeek(Math.max(0, currentTime - 5))} title="Skip back 5s">
                 <SkipBack className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={handlePlayPause}>
-                {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              <Button variant="ghost" size="icon" onClick={handlePlayPause} title={isPlaying ? 'Pause' : 'Play'}>
+                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => handleSeek(Math.min(duration, currentTime + 5))}>
+              <Button variant="ghost" size="icon" onClick={() => handleSeek(Math.min(duration, currentTime + 5))} title="Skip forward 5s">
                 <SkipForward className="h-4 w-4" />
               </Button>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono min-w-[100px]">
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
               <div className="flex-1" />
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={toggleMute}>
+                <Button variant="ghost" size="icon" onClick={toggleMute} title={isMuted ? 'Unmute' : 'Mute'}>
                   {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                 </Button>
                 <input
@@ -303,15 +359,14 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
                   value={isMuted ? 0 : volume}
                   onChange={(e) => handleVolumeChange(Number(e.target.value))}
                   className="w-20"
+                  title="Volume"
                 />
               </div>
-              <Button variant="ghost" size="icon" onClick={() => {}}>
-                <Maximize className="h-4 w-4" />
-              </Button>
             </div>
           </div>
 
-          <div className="h-48 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+          {/* Timeline */}
+          <div className="h-52 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
             <Timeline
               clips={clips}
               selectedClipId={selectedClipId}
@@ -330,7 +385,8 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
           </div>
         </div>
 
-        <div className="w-80 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
+        {/* Side Zone: Contextual Tools */}
+        <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
           <ToolPanel
             activeTool={activeTool}
             onSelectTool={setActiveTool}
@@ -345,8 +401,8 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
         </div>
       </div>
 
-      {error && (
-        <div className="fixed bottom-4 right-4">
+      {error && !success && (
+        <div className="fixed bottom-4 right-4 z-50">
           <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
@@ -354,7 +410,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
         </div>
       )}
       {success && (
-        <div className="fixed bottom-4 right-4">
+        <div className="fixed bottom-4 right-4 z-50">
           <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>
@@ -366,6 +422,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
 }
 
 function formatTime(seconds: number): string {
+  if (!isFinite(seconds) || isNaN(seconds)) return '0:00';
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, '0')}`;
