@@ -94,6 +94,7 @@ export default function ProjectsPage() {
 
   const handleDelete = async () => {
     if (!selectedProject) return;
+    if (!confirm('Delete this project?')) return;
     setSubmitting(true);
     try {
       await api.deleteProject(selectedProject.id);
