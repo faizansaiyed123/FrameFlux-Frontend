@@ -171,23 +171,39 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
 function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
   const [format, setFormat] = useState('mp4');
   const [resolution, setResolution] = useState('');
-  const [fps, setFps] = useState('');
+  const [customWidth, setCustomWidth] = useState('');
+  const [customHeight, setCustomHeight] = useState('');
+  const [fpsPreset, setFpsPreset] = useState('');
+  const [customFps, setCustomFps] = useState('');
+  const [aspectRatioPreset, setAspectRatioPreset] = useState('');
+  const [customAspectRatio, setCustomAspectRatio] = useState('');
   const [videoBitrate, setVideoBitrate] = useState('');
   const [audioBitrate, setAudioBitrate] = useState('');
+  const [videoCodec, setVideoCodec] = useState('');
+  const [audioCodec, setAudioCodec] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const data: Record<string, unknown> = { format };
     if (resolution) data.resolution = resolution;
-    if (fps) data.fps = Number(fps);
+    if (customWidth && customHeight) {
+      data.width = Number(customWidth);
+      data.height = Number(customHeight);
+    }
+    if (fpsPreset) data.fps_preset = fpsPreset;
+    if (customFps) data.fps = Number(customFps);
+    if (aspectRatioPreset) data.aspect_ratio_preset = aspectRatioPreset;
+    if (customAspectRatio) data.aspect_ratio = customAspectRatio;
     if (videoBitrate) data.video_bitrate = videoBitrate;
     if (audioBitrate) data.audio_bitrate = audioBitrate;
+    if (videoCodec) data.video_codec = videoCodec;
+    if (audioCodec) data.audio_codec = audioCodec;
     onSubmit(data);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="format">Output Format</Label>
           <Select value={format} onValueChange={setFormat}>
@@ -200,28 +216,121 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
               <SelectItem value="mov">MOV</SelectItem>
               <SelectItem value="avi">AVI</SelectItem>
               <SelectItem value="mkv">MKV</SelectItem>
+              <SelectItem value="flv">FLV</SelectItem>
+              <SelectItem value="mpeg">MPEG</SelectItem>
+              <SelectItem value="ts">TS</SelectItem>
+              <SelectItem value="m4v">M4V</SelectItem>
+              <SelectItem value="3gp">3GP</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="resolution">Resolution</Label>
+          <Label htmlFor="resolution">Resolution Preset</Label>
           <Select value={resolution} onValueChange={setResolution}>
             <SelectTrigger>
               <SelectValue placeholder="Keep original" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">Keep original</SelectItem>
+              <SelectItem value="144p">144p</SelectItem>
+              <SelectItem value="240p">240p</SelectItem>
+              <SelectItem value="360p">360p</SelectItem>
+              <SelectItem value="480p">480p</SelectItem>
               <SelectItem value="720p">720p</SelectItem>
               <SelectItem value="1080p">1080p</SelectItem>
-              <SelectItem value="4k">4K</SelectItem>
+              <SelectItem value="1440p">1440p</SelectItem>
+              <SelectItem value="2160p">4K (2160p)</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="fps">Frame Rate</Label>
-          <Input id="fps" type="number" placeholder="Keep original" value={fps} onChange={(e) => setFps(e.target.value)} />
+          <Label htmlFor="videoCodec">Video Codec</Label>
+          <Select value={videoCodec} onValueChange={setVideoCodec}>
+            <SelectTrigger>
+              <SelectValue placeholder="Default" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Default</SelectItem>
+              <SelectItem value="h264">H.264</SelectItem>
+              <SelectItem value="h265">H.265</SelectItem>
+              <SelectItem value="vp8">VP8</SelectItem>
+              <SelectItem value="vp9">VP9</SelectItem>
+              <SelectItem value="av1">AV1</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="customWidth">Custom Width</Label>
+          <Input id="customWidth" type="number" placeholder="e.g. 1920" value={customWidth} onChange={(e) => setCustomWidth(e.target.value)} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="customHeight">Custom Height</Label>
+          <Input id="customHeight" type="number" placeholder="e.g. 1080" value={customHeight} onChange={(e) => setCustomHeight(e.target.value)} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="audioCodec">Audio Codec</Label>
+          <Select value={audioCodec} onValueChange={setAudioCodec}>
+            <SelectTrigger>
+              <SelectValue placeholder="Default" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Default</SelectItem>
+              <SelectItem value="aac">AAC</SelectItem>
+              <SelectItem value="mp3">MP3</SelectItem>
+              <SelectItem value="opus">Opus</SelectItem>
+              <SelectItem value="ac3">AC3</SelectItem>
+              <SelectItem value="no_audio">No Audio</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="fpsPreset">Frame Rate Preset</Label>
+          <Select value={fpsPreset} onValueChange={setFpsPreset}>
+            <SelectTrigger>
+              <SelectValue placeholder="Keep original" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Keep original</SelectItem>
+              <SelectItem value="24">24 FPS (Cinema)</SelectItem>
+              <SelectItem value="25">25 FPS (PAL)</SelectItem>
+              <SelectItem value="30">30 FPS (NTSC)</SelectItem>
+              <SelectItem value="50">50 FPS</SelectItem>
+              <SelectItem value="60">60 FPS</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="customFps">Custom Frame Rate</Label>
+          <Input id="customFps" type="number" step="0.01" min="1" placeholder="e.g. 29.97" value={customFps} onChange={(e) => setCustomFps(e.target.value)} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="aspectRatioPreset">Aspect Ratio Preset</Label>
+          <Select value={aspectRatioPreset} onValueChange={setAspectRatioPreset}>
+            <SelectTrigger>
+              <SelectValue placeholder="Keep original" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Keep original</SelectItem>
+              <SelectItem value="16:9">16:9 (Widescreen)</SelectItem>
+              <SelectItem value="9:16">9:16 (Vertical)</SelectItem>
+              <SelectItem value="4:3">4:3 (Standard)</SelectItem>
+              <SelectItem value="1:1">1:1 (Square)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="customAspectRatio">Custom Aspect Ratio</Label>
+          <Input id="customAspectRatio" placeholder="e.g. 2.35:1 or 16:10" value={customAspectRatio} onChange={(e) => setCustomAspectRatio(e.target.value)} />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Format: W:H or decimal (e.g. 16:9, 2.35:1)</p>
         </div>
 
         <div className="space-y-2">
@@ -229,7 +338,7 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
           <Input id="videoBitrate" placeholder="e.g. 2M" value={videoBitrate} onChange={(e) => setVideoBitrate(e.target.value)} />
         </div>
 
-        <div className="space-y-2 sm:col-span-2">
+        <div className="space-y-2 lg:col-span-2">
           <Label htmlFor="audioBitrate">Audio Bitrate</Label>
           <Input id="audioBitrate" placeholder="e.g. 128k" value={audioBitrate} onChange={(e) => setAudioBitrate(e.target.value)} />
         </div>
