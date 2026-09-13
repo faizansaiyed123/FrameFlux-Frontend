@@ -11,20 +11,20 @@ import {
 const helpResources = [
   {
     title: 'Documentation',
-    description: 'Read the full API reference and guides',
-    href: '/docs',
+    description: 'Read the full FrameFlux guide',
+    href: '/app/dashboard/help',
     icon: BookOpen,
   },
   {
-    title: 'API Reference',
-    description: 'Explore endpoints, schemas, and examples',
-    href: '/docs/api',
+    title: 'Getting Started',
+    description: 'Upload, edit, and export your first video',
+    href: '/app/dashboard/media',
     icon: FileText,
   },
   {
     title: 'Community',
-    description: 'Join discussions and get help from other developers',
-    href: '/community',
+    description: 'Join discussions and get help from other users',
+    href: '/app/dashboard/settings',
     icon: MessageSquare,
   },
 ];
