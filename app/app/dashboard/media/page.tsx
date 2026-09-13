@@ -30,6 +30,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
+import { ResumableUploader } from '@/lib/api/resumable';
 import type { Media } from '@/types/api';
 import {
   Film,
@@ -80,10 +81,43 @@ export default function MediaPage() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<Media | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [deleting, setDeleting] = useState(false);
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+
+  const handleFileSelect = (selectedFile: File | null) => {
+    if (selectedFile) {
+      const validTypes = ['video/', 'audio/', 'image/'];
+      const isValid = validTypes.some((type) => selectedFile.type.startsWith(type));
+      if (!isValid) {
+        setError('Invalid file type. Please select a video, audio, or image file.');
+        return;
+      }
+      setFile(selectedFile);
+    }
+  };
+
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  };
 
   const fetchMedia = useCallback(async () => {
     try {
@@ -109,10 +143,15 @@ export default function MediaPage() {
     if (!file) return;
     setUploading(true);
     try {
-      const uploaded = await api.uploadMedia(file);
+      const uploader = new ResumableUploader();
+      await uploader.init(file);
+      await uploader.uploadAll((progress) => {
+        setUploadProgress(progress);
+      });
+      const media = await uploader.finalize();
       setUploadOpen(false);
       setFile(null);
-      router.push(`/app/dashboard/media/${uploaded.id}`);
+      router.push(`/app/dashboard/media/${media.id}?from_upload=1`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to upload media');
     } finally {
@@ -122,6 +161,7 @@ export default function MediaPage() {
 
   const handleDelete = async () => {
     if (!selectedMedia) return;
+    if (!confirm('Delete this media file?')) return;
     setDeleting(true);
     try {
       await api.deleteMedia(selectedMedia.id);
@@ -292,24 +332,65 @@ export default function MediaPage() {
             <DialogDescription>Upload a video, audio, or image file to process.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="file">File</Label>
-              <Input
-                id="file"
-                type="file"
-                accept="video/*,audio/*,image/*"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                disabled={uploading}
-              />
-              {file && (
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  Selected: {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                </p>
-              )}
-            </div>
+            {uploading ? (
+              <div className="space-y-2">
+                <div className="h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all" style={{ width: `${uploadProgress}%` }} />
+                </div>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 text-right">{uploadProgress}%</p>
+              </div>
+            ) : (
+              <div
+                className={cn(
+                  'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
+                  dragActive
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+                    : 'border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500'
+                )}
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+              >
+                <input
+                  id="file"
+                  type="file"
+                  accept="video/*,audio/*,image/*"
+                  onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+                  disabled={uploading}
+                  className="hidden"
+                  ref={(el) => {
+                    if (el && file === null) el.value = '';
+                  }}
+                />
+                <label
+                  htmlFor="file"
+                  className="cursor-pointer"
+                  onClick={() => document.getElementById('file')?.click()}
+                >
+                  <Upload className="mx-auto h-12 w-12 text-zinc-400 dark:text-zinc-500 mb-4" />
+                  <p className="text-lg font-medium text-zinc-900 dark:text-zinc-50 mb-1">
+                    Drag & drop a file here, or click to browse
+                  </p>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    Supports video, audio, and image files
+                  </p>
+                </label>
+                {file && (
+                  <div className="mt-4 p-3 bg-zinc-100 dark:bg-zinc-800 rounded-lg text-left">
+                    <p className="font-medium text-zinc-900 dark:text-zinc-50 truncate">
+                      {file.name}
+                    </p>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setUploadOpen(false)} disabled={uploading}>
+            <Button variant="outline" onClick={() => { setUploadOpen(false); setFile(null); }} disabled={uploading}>
               Cancel
             </Button>
             <Button onClick={handleUpload} disabled={uploading || !file}>

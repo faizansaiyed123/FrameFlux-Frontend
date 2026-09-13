@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -40,6 +40,7 @@ import { AudioExtractForm } from '@/components/dashboard/media/AudioExtractForm'
 import { ThumbnailForm } from '@/components/dashboard/media/ThumbnailForm';
 import { PreviewForm } from '@/components/dashboard/media/PreviewForm';
 import { SubtitleForm } from '@/components/dashboard/media/SubtitleForm';
+import { GifForm } from '@/components/dashboard/media/GifForm';
 import { MediaInfoSection } from '@/components/dashboard/media/MediaInfoSection';
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
@@ -72,7 +73,14 @@ function downloadBlob(blob: Blob, filename: string) {
 export default function MediaDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const mediaId = params.id as string;
+
+  useEffect(() => {
+    if (searchParams.get('from_upload') === '1') {
+      setUploadSuccess(true);
+    }
+  }, [searchParams]);
 
   const [media, setMedia] = useState<Media | null>(null);
   const [status, setStatus] = useState<MediaProcessingStatusResponse | null>(null);
@@ -83,6 +91,7 @@ export default function MediaDetailPage() {
   const [downloading, setDownloading] = useState(false);
   const [versions, setVersions] = useState<MediaVersion[]>([]);
   const [versionsLoading, setVersionsLoading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [sharePassword, setSharePassword] = useState('');
   const [shares, setShares] = useState<ShareResponse[]>([]);
@@ -97,10 +106,6 @@ export default function MediaDetailPage() {
       setMedia(mediaData);
       setStatus(statusData);
       setError(null);
-
-      if (mediaData.mime_type.startsWith('video/') || mediaData.mime_type.startsWith('audio/') || mediaData.mime_type.startsWith('image/')) {
-        setActiveTab('processing');
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load media');
     } finally {
@@ -256,6 +261,17 @@ export default function MediaDetailPage() {
 
   return (
     <div className="space-y-8">
+      {uploadSuccess && (
+        <div className="flex items-center gap-3 rounded-lg border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 p-4">
+          <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
+          <p className="text-sm font-medium text-green-700 dark:text-green-300">
+            Media uploaded successfully — {media.original_filename}
+          </p>
+          <Button variant="ghost" size="sm" onClick={() => setUploadSuccess(false)} className="ml-auto shrink-0">
+            Dismiss
+          </Button>
+        </div>
+      )}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
@@ -480,6 +496,18 @@ export default function MediaDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <SubtitleForm mediaId={mediaId} />
+                </CardContent>
+              </Card>
+            )}
+
+            {/* GIF Generation */}
+            {media.mime_type.startsWith('video/') && (
+              <Card className="border-zinc-200 dark:border-zinc-800">
+                <CardHeader>
+                  <CardTitle className="text-base">Generate GIF</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <GifForm mediaId={mediaId} />
                 </CardContent>
               </Card>
             )}
