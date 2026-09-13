@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api/client';
-import { Loader2, GitCompare, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Loader2, GitCompare, RefreshCw } from 'lucide-react';
 
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 Bytes';
