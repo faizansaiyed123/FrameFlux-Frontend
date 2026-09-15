@@ -29,6 +29,8 @@ import {
   Copy,
   History,
   Settings2,
+  Code,
+  X,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { MediaProcessing } from '@/components/dashboard/MediaProcessing';
@@ -94,8 +96,12 @@ export default function MediaDetailPage() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [sharePassword, setSharePassword] = useState('');
+  const [shareExpiresIn, setShareExpiresIn] = useState('');
+  const [shareAllowedDomains, setShareAllowedDomains] = useState('');
+  const [shareAllowDownload, setShareAllowDownload] = useState(true);
   const [shares, setShares] = useState<ShareResponse[]>([]);
   const [shareLoading, setShareLoading] = useState(false);
+  const [selectedShareEmbed, setSelectedShareEmbed] = useState<{ embed_url: string; embed_code: string; media_title: string } | null>(null);
 
   const fetchMedia = useCallback(async () => {
     try {
@@ -207,9 +213,51 @@ export default function MediaDetailPage() {
 
   const handleCreateShare = async () => {
     try {
-      await api.createShare({ media_id: mediaId, password: sharePassword || undefined, allow_download: true });
+      await api.createShare({
+        media_id: mediaId,
+        password: sharePassword || undefined,
+        expires_in_hours: shareExpiresIn ? parseInt(shareExpiresIn) : undefined,
+        allow_download: shareAllowDownload,
+        allowed_domains: shareAllowedDomains || undefined,
+      });
       setShareDialogOpen(false);
       setSharePassword('');
+      setShareExpiresIn('');
+      setShareAllowedDomains('');
+      setShareAllowDownload(true);
+      fetchShares();
+    } catch {
+      // silent
+    }
+  };
+
+  const copyShareUrl = async (token: string) => {
+    const url = `${window.location.origin}/sharing/${token}`;
+    await navigator.clipboard.writeText(url);
+  };
+
+  const copyEmbedCode = async (token: string) => {
+    try {
+      const embed = await api.getEmbed(token);
+      await navigator.clipboard.writeText(embed.embed_code);
+      setSelectedShareEmbed(embed);
+    } catch {
+      // silent
+    }
+  };
+
+  const disableShare = async (shareId: string) => {
+    try {
+      await api.disableShare(shareId);
+      fetchShares();
+    } catch {
+      // silent
+    }
+  };
+
+  const deleteShare = async (shareId: string) => {
+    try {
+      await api.deleteShare(shareId);
       fetchShares();
     } catch {
       // silent
@@ -569,10 +617,29 @@ export default function MediaDetailPage() {
                   {shares.map((share) => (
                     <div key={share.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50 truncate">{share.token}</p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {share.is_active ? 'Active' : 'Disabled'} • {share.allow_download ? 'Download allowed' : 'View only'}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50 truncate">{share.token}</p>
+                          <Badge variant={share.is_active ? 'default' : 'secondary'} className="text-xs">{share.is_active ? 'Active' : 'Disabled'}</Badge>
+                          <Badge variant="outline" className="text-xs">{share.allow_download ? 'Download' : 'View Only'}</Badge>
+                          {(share.view_count || 0) > 0 && <Badge variant="outline" className="text-xs">{share.view_count} views</Badge>}
+                        </div>
+                        {share.allowed_domains && (
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Allowed domains: {share.allowed_domains}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <Button variant="ghost" size="icon" onClick={() => copyShareUrl(share.token)} title="Copy share URL">
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => copyEmbedCode(share.token)} title="Copy embed code">
+                          <Code className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => disableShare(share.id)} disabled={!share.is_active} title="Disable">
+                          <X className="h-4 w-4 text-red-600" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => deleteShare(share.id)} title="Delete">
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -580,6 +647,42 @@ export default function MediaDetailPage() {
               )}
             </CardContent>
           </Card>
+          
+          {selectedShareEmbed && (
+            <Card className="border-zinc-200 dark:border-zinc-800 border-indigo-500/50">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  Embed Code
+                  <Button variant="ghost" size="icon" onClick={() => setSelectedShareEmbed(null)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-sm">Embed URL</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Input value={selectedShareEmbed.embed_url} readOnly />
+                    <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(selectedShareEmbed.embed_url)}>Copy</Button>
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-sm">Embed Code (iframe)</Label>
+                  <div className="flex gap-2 mt-1">
+                    <Textarea value={selectedShareEmbed.embed_code} readOnly rows={3} className="font-mono text-xs" />
+                    <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(selectedShareEmbed.embed_code)} className="self-end">Copy</Button>
+                  </div>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Paste this iframe code into your website to embed the player.</p>
+                </div>
+                <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30">
+                  <p className="text-sm font-medium mb-2">Preview:</p>
+                  <div style={{width: '100%', aspectRatio: '16/9'}}>
+                    <iframe src={selectedShareEmbed.embed_url} width="100%" height="100%" frameBorder="0" allowFullScreen></iframe>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
         <TabsContent value="metadata" className="space-y-6">
           <Card className="border-zinc-200 dark:border-zinc-800">
@@ -636,9 +739,41 @@ export default function MediaDetailPage() {
                 onChange={(e) => setSharePassword(e.target.value)}
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="expires_in">Expires in hours (optional)</Label>
+              <Input
+                id="expires_in"
+                type="number"
+                min="1"
+                placeholder="e.g., 24"
+                value={shareExpiresIn}
+                onChange={(e) => setShareExpiresIn(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="allowed_domains">Allowed domains for embed (optional, comma-separated)</Label>
+              <Input
+                id="allowed_domains"
+                type="text"
+                placeholder="example.com, test.example.com"
+                value={shareAllowedDomains}
+                onChange={(e) => setShareAllowedDomains(e.target.value)}
+              />
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Leave empty to allow embedding on any domain</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="allow_download"
+                checked={shareAllowDownload}
+                onChange={(e) => setShareAllowDownload(e.target.checked)}
+                className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <Label htmlFor="allow_download" className="mb-0">Allow download</Label>
+            </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShareDialogOpen(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => { setShareDialogOpen(false); setSharePassword(''); setShareExpiresIn(''); setShareAllowedDomains(''); setShareAllowDownload(true); }}>Cancel</Button>
             <Button onClick={handleCreateShare}>Create Link</Button>
           </DialogFooter>
         </DialogContent>
