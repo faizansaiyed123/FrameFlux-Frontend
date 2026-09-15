@@ -16,11 +16,15 @@ export function AudioExtractForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
   const [format, setFormat] = useState('mp3');
   const [bitrate, setBitrate] = useState('192k');
+  const [sampleRate, setSampleRate] = useState('');
 
   const handleExtract = async () => {
     setLoading(true);
     try {
-      const blob = await api.extractAudio(mediaId, { format, bitrate });
+      const blob = await api.extractAudio(mediaId, {
+        format, bitrate,
+        sample_rate: sampleRate ? parseInt(sampleRate) : undefined,
+      });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -51,6 +55,8 @@ export function AudioExtractForm({ mediaId }: Props) {
             <SelectItem value="flac">FLAC</SelectItem>
             <SelectItem value="ogg">OGG</SelectItem>
             <SelectItem value="m4a">M4A</SelectItem>
+            <SelectItem value="opus">Opus</SelectItem>
+            <SelectItem value="aiff">AIFF</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -67,6 +73,18 @@ export function AudioExtractForm({ mediaId }: Props) {
             <SelectItem value="320k">320 kbps</SelectItem>
           </SelectContent>
         </Select>
+      </div>
+      <div className="space-y-2">
+        <Label>Sample Rate (Hz, optional)</Label>
+        <Input
+          type="number"
+          value={sampleRate}
+          onChange={(e) => setSampleRate(e.target.value)}
+          placeholder="e.g. 44100"
+          min="8000"
+          max="384000"
+          className="text-xs h-7"
+        />
       </div>
       <Button onClick={handleExtract} disabled={loading} className="w-full">
         {loading ? (
