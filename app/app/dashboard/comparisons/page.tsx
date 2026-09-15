@@ -61,7 +61,10 @@ export default function ComparisonsPage() {
   }, []);
 
   useEffect(() => {
-    fetchMedia();
+    const timeoutId = setTimeout(() => {
+      fetchMedia();
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [fetchMedia]);
 
   const handleCompare = async () => {
