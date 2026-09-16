@@ -42,7 +42,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       signup: async (email: string, password: string, fullName?: string) => {
-        const { access_token } = await api.signup({ email, password, full_name: fullName });
+        await api.signup({ email, password, full_name: fullName });
+        const { access_token } = await api.login({ email, password });
         api.setToken(access_token);
         await get().refresh();
       },
@@ -50,6 +51,8 @@ export const useAuthStore = create<AuthState>()(
       logout: async () => {
         try {
           await api.logout();
+        } catch {
+          // Token may be expired or revoked; clear local state regardless
         } finally {
           api.setToken(null);
           set({ user: null });
@@ -61,11 +64,10 @@ export const useAuthStore = create<AuthState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user }),
       onRehydrateStorage: () => (state) => {
-        if (state) {
-          state.loading = false;
-          if (state.user) {
-            state.refresh();
-          }
+        if (state && state.user) {
+          state.refresh();
+        } else if (state) {
+          state.setLoading(false);
         }
       },
     }
