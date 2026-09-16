@@ -21,6 +21,7 @@ import {
   Heart,
   Layers,
   Settings2,
+  Zap,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -41,6 +42,7 @@ const navItems = [
   { name: 'Media Library', href: '/app/dashboard/media', icon: Film },
   { name: 'Batch', href: '/app/dashboard/batch', icon: Layers },
   { name: 'Favorites', href: '/app/dashboard/favorites', icon: Heart },
+  { name: 'Quick Actions', href: '/app/dashboard/quick-actions', icon: Zap },
   { name: 'Search', href: '/app/dashboard/search', icon: Search },
   { name: 'Workflows', href: '/app/dashboard/workflows', icon: Workflow },
   { name: 'Presets', href: '/app/dashboard/presets', icon: Settings2 },
@@ -119,9 +121,11 @@ export function Sidebar({ className }: SidebarProps) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profile
+            <DropdownMenuItem asChild>
+              <Link href="/app/dashboard/settings" className="text-zinc-700 dark:text-zinc-300">
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
