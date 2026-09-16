@@ -2,43 +2,29 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { GitBranch, MessageSquare, Mail, Link2 } from 'lucide-react';
+import { Mail, Link2 } from 'lucide-react';
 
 export function Footer() {
   const navLinks = {
     Product: [
-      { label: 'Features', href: '#features' },
+      { label: 'Features', href: '/#features' },
       { label: 'Pricing', href: '/pricing' },
-      { label: 'Documentation', href: '/docs' },
-      { label: 'API Reference', href: '/docs/api' },
       { label: 'Changelog', href: '/changelog' },
     ],
-    Company: [
-      { label: 'About', href: '/about' },
-      { label: 'Blog', href: '/blog' },
-      { label: 'Careers', href: '/careers' },
+    Support: [
+      { label: 'Help', href: '/help-center' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Press', href: '/press' },
-    ],
-    Resources: [
-      { label: 'Community', href: '/community' },
-      { label: 'Discord', href: 'https://discord.gg/frameflux' },
-      { label: 'GitHub', href: 'https://github.com/frameflux' },
       { label: 'Status', href: 'https://status.frameflux.io' },
-      { label: 'Security', href: '/security' },
     ],
     Legal: [
       { label: 'Privacy', href: '/privacy' },
       { label: 'Terms', href: '/terms' },
       { label: 'Cookie Policy', href: '/cookies' },
-      { label: 'DPA', href: '/dpa' },
     ],
   };
 
   const socialLinks = [
-    { icon: GitBranch, href: 'https://github.com/frameflux', label: 'GitHub' },
     { icon: Link2, href: 'https://linkedin.com/company/frameflux', label: 'LinkedIn' },
-    { icon: MessageSquare, href: 'https://discord.gg/frameflux', label: 'Discord' },
     { icon: Mail, href: 'mailto:hello@frameflux.io', label: 'Email' },
   ];
 
@@ -51,7 +37,7 @@ export function Footer() {
               FrameFlux
             </Link>
             <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400 max-w-xs">
-              Video processing API for developers. Build media workflows without infrastructure.
+              Professional media processing made simple. Upload, edit, and export video, audio, and images.
             </p>
             <div className="mt-6 flex gap-4">
               {socialLinks.map((social) => (
@@ -95,7 +81,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-6">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/auth/signup">Start Free</Link>
+                <Link href="/auth/signup">Get Started</Link>
               </Button>
               <Button variant="outline" size="sm" asChild>
                 <Link href="/auth/login">Sign In</Link>
