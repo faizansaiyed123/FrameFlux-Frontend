@@ -313,6 +313,8 @@ export interface ShareResponse {
   expires_at: string | null;
   is_active: boolean;
   allow_download: boolean;
+  view_count: number;
+  allowed_domains: string | null;
   created_at: string;
 }
 
