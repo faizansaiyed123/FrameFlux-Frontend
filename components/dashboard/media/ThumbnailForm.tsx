@@ -16,11 +16,19 @@ export function ThumbnailForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
   const [timestamp, setTimestamp] = useState('0');
   const [fmt, setFmt] = useState('jpg');
+  const [resolution, setResolution] = useState('original');
 
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const blob = await api.getThumbnail(mediaId, parseFloat(timestamp), undefined, undefined, fmt);
+      let width: number | undefined;
+      let height: number | undefined;
+      if (resolution !== 'original') {
+        const [w, h] = resolution.split('x').map(Number);
+        width = w;
+        height = h;
+      }
+      const blob = await api.getThumbnail(mediaId, parseFloat(timestamp), width, height, fmt);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -52,6 +60,27 @@ export function ThumbnailForm({ mediaId }: Props) {
             <SelectItem value="jpg">JPG</SelectItem>
             <SelectItem value="png">PNG</SelectItem>
             <SelectItem value="webp">WebP</SelectItem>
+            <SelectItem value="jpeg">JPEG</SelectItem>
+            <SelectItem value="bmp">BMP</SelectItem>
+            <SelectItem value="tiff">TIFF</SelectItem>
+            <SelectItem value="gif">GIF</SelectItem>
+            <SelectItem value="svg">SVG</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label>Resolution</Label>
+        <Select value={resolution} onValueChange={setResolution}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select resolution" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="original">Original</SelectItem>
+            <SelectItem value="640x360">360p (640x360)</SelectItem>
+            <SelectItem value="854x480">480p (854x480)</SelectItem>
+            <SelectItem value="1280x720">720p (1280x720)</SelectItem>
+            <SelectItem value="1920x1080">1080p (1920x1080)</SelectItem>
+            <SelectItem value="3840x2160">4K (3840x2160)</SelectItem>
           </SelectContent>
         </Select>
       </div>
