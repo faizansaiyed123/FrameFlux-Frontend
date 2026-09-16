@@ -41,6 +41,8 @@ class ApiClient {
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers,
+      credentials: 'include',
+      mode: 'cors',
     });
 
     if (!response.ok) {
@@ -819,9 +821,11 @@ class ApiClient {
     if (data.channels) query.set('channels', String(data.channels));
     if (data.quality_preset) query.set('quality_preset', data.quality_preset);
     const qs = query.toString();
-    return this.request<Blob>(`/audio/${mediaId}/extract${qs ? `?${qs}` : ''}`, {
-      headers: {},
+    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/extract${qs ? `?${qs}` : ''}`, {
+      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
     });
+    if (!response.ok) throw new Error('Failed to extract audio');
+    return response.blob();
   }
 
   async adjustVolume(mediaId: string, volume: number, fadeIn?: number, fadeOut?: number) {
@@ -838,6 +842,28 @@ class ApiClient {
     });
   }
 
+  async syncAudioVideo(mediaId: string, data: {
+    audio_path: string;
+    audio_offset?: number;
+    video_duration?: number;
+    audio_duration?: number;
+    fade_in?: number;
+    fade_out?: number;
+    volume?: number;
+    mix?: boolean;
+    mix_volume?: number;
+    output_format?: 'mp4' | 'webm';
+  }) {
+    return this.request<{
+      output_filename: string;
+      operation: string;
+      media_id: string;
+    }>(`/audio/${mediaId}/sync-audio`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
   async convertAudio(mediaId: string, data: {
     format: string;
     bitrate?: string;
@@ -845,10 +871,23 @@ class ApiClient {
     channels?: number;
     quality?: string;
   }) {
-    return this.request<Blob>(`/audio/${mediaId}/convert`, {
+    const query = new URLSearchParams();
+    if (data.format) query.set('format', data.format);
+    if (data.bitrate) query.set('bitrate', data.bitrate);
+    if (data.sample_rate) query.set('sample_rate', String(data.sample_rate));
+    if (data.channels) query.set('channels', String(data.channels));
+    if (data.quality) query.set('quality', data.quality);
+    const qs = query.toString();
+    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/convert${qs ? `?${qs}` : ''}`, {
       method: 'POST',
       body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
     });
+    if (!response.ok) throw new Error('Failed to convert audio');
+    return response.blob();
   }
 
   async editAudio(mediaId: string, data: {
@@ -881,10 +920,16 @@ class ApiClient {
     duration?: number;
     output_format?: string;
   }) {
-    return this.request<Blob>(`/audio/${mediaId}/to-video`, {
+    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/to-video`, {
       method: 'POST',
       body: JSON.stringify(data),
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
     });
+    if (!response.ok) throw new Error('Failed to convert audio to video');
+    return response.blob();
   }
 
   // Thumbnails
@@ -1269,6 +1314,14 @@ class ApiClient {
     }>(`/media/${mediaId}/versions/${versionId}`);
   }
 
+  async getMediaVersionFile(mediaId: string, versionId: string) {
+    const response = await fetch(`${this.baseUrl}/media/${mediaId}/versions/${versionId}/download`, {
+      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+    });
+    if (!response.ok) throw new Error('Failed to fetch version file');
+    return response.blob();
+  }
+
   async deleteMediaVersion(mediaId: string, versionId: string) {
     return this.request<void>(`/media/${mediaId}/versions/${versionId}`, { method: 'DELETE' });
   }
@@ -1310,7 +1363,7 @@ class ApiClient {
   }
 
   // Sharing
-  async createShare(data: { media_id: string; password?: string; expires_in_hours?: number; allow_download?: boolean }) {
+  async createShare(data: { media_id: string; password?: string; expires_in_hours?: number; allow_download?: boolean; allowed_domains?: string }) {
     return this.request<{
       id: string;
       media_id: string;
@@ -1319,6 +1372,8 @@ class ApiClient {
       expires_at: string | null;
       is_active: boolean;
       allow_download: boolean;
+      view_count: number;
+      allowed_domains: string | null;
       created_at: string;
     }>('/sharing', {
       method: 'POST',
@@ -1335,6 +1390,8 @@ class ApiClient {
       expires_at: string | null;
       is_active: boolean;
       allow_download: boolean;
+      view_count: number;
+      allowed_domains: string | null;
       created_at: string;
     }>(`/sharing/${token}`);
   }
@@ -1348,8 +1405,18 @@ class ApiClient {
       expires_at: string | null;
       is_active: boolean;
       allow_download: boolean;
+      view_count: number;
+      allowed_domains: string | null;
       created_at: string;
     }[]>('/sharing');
+  }
+
+  async getEmbed(token: string) {
+    return this.request<{
+      embed_url: string;
+      embed_code: string;
+      media_title: string;
+    }>(`/sharing/embed/${token}`);
   }
 
   async deleteShare(shareId: string) {
