@@ -41,7 +41,7 @@ function formatSize(bytes: number) {
 
 export function Hero() {
   const router = useRouter();
-  const { user, login, signup, loading: authLoading } = useAuth();
+  const { user, login, signup, loading: authLoadingState } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null); const uploaderRef = useRef<ResumableUploader | null>(null);
   const [file, setFile] = useState<DetectedFile | null>(null); const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState(''); const [uploading, setUploading] = useState(false); const [progress, setProgress] = useState(0); const [paused, setPaused] = useState(false);
@@ -73,7 +73,7 @@ export function Hero() {
     finally { setAuthLoading(false); }
   };
 
-  if (authLoading) return <section className="min-h-[80vh] flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-indigo-600" /></section>;
+  if (authLoadingState) return <section className="min-h-[80vh] flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-indigo-600" /></section>;
 
   return (
     <>
