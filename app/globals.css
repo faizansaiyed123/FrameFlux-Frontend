@@ -21,6 +21,38 @@ html { scroll-behavior: smooth; }
 body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
 ::selection { background: rgba(99, 102, 241, 0.18); }
 
+/* Native action buttons should look clickable. Existing shadcn/Radix controls
+   expose data-slot and keep their own component styling. */
+button:not([data-slot]) {
+  cursor: pointer;
+  transition: border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+button:not([data-slot]):not(:disabled) {
+  border: 1px solid #e4e4e7;
+  border-radius: .55rem;
+  background: rgba(255,255,255,.86);
+}
+button:not([data-slot]):not(:disabled):hover {
+  background: #fafafa;
+  border-color: #d4d4d8;
+  box-shadow: 0 3px 10px rgba(24,24,27,.06);
+}
+button:not([data-slot]):not(:disabled):active { transform: translateY(1px); }
+button:not([data-slot]):focus-visible {
+  outline: none;
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(99,102,241,.14);
+}
+.dark button:not([data-slot]):not(:disabled) {
+  border-color: #3f3f46;
+  background: rgba(24,24,27,.78);
+}
+.dark button:not([data-slot]):not(:disabled):hover {
+  background: #27272a;
+  border-color: #52525b;
+  box-shadow: 0 3px 10px rgba(0,0,0,.18);
+}
+
 @layer utilities {
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-hide::-webkit-scrollbar { display: none; }
