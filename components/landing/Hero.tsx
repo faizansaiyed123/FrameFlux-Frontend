@@ -1,562 +1,142 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Upload, Film, Music, Image, FileText, Eye, EyeOff, Mail, Lock, User, Play, Scissors, Merge, Download, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { api } from '@/lib/api/client';
 import { ResumableUploader } from '@/lib/api/resumable';
-import type { Media } from '@/types/api';
+import { ArrowRight, Check, Film, FileAudio, FileImage, FileText, Loader2, LockKeyhole, Mail, Play, Sparkles, Upload, User, X } from 'lucide-react';
 
 type MediaCategory = 'video' | 'audio' | 'image' | 'subtitle';
+interface DetectedFile { file: File; category: MediaCategory; icon: React.ElementType; }
 
-interface DetectedFile {
-  file: File;
-  category: MediaCategory;
-  icon: React.ElementType;
-}
-
-const VIDEO_EXTENSIONS = new Set(['.mp4', '.mov', '.avi', '.mkv', '.webm']);
-const AUDIO_EXTENSIONS = new Set(['.mp3', '.wav', '.m4a', '.aiff', '.aif', '.wma', '.ogg', '.flac', '.opus']);
-const IMAGE_EXTENSIONS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tiff', '.tif']);
-const SUBTITLE_EXTENSIONS = new Set(['.srt', '.vtt', '.ass']);
-
-const ALLOWED_EXTENSIONS = new Set([
-  ...VIDEO_EXTENSIONS,
-  ...AUDIO_EXTENSIONS,
-  ...IMAGE_EXTENSIONS,
-  ...SUBTITLE_EXTENSIONS,
-]);
-
-const CATEGORY_ICONS: Record<MediaCategory, React.ElementType> = {
-  video: Film,
-  audio: Music,
-  image: Image,
-  subtitle: FileText,
+const EXTENSIONS: Record<MediaCategory, Set<string>> = {
+  video: new Set(['.mp4', '.mov', '.avi', '.mkv', '.webm']),
+  audio: new Set(['.mp3', '.wav', '.m4a', '.aiff', '.aif', '.wma', '.ogg', '.flac', '.opus']),
+  image: new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tiff', '.tif']),
+  subtitle: new Set(['.srt', '.vtt', '.ass']),
 };
+const ICONS: Record<MediaCategory, React.ElementType> = { video: Film, audio: FileAudio, image: FileImage, subtitle: FileText };
+const ACCEPT = Object.values(EXTENSIONS).flatMap((set) => [...set]).join(',');
+const FEATURES = [
+  ['Instant processing', 'Upload media and get to work immediately.'],
+  ['Resumable uploads', 'Large files continue safely when connections drop.'],
+  ['One focused workspace', 'Edit, convert, compress, and export in one place.'],
+];
 
-function detectMediaType(filename: string): MediaCategory | null {
-  const ext = filename.slice(filename.lastIndexOf('.')).toLowerCase();
-  if (VIDEO_EXTENSIONS.has(ext)) return 'video';
-  if (AUDIO_EXTENSIONS.has(ext)) return 'audio';
-  if (IMAGE_EXTENSIONS.has(ext)) return 'image';
-  if (SUBTITLE_EXTENSIONS.has(ext)) return 'subtitle';
+function detectMediaType(name: string): MediaCategory | null {
+  const ext = name.slice(name.lastIndexOf('.')).toLowerCase();
+  for (const [category, extensions] of Object.entries(EXTENSIONS) as [MediaCategory, Set<string>][]) if (extensions.has(ext)) return category;
   return null;
 }
-
-function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+function formatSize(bytes: number) {
+  if (!bytes) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB']; const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
+  return `${(bytes / 1024 ** i).toFixed(i ? 1 : 0)} ${units[i]}`;
 }
-
-const FEATURE_CARDS = [
-  { icon: Scissors, title: 'Trim & Cut', description: 'Frame-accurate video editing with timeline' },
-  { icon: Merge, title: 'Merge & Split', description: 'Combine clips or divide at any point' },
-  { icon: Sparkles, title: 'Convert', description: 'Change format, resolution, and quality' },
-  { icon: Download, title: 'Compress', description: 'Reduce file size while preserving quality' },
-  { icon: Music, title: 'Audio', description: 'Extract, replace, and mix audio tracks' },
-  { icon: Film, title: 'Subtitles', description: 'Burn or keep selectable subtitle tracks' },
-];
 
 export function Hero() {
   const router = useRouter();
-  const { user, signup, login, loading: authLoading } = useAuth();
+  const { user, login, signup, loading: authLoading } = useAuth();
+  const inputRef = useRef<HTMLInputElement>(null); const uploaderRef = useRef<ResumableUploader | null>(null);
+  const [file, setFile] = useState<DetectedFile | null>(null); const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState(''); const [uploading, setUploading] = useState(false); const [progress, setProgress] = useState(0); const [paused, setPaused] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false); const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [fullName, setFullName] = useState(''); const [authError, setAuthError] = useState(''); const [authLoading, setAuthLoading] = useState(false);
 
-  const [dragOver, setDragOver] = useState(false);
-  const [detectedFile, setDetectedFile] = useState<DetectedFile | null>(null);
-  const [uploadError, setUploadError] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [uploadState, setUploadState] = useState<'idle' | 'uploading' | 'processing'>('idle');
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadPaused, setUploadPaused] = useState(false);
-  const uploaderRef = useRef<ResumableUploader | null>(null);
-
-  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
-  const [authEmail, setAuthEmail] = useState('');
-  const [authPassword, setAuthPassword] = useState('');
-  const [authFullName, setAuthFullName] = useState('');
-  const [authSubmitting, setAuthSubmitting] = useState(false);
-  const [authError, setAuthError] = useState('');
-  const [showAuth, setShowAuth] = useState(false);
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const processFile = useCallback((file: File) => {
-    setUploadError('');
-
-    const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-    if (!ext || !ALLOWED_EXTENSIONS.has(ext)) {
-      setUploadError(`Unsupported file type. Supported: ${[...ALLOWED_EXTENSIONS].join(', ')}`);
-      setDetectedFile(null);
-      return;
-    }
-
-    const category = detectMediaType(file.name);
-    if (!category) {
-      setUploadError('Could not detect media type from filename.');
-      setDetectedFile(null);
-      return;
-    }
-
-    setDetectedFile({ file, category, icon: CATEGORY_ICONS[category] });
+  const selectFile = useCallback((candidate: File) => {
+    setError(''); const category = detectMediaType(candidate.name);
+    if (!category) { setFile(null); setError('Unsupported file type. Please choose a supported media file.'); return; }
+    setFile({ file: candidate, category, icon: ICONS[category] });
   }, []);
 
-  const handleUpload = useCallback(async (file: File) => {
-    setUploading(true);
-    setUploadState('uploading');
-    setUploadError('');
-    setUploadProgress(0);
-    setUploadPaused(false);
-
-    const uploader = new ResumableUploader();
-    uploaderRef.current = uploader;
-
+  const upload = useCallback(async (candidate: File) => {
+    setUploading(true); setProgress(0); setError('');
+    const uploader = new ResumableUploader(); uploaderRef.current = uploader;
     try {
-      await uploader.init(file);
-      setUploadState('uploading');
-
-      await uploader.uploadAll((progress) => {
-        setUploadProgress(progress);
-      });
-
+      await uploader.init(candidate);
+      await uploader.uploadAll((value) => setProgress(value));
       const media = await uploader.finalize();
-      setUploadState('processing');
       router.push(`/app/dashboard/media/${media.id}?from_upload=1`);
-    } catch (err) {
-      setUploadState('idle');
-      setUploadError(err instanceof Error ? err.message : 'Upload failed. Please try again.');
-    } finally {
-      setUploading(false);
-    }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Upload failed. Please try again.'); setUploading(false); }
   }, [router]);
 
-  const handlePauseUpload = useCallback(async () => {
-    const uploader = uploaderRef.current;
-    if (!uploader) return;
-    if (uploadPaused) {
-      await uploader.resume();
-      setUploadPaused(false);
-    } else {
-      await uploader.pause();
-      setUploadPaused(true);
-    }
-  }, [uploadPaused]);
-
-  const handleCancelUpload = useCallback(async () => {
-    const uploader = uploaderRef.current;
-    if (!uploader) return;
-    await uploader.cancel();
-    setUploading(false);
-    setUploadState('idle');
-    setUploadProgress(0);
-    setUploadPaused(false);
-    setUploadError('Upload cancelled');
-  }, []);
-
-  const handleAuthAndUpload = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError('');
-    setAuthSubmitting(true);
-
-    try {
-      if (authMode === 'signup') {
-        await signup(authEmail, authPassword, authFullName || undefined);
-      } else {
-        await login(authEmail, authPassword);
-      }
-
-      if (detectedFile) {
-        setShowAuth(false);
-        await handleUpload(detectedFile.file);
-      }
-    } catch (err) {
-      setAuthError(err instanceof Error ? err.message : 'Authentication failed');
-    } finally {
-      setAuthSubmitting(false);
-    }
-  }, [authMode, authEmail, authPassword, authFullName, signup, login, detectedFile, handleUpload]);
-
-  const handleFileSelect = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    processFile(files[0]);
+  const startUpload = () => { if (!file) { inputRef.current?.click(); return; } if (!user) { setAuthOpen(true); return; } upload(file.file); };
+  const submitAuth = async (e: React.FormEvent) => {
+    e.preventDefault(); setAuthError(''); setAuthLoading(true);
+    try { if (authMode === 'signup') await signup(email, password, fullName || undefined); else await login(email, password); setAuthOpen(false); if (file) await upload(file.file); }
+    catch (err) { setAuthError(err instanceof Error ? err.message : 'Authentication failed'); }
+    finally { setAuthLoading(false); }
   };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragOver(false);
-    handleFileSelect(e.dataTransfer.files);
-  };
+  if (authLoading) return <section className="min-h-[80vh] flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-indigo-600" /></section>;
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragOver(true);
-  };
+  return (
+    <>
+      <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
+        <div className="absolute inset-0 ff-grid opacity-60 dark:opacity-30" />
+        <div className="absolute left-1/2 top-24 h-96 w-96 -translate-x-1/2 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-24 sm:px-8 lg:pb-28 lg:pt-28">
+          <div className="mx-auto max-w-4xl text-center">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-3.5 py-1.5 text-xs font-medium text-zinc-600 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-300"><Sparkles className="h-3.5 w-3.5 text-indigo-500" /> Professional media processing, simplified</div>
+            <h1 className="text-5xl font-semibold tracking-[-0.055em] text-zinc-950 sm:text-6xl lg:text-7xl dark:text-white">Turn raw media into<br /><span className="text-indigo-600 dark:text-indigo-400">finished work.</span></h1>
+            <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-zinc-500 sm:text-lg dark:text-zinc-400">Upload video, audio, images, or subtitles. FrameFlux gives you the tools to process, transform, and export without the usual setup.</p>
+          </div>
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragOver(false);
-  };
+          <div className="mx-auto mt-12 max-w-4xl">
+            <div className="rounded-2xl border border-zinc-200 bg-white p-2 shadow-[0_24px_70px_-35px_rgba(24,24,27,.35)] dark:border-zinc-800 dark:bg-zinc-900">
+              {uploading ? (
+                <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-6 py-14 text-center dark:border-zinc-800 dark:bg-zinc-950">
+                  <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400"><Loader2 className="h-5 w-5 animate-spin" /></div>
+                  <h3 className="font-medium text-zinc-950 dark:text-white">Uploading {file?.file.name}</h3>
+                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{progress}% complete</p>
+                  <div className="mx-auto mt-6 h-2 max-w-md overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800"><div className="h-full rounded-full bg-indigo-600 transition-all dark:bg-indigo-500" style={{ width: `${progress}%` }} /></div>
+                  <div className="mt-5 flex justify-center gap-2"><Button variant="outline" size="sm" onClick={async () => { const u = uploaderRef.current; if (!u) return; if (paused) await u.resume(); else await u.pause(); setPaused(!paused); }}>{paused ? 'Resume' : 'Pause'}</Button><Button variant="ghost" size="sm" onClick={async () => { await uploaderRef.current?.cancel(); setUploading(false); setProgress(0); setPaused(false); setError('Upload cancelled'); }}>Cancel</Button></div>
+                </div>
+              ) : file ? (
+                <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 px-6 py-10 dark:border-indigo-900/60 dark:bg-indigo-950/20">
+                  <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:text-left">
+                    <div className="flex items-center gap-4"><div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm dark:bg-zinc-900 dark:text-indigo-400"><file.icon className="h-7 w-7" /></div><div><p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">{file.category} ready</p><h3 className="mt-1 max-w-lg truncate font-semibold text-zinc-950 dark:text-white">{file.file.name}</h3><p className="mt-1 text-sm text-zinc-500">{formatSize(file.file.size)}</p></div></div>
+                    <div className="flex shrink-0 gap-2"><Button variant="outline" onClick={() => { setFile(null); setError(''); }}>Change</Button><Button onClick={startUpload}><Upload className="mr-2 h-4 w-4" /> {user ? 'Upload & open' : 'Continue'}<ArrowRight className="ml-2 h-4 w-4" /></Button></div>
+                  </div>
+                </div>
+              ) : (
+                <div className={`rounded-xl border-2 border-dashed px-6 py-14 text-center transition-all sm:py-16 ${dragOver ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/20' : 'border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700'}`} onDrop={(e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files[0]) selectFile(e.dataTransfer.files[0]); }} onDragOver={(e) => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)}>
+                  <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"><Upload className="h-6 w-6" /></div>
+                  <h2 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">Drop your media here</h2><p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500 dark:text-zinc-400">Video, audio, images, and subtitles. We’ll detect the format automatically.</p>
+                  <input ref={inputRef} type="file" className="hidden" accept={ACCEPT} onChange={(e) => e.target.files?.[0] && selectFile(e.target.files[0])} />
+                  <Button className="mt-6 h-10 rounded-lg px-5" onClick={startUpload}>Choose a file <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                  <p className="mt-4 text-[11px] text-zinc-400">Secure upload · Resumable · No setup required</p>
+                </div>
+              )}
+            </div>
+            {error && <Alert className="mt-4 border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"><AlertDescription>{error}</AlertDescription></Alert>}
+          </div>
 
-  const handleUploadClick = () => {
-    if (!detectedFile) {
-      fileInputRef.current?.click();
-      return;
-    }
-
-    if (!user) {
-      setShowAuth(true);
-      return;
-    }
-
-    handleUpload(detectedFile.file);
-  };
-
-  const handleReset = () => {
-    setDetectedFile(null);
-    setUploadError('');
-  };
-
-  if (authLoading) {
-    return (
-      <section className="py-32 lg:pt-48 lg:pb-32 min-h-[500px] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto mb-4" />
-          <p className="text-zinc-600 dark:text-zinc-400">Loading...</p>
+          <div id="features" className="mx-auto mt-12 grid max-w-4xl gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-800 md:grid-cols-3">
+            {FEATURES.map(([title, description]) => <div key={title} className="bg-white px-6 py-5 dark:bg-zinc-950"><div className="mb-3 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900"><Check className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" /></div><h3 className="text-sm font-semibold text-zinc-950 dark:text-white">{title}</h3><p className="mt-1.5 text-xs leading-5 text-zinc-500 dark:text-zinc-400">{description}</p></div>)}
+          </div>
+          <p className="mt-6 text-center text-xs text-zinc-400">{user ? <Link href="/app/dashboard/media" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">Browse your media library →</Link> : <>Already have an account? <Link href="/auth/login" className="font-medium text-zinc-700 hover:underline dark:text-zinc-200">Sign in</Link></>}</p>
         </div>
       </section>
-    );
-  }
 
-  return (
-    <section className="py-12 lg:py-20 min-h-screen flex items-center">
-      <div className="mx-auto max-w-4xl w-full px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mb-6">
-            Professional Media Processing
-            <br />
-            <span className="text-indigo-600 dark:text-indigo-400">Made Simple</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            Upload video, audio, images, or subtitles. We detect your media type and open
-            the right workspace so you can edit, convert, and export without any setup.
-          </p>
+      {authOpen && <div className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 px-4 backdrop-blur-sm" role="dialog" aria-modal="true">
+        <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-7 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="flex items-start justify-between"><div><div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950"><LockKeyhole className="h-4 w-4" /></div><h2 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">{authMode === 'signup' ? 'Create your account' : 'Welcome back'}</h2><p className="mt-1 text-sm text-zinc-500">Sign in to continue with your upload.</p></div><button onClick={() => setAuthOpen(false)} className="text-zinc-400 hover:text-zinc-700 dark:hover:text-white" aria-label="Close"><X className="h-5 w-5" /></button></div>
+          {authError && <Alert className="mt-5 border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"><AlertDescription>{authError}</AlertDescription></Alert>}
+          <form onSubmit={submitAuth} className="mt-6 space-y-4">
+            {authMode === 'signup' && <div className="space-y-2"><Label htmlFor="hero-name">Full name</Label><div className="relative"><User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" /><Input id="hero-name" value={fullName} onChange={(e) => setFullName(e.target.value)} className="h-11 pl-9" disabled={authLoading} /></div></div>}
+            <div className="space-y-2"><Label htmlFor="hero-email">Email</Label><div className="relative"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" /><Input id="hero-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="h-11 pl-9" required disabled={authLoading} /></div></div>
+            <div className="space-y-2"><Label htmlFor="hero-password">Password</Label><Input id="hero-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="h-11" required minLength={8} disabled={authLoading} /></div>
+            <Button className="h-11 w-full rounded-lg" disabled={authLoading}>{authLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...</> : authMode === 'signup' ? 'Create account & upload' : 'Sign in & upload'}</Button>
+          </form>
+          <p className="mt-5 text-center text-xs text-zinc-500">{authMode === 'signup' ? 'Already have an account?' : 'New to FrameFlux?'} <button type="button" onClick={() => { setAuthMode(authMode === 'signup' ? 'login' : 'signup'); setAuthError(''); }} className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">{authMode === 'signup' ? 'Sign in' : 'Create account'}</button></p>
         </div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-          {FEATURE_CARDS.map((card) => (
-            <div key={card.title} className="border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 text-center hover:border-indigo-200 dark:hover:border-indigo-900/30 transition-colors">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 mx-auto mb-3">
-                <card.icon className="h-5 w-5" />
-              </div>
-              <h3 className="font-medium text-zinc-900 dark:text-zinc-50 mb-1">{card.title}</h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">{card.description}</p>
-            </div>
-          ))}
-        </div>
-
-        {uploading ? (
-          <div className="text-center py-16 space-y-4">
-            <Loader2 className="h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400 mx-auto mb-4" />
-            <p className="text-zinc-600 dark:text-zinc-400">
-              {uploadState === 'processing'
-                ? `Processing ${detectedFile?.file.name}...`
-                : `Uploading ${detectedFile?.file.name}...`}
-            </p>
-            <div className="max-w-xs mx-auto">
-              <div className="h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-                <div className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all" style={{ width: `${uploadProgress}%` }} />
-              </div>
-              <p className="text-[10px] text-zinc-400 mt-1 text-right">{uploadProgress}%</p>
-            </div>
-            <div className="flex justify-center gap-2">
-              <Button variant="outline" size="sm" onClick={handlePauseUpload}>
-                {uploadPaused ? 'Resume' : 'Pause'}
-              </Button>
-              <Button variant="destructive" size="sm" onClick={handleCancelUpload}>
-                Cancel
-              </Button>
-            </div>
-          </div>
-        ) : detectedFile ? (
-          <div className="border-2 border-dashed border-indigo-200 dark:border-indigo-900/30 rounded-xl p-8 text-center bg-indigo-50/30 dark:bg-indigo-900/10">
-            <div className="flex items-center justify-center mb-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
-                {(() => {
-                  const Icon = detectedFile.icon;
-                  return <Icon className="h-8 w-8" />;
-                })()}
-              </div>
-            </div>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2 capitalize">
-              {detectedFile.category} file ready to process
-            </h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4 break-all">
-              {detectedFile.file.name}
-            </p>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-              {formatFileSize(detectedFile.file.size)}
-            </p>
-            <div className="flex justify-center gap-4">
-              <Button variant="outline" onClick={handleReset} disabled={uploading}>
-                Choose another file
-              </Button>
-              <Button onClick={handleUploadClick} disabled={uploading}>
-                {uploading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {uploadState === 'processing' ? 'Processing...' : 'Uploading...'}
-                  </>
-                ) : user ? (
-                  <>
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload and open workspace
-                  </>
-                ) : (
-                  <>
-                    <ArrowRight className="mr-2 h-4 w-4" />
-                    Continue with sign in
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div
-            className={`border-2 border-dashed rounded-xl p-12 text-center transition-all ${
-              dragOver
-                ? 'border-indigo-400 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-900/10'
-                : 'border-zinc-200 dark:border-zinc-800 hover:border-indigo-200 dark:hover:border-indigo-900/30'
-            }`}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-          >
-            <Upload className="h-12 w-12 text-zinc-400 dark:text-zinc-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
-              Drag & drop your media file
-            </h3>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-6 max-w-md mx-auto">
-              Video, audio, images, and subtitles. We'll detect the type and open the right workspace.
-            </p>
-            <label className="inline-flex items-center px-6 py-3 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors">
-              <input
-                type="file"
-                className="hidden"
-                ref={fileInputRef}
-                accept={[...ALLOWED_EXTENSIONS].join(',')}
-                onChange={(e) => handleFileSelect(e.target.files)}
-              />
-              <Upload className="mr-2 h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-              Choose file
-            </label>
-          </div>
-        )}
-
-        {uploadError && (
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mt-6">
-            <AlertDescription>{uploadError}</AlertDescription>
-          </Alert>
-        )}
-
-        {user ? (
-          <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-8">
-            Or{' '}
-            <Link href="/app/dashboard/media" className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
-              browse your media library
-            </Link>
-          </p>
-        ) : (
-          <p className="text-center text-sm text-zinc-600 dark:text-zinc-400 mt-8">
-            <Link href="/auth/login" className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
-              Sign in
-            </Link>{' '}
-            or{' '}
-            <Link href="/auth/signup" className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
-              create an account
-            </Link>{' '}
-            to save your work to the cloud.
-          </p>
-        )}
-      </div>
-
-      <AuthModal
-        open={showAuth}
-        mode={authMode}
-        email={authEmail}
-        password={authPassword}
-        fullName={authFullName}
-        loading={authSubmitting}
-        error={authError}
-        onEmailChange={setAuthEmail}
-        onPasswordChange={setAuthPassword}
-        onFullNameChange={setAuthFullName}
-        onModeChange={setAuthMode}
-        onSubmit={handleAuthAndUpload}
-        onClose={() => setShowAuth(false)}
-      />
-    </section>
-  );
-}
-
-interface AuthModalProps {
-  open: boolean;
-  mode: 'login' | 'signup';
-  email: string;
-  password: string;
-  fullName: string;
-  loading: boolean;
-  error: string;
-  onEmailChange: (v: string) => void;
-  onPasswordChange: (v: string) => void;
-  onFullNameChange: (v: string) => void;
-  onModeChange: (v: 'login' | 'signup') => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onClose: () => void;
-}
-
-function AuthModal({
-  open,
-  mode,
-  email,
-  password,
-  fullName,
-  loading,
-  error,
-  onEmailChange,
-  onPasswordChange,
-  onFullNameChange,
-  onModeChange,
-  onSubmit,
-  onClose,
-}: AuthModalProps) {
-  if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            {mode === 'signup' ? 'Create your account' : 'Sign in to your account'}
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-            aria-label="Close"
-          >
-            ×
-          </button>
-        </div>
-
-        {error && (
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mb-4">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <form onSubmit={onSubmit} className="space-y-4">
-          {mode === 'signup' && (
-            <div className="space-y-2">
-              <Label htmlFor="auth_full_name">Full Name</Label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-                <Input
-                  id="auth_full_name"
-                  type="text"
-                  placeholder="Jane Doe"
-                  value={fullName}
-                  onChange={(e) => onFullNameChange(e.target.value)}
-                  className="pl-10"
-                  disabled={loading}
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="auth_email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-              <Input
-                id="auth_email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => onEmailChange(e.target.value)}
-                className="pl-10"
-                required
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="auth_password">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-              <Input
-                id="auth_password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => onPasswordChange(e.target.value)}
-                className="pl-10"
-                required
-                minLength={8}
-                disabled={loading}
-              />
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-500">At least 8 characters</p>
-          </div>
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {mode === 'signup' ? 'Creating account...' : 'Signing in...'}
-              </>
-            ) : (
-              mode === 'signup' ? 'Create account & upload' : 'Sign in & upload'
-            )}
-          </Button>
-
-          <div className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-            {mode === 'signup' ? (
-              <>
-                Already have an account?{' '}
-                <button
-                  type="button"
-                  onClick={() => onModeChange('login')}
-                  className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
-                >
-                  Sign in
-                </button>
-              </>
-            ) : (
-              <>
-                New to FrameFlux?{' '}
-                <button
-                  type="button"
-                  onClick={() => onModeChange('signup')}
-                  className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
-                >
-                  Create account
-                </button>
-              </>
-            )}
-          </div>
-        </form>
-      </div>
-    </div>
+      </div>}
+    </>
   );
 }
