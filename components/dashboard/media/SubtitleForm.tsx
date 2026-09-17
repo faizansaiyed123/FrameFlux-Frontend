@@ -173,7 +173,7 @@ export function SubtitleForm({ mediaId }: Props) {
         <div className="space-y-2">
           <Label>Subtitle File</Label>
           <div
-            className={`border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-colors ${
+            className={`relative border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-colors ${
               dragActive ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20' : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
             }`}
             onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setDragActive(true); }}
