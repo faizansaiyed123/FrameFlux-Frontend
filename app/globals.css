@@ -3,6 +3,22 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --radius-sm: calc(var(--radius) - 4px);
@@ -11,46 +27,112 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-:root { --background: #ffffff; --foreground: #18181b; --radius: 0.65rem; }
-.dark { --background: #08080a; --foreground: #fafafa; }
-@media (prefers-color-scheme: dark) { :root:not(.light) { --background: #08080a; --foreground: #fafafa; } }
+:root {
+  --background: #ffffff;
+  --foreground: #18181b;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2ff;
+  --secondary-foreground: #3730a3;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #eef2ff;
+  --accent-foreground: #3730a3;
+  --destructive: #dc2626;
+  --border: #e4e4e7;
+  --input: #e4e4e7;
+  --ring: #818cf8;
+  --radius: 0.65rem;
+}
 
-* { border-color: #e4e4e7; }
-.dark * { border-color: #27272a; }
+.dark {
+  --background: #08080a;
+  --foreground: #fafafa;
+  --card: #111113;
+  --card-foreground: #fafafa;
+  --popover: #111113;
+  --popover-foreground: #fafafa;
+  --primary: #818cf8;
+  --primary-foreground: #171717;
+  --secondary: #27272a;
+  --secondary-foreground: #e0e7ff;
+  --muted: #18181b;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #e0e7ff;
+  --destructive: #ef4444;
+  --border: #27272a;
+  --input: #3f3f46;
+  --ring: #818cf8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: #08080a;
+    --foreground: #fafafa;
+    --card: #111113;
+    --card-foreground: #fafafa;
+    --popover: #111113;
+    --popover-foreground: #fafafa;
+    --primary: #818cf8;
+    --primary-foreground: #171717;
+    --secondary: #27272a;
+    --secondary-foreground: #e0e7ff;
+    --muted: #18181b;
+    --muted-foreground: #a1a1aa;
+    --accent: #27272a;
+    --accent-foreground: #e0e7ff;
+    --destructive: #ef4444;
+    --border: #27272a;
+    --input: #3f3f46;
+    --ring: #818cf8;
+  }
+}
+
+* { border-color: var(--border); }
 html { scroll-behavior: smooth; }
 body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
 ::selection { background: rgba(99, 102, 241, 0.18); }
 
-/* Native action buttons should look clickable. Existing shadcn/Radix controls
-   expose data-slot and keep their own component styling. */
+/* Native buttons receive a clear, restrained secondary treatment. Primary
+   actions should use the shared Button component for stronger visual hierarchy. */
 button:not([data-slot]) {
   cursor: pointer;
   transition: border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 button:not([data-slot]):not(:disabled) {
-  border: 1px solid #e4e4e7;
-  border-radius: .55rem;
-  background: rgba(255,255,255,.86);
+  border: 1px solid var(--border);
+  border-radius: .6rem;
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: 0 1px 2px rgba(24,24,27,.04);
 }
 button:not([data-slot]):not(:disabled):hover {
-  background: #fafafa;
-  border-color: #d4d4d8;
-  box-shadow: 0 3px 10px rgba(24,24,27,.06);
+  background: var(--accent);
+  border-color: #a5b4fc;
+  color: var(--accent-foreground);
+  box-shadow: 0 4px 12px rgba(79,70,229,.10);
 }
 button:not([data-slot]):not(:disabled):active { transform: translateY(1px); }
 button:not([data-slot]):focus-visible {
   outline: none;
-  border-color: #818cf8;
-  box-shadow: 0 0 0 3px rgba(99,102,241,.14);
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(99,102,241,.16);
 }
 .dark button:not([data-slot]):not(:disabled) {
-  border-color: #3f3f46;
-  background: rgba(24,24,27,.78);
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: 0 1px 2px rgba(0,0,0,.18);
 }
 .dark button:not([data-slot]):not(:disabled):hover {
-  background: #27272a;
-  border-color: #52525b;
-  box-shadow: 0 3px 10px rgba(0,0,0,.18);
+  background: var(--accent);
+  border-color: #6366f1;
+  color: var(--accent-foreground);
+  box-shadow: 0 4px 14px rgba(99,102,241,.12);
 }
 
 @layer utilities {
