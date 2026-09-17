@@ -27,9 +27,9 @@ export default function SignupPage() {
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
         <section className="relative hidden overflow-hidden bg-zinc-950 px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
           <div className="absolute inset-0 ff-grid opacity-30" />
-          <div className="relative z-10 flex cursor-pointer items-center gap-2.5" onClick={() => router.push('/')}>
+          <Link href="/" className="relative z-10 flex cursor-pointer items-center gap-2.5" aria-label="FrameFlux home">
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-950"><span className="h-2.5 w-2.5 rounded-[3px] bg-current" /></span><span className="font-semibold tracking-tight">FrameFlux</span>
-          </div>
+          </Link>
           <div className="relative z-10 max-w-xl pb-10">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300"><Zap className="h-3.5 w-3.5" /> Start building your workflow</div>
             <h1 className="text-5xl font-semibold leading-[1.05] tracking-[-0.04em] xl:text-6xl">A faster way to<br /><span className="text-zinc-400">work with media.</span></h1>
