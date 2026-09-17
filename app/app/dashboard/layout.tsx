@@ -25,9 +25,7 @@ export default function DashboardLayout({
       <div className="flex h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
-            Loading...
-          </p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading your workspace...</p>
         </div>
       </div>
     );
@@ -38,12 +36,14 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950">
-      <Sidebar className="hidden md:flex w-64 shrink-0" />
+    <div className="flex h-screen overflow-hidden bg-zinc-50 dark:bg-zinc-950">
+      <Sidebar className="hidden w-[272px] shrink-0 md:flex" />
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8">
-          {children}
+      <main className="min-w-0 flex-1 overflow-y-auto">
+        <div className="min-h-full bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.055),transparent_34%)] dark:bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.075),transparent_32%)]">
+          <div className="mx-auto max-w-[1440px] px-5 py-7 sm:px-7 sm:py-8 lg:px-10 lg:py-10">
+            {children}
+          </div>
         </div>
       </main>
     </div>
