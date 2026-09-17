@@ -98,41 +98,42 @@ html { scroll-behavior: smooth; }
 body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
 ::selection { background: rgba(99, 102, 241, 0.18); }
 
-/* Native buttons receive a clear, restrained secondary treatment. Primary
-   actions should use the shared Button component for stronger visual hierarchy. */
+/* Native buttons get a visible soft-primary treatment so custom controls are
+   recognizable as actions even when they do not use the shared Button API. */
 button:not([data-slot]) {
   cursor: pointer;
   transition: border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
 }
 button:not([data-slot]):not(:disabled) {
-  border: 1px solid var(--border);
+  border: 1px solid #c7d2fe;
   border-radius: .6rem;
-  background: var(--card);
-  color: var(--foreground);
-  box-shadow: 0 1px 2px rgba(24,24,27,.04);
+  background: #f5f7ff;
+  color: #4338ca;
+  box-shadow: 0 1px 2px rgba(79,70,229,.06);
 }
 button:not([data-slot]):not(:disabled):hover {
-  background: var(--accent);
-  border-color: #a5b4fc;
-  color: var(--accent-foreground);
-  box-shadow: 0 4px 12px rgba(79,70,229,.10);
+  background: #eef2ff;
+  border-color: #818cf8;
+  color: #3730a3;
+  box-shadow: 0 5px 14px rgba(79,70,229,.12);
 }
-button:not([data-slot]):not(:disabled):active { transform: translateY(1px); }
+button:not([data-slot]):active { transform: translateY(1px); }
 button:not([data-slot]):focus-visible {
   outline: none;
   border-color: var(--ring);
   box-shadow: 0 0 0 3px rgba(99,102,241,.16);
 }
 .dark button:not([data-slot]):not(:disabled) {
-  background: var(--card);
-  color: var(--foreground);
+  border-color: #4f46e5;
+  background: #17172a;
+  color: #c7d2fe;
   box-shadow: 0 1px 2px rgba(0,0,0,.18);
 }
 .dark button:not([data-slot]):not(:disabled):hover {
-  background: var(--accent);
-  border-color: #6366f1;
-  color: var(--accent-foreground);
-  box-shadow: 0 4px 14px rgba(99,102,241,.12);
+  background: #24245a;
+  border-color: #818cf8;
+  color: #e0e7ff;
+  box-shadow: 0 5px 16px rgba(99,102,241,.16);
 }
 
 @layer utilities {
