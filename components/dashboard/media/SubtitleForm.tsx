@@ -12,6 +12,7 @@ const ACCEPTED_EXTENSIONS = ['.srt', '.ass', '.vtt', '.sub', '.txt'];
 
 interface Props {
   mediaId: string;
+  onProcessed?: () => void;
 }
 
 interface SubtitleTrack {
@@ -42,6 +43,7 @@ function downloadBlob(blob: Blob, filename: string) {
 
 export function SubtitleForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
+  const [subtitleUploading, setSubtitleUploading] = useState(false);
   const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync'>('burn');
   const [subtitlePath, setSubtitlePath] = useState('');
   const [subtitleFileName, setSubtitleFileName] = useState('');
@@ -54,7 +56,7 @@ export function SubtitleForm({ mediaId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = useCallback((file: File | undefined) => {
+  const handleFileSelect = useCallback(async (file: File | undefined) => {
     if (!file) return;
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!ACCEPTED_EXTENSIONS.includes(ext)) {
@@ -64,6 +66,19 @@ export function SubtitleForm({ mediaId }: Props) {
     setError(null);
     setSubtitleFileName(file.name);
     setSubtitlePath(file.name);
+    setSubtitleUploading(true);
+    
+    // Upload subtitle file to backend
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const result = await api.uploadSubtitleFile(formData);
+      setSubtitlePath(result.filename);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload subtitle file');
+    } finally {
+      setSubtitleUploading(false);
+    }
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -80,8 +95,9 @@ export function SubtitleForm({ mediaId }: Props) {
     try {
       if (action === 'burn') {
         if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
-        const blob = await api.burnSubtitles(mediaId, subtitlePath, { font_size: parseInt(fontSize), font_color: fontColor, position });
-        downloadBlob(blob, `subtitles_burned_${mediaId}.mp4`);
+        const version = await api.burnSubtitles(mediaId, subtitlePath, { font_size: parseInt(fontSize), font_color: fontColor, position });
+        // Version created successfully, refresh versions
+        if (onProcessed) onProcessed();
       } else if (action === 'mux') {
         if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
         const blob = await api.muxSubtitles(mediaId, subtitlePath, { language: 'und' });
@@ -166,11 +182,20 @@ export function SubtitleForm({ mediaId }: Props) {
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <input ref={fileInputRef} type="file" accept=".srt,.ass,.vtt,.sub,.txt" onChange={(e) => handleFileSelect(e.target.files?.[0])} className="hidden" />
+            <input ref={fileInputRef} type="file" accept=".srt,.ass,.vtt,.sub,.txt" onChange={(e) => handleFileSelect(e.target.files?.[0])} style={{ position: 'absolute', opacity: 0, width: '100%', height: '100%', top: 0, left: 0, cursor: 'pointer' }} />
             {subtitleFileName ? (
               <div className="flex items-center justify-center gap-2">
-                <FileText className="h-4 w-4 text-green-500" />
-                <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{subtitleFileName}</span>
+                {subtitleUploading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 text-indigo-500 animate-spin" />
+                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4 text-green-500" />
+                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{subtitleFileName}</span>
+                  </>
+                )}
               </div>
             ) : (
               <>
@@ -218,7 +243,7 @@ export function SubtitleForm({ mediaId }: Props) {
           </div>
         </>
       )}
-      <Button onClick={handleAction} disabled={loading} className="w-full">
+      <Button onClick={handleAction} disabled={loading || subtitleUploading} className="w-full">
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

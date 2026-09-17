@@ -119,6 +119,23 @@ export default function MediaDetailPage() {
     }
   }, [mediaId]);
 
+  const fetchVersions = useCallback(async () => {
+    setVersionsLoading(true);
+    try {
+      const data = await api.listMediaVersions(mediaId);
+      setVersions(data);
+    } catch {
+      // silent
+    } finally {
+      setVersionsLoading(false);
+    }
+  }, [mediaId]);
+
+  const fetchMediaAndVersions = useCallback(async () => {
+    await fetchMedia();
+    await fetchVersions();
+  }, [fetchMedia, fetchVersions]);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMedia();
@@ -140,18 +157,6 @@ export default function MediaDetailPage() {
 
     return () => clearInterval(interval);
   }, [media, mediaId]);
-
-  const fetchVersions = useCallback(async () => {
-    setVersionsLoading(true);
-    try {
-      const data = await api.listMediaVersions(mediaId);
-      setVersions(data);
-    } catch {
-      // silent
-    } finally {
-      setVersionsLoading(false);
-    }
-  }, [mediaId]);
 
   const fetchShares = useCallback(async () => {
     setShareLoading(true);
@@ -543,7 +548,7 @@ export default function MediaDetailPage() {
                   <CardTitle className="text-base">Subtitles</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <SubtitleForm mediaId={mediaId} />
+                  <SubtitleForm mediaId={mediaId} onProcessed={fetchMediaAndVersions} />
                 </CardContent>
               </Card>
             )}
@@ -591,6 +596,23 @@ export default function MediaDetailPage() {
                           {version.processing_status} • {formatDistanceToNow(new Date(version.created_at), { addSuffix: true })}
                         </p>
                       </div>
+                      {version.processing_status === 'completed' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={async () => {
+                            try {
+                              const blob = await api.getMediaVersionFile(mediaId, version.id);
+                              downloadBlob(blob, version.original_filename || `version-${version.version_number}`);
+                            } catch (err) {
+                              setError(err instanceof Error ? err.message : 'Failed to download version');
+                            }
+                          }}
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>

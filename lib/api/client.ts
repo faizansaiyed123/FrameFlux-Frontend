@@ -701,7 +701,6 @@ class ApiClient {
     formData.append('file', chunk);
     return this.request<{ detail: string }>(`/media/resumable/${uploadId}/chunk/${index}`, {
       method: 'POST',
-      headers: {},
       body: formData,
     });
   }
@@ -990,10 +989,23 @@ class ApiClient {
     const qs = query.toString();
     const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/burn?${qs}`, {
       method: 'POST',
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
     });
     if (!response.ok) throw new Error('Failed to burn subtitles');
-    return response.blob();
+    return response.json();
+  }
+
+  async uploadSubtitleFile(formData: FormData) {
+    const response = await fetch(`${this.baseUrl}/subtitles/upload`, {
+      method: 'POST',
+      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      body: formData,
+    });
+    if (!response.ok) throw new Error('Failed to upload subtitle file');
+    return response.json();
   }
 
   async muxSubtitles(mediaId: string, subtitlePath: string, data: {

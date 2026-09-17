@@ -223,6 +223,70 @@ export default function QuickActionsPage() {
               ))}
             </div>
           </div>
+
+          {quickActions.image && quickActions.image.length > 0 && (
+            <div>
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">Image Actions</h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {quickActions.image.map((action) => (
+                  <Card key={action.id} className="border-zinc-200 dark:border-zinc-800">
+                    <CardContent className="p-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-zinc-900 dark:text-zinc-50">{action.label}</span>
+                          <Badge variant="secondary" className="text-xs">Image</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-zinc-500 dark:text-zinc-400 font-mono">{action.id}</span>
+                        </div>
+                        <Button
+                          onClick={() => handleExecute(action.id)}
+                          disabled={!mediaId || executing === action.id}
+                          className="w-full"
+                        >
+                          {executing === action.id ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Executing...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="mr-2 h-4 w-4" />
+                              Execute
+                            </>
+                          )}
+                        </Button>
+                        {executionStatus[action.id] && (
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span>{executionStatus[action.id].status}</span>
+                              <span>{executionStatus[action.id].progress}%</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                              <div
+                                className={cn(
+                                  'h-full transition-all',
+                                  executionStatus[action.id].status === 'failed'
+                                    ? 'bg-red-500'
+                                    : executionStatus[action.id].status === 'completed'
+                                    ? 'bg-green-500'
+                                    : 'bg-indigo-500'
+                                )}
+                                style={{ width: `${executionStatus[action.id].progress}%` }}
+                              />
+                            </div>
+                            {executionStatus[action.id].error && (
+                              <p className="text-xs text-red-600 dark:text-red-400">{executionStatus[action.id].error}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
