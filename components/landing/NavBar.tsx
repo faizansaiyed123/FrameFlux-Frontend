@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowUpRight, Circle } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 export function NavBar() {
   const { user, loading } = useAuth();
@@ -17,13 +17,11 @@ export function NavBar() {
           </span>
           <span className="text-[17px] font-semibold tracking-[-0.02em] text-zinc-950 dark:text-white">FrameFlux</span>
         </Link>
-
         <div className="hidden items-center gap-8 md:flex">
           <Link href="/#features" className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white">Features</Link>
           <Link href="/pricing" className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white">Pricing</Link>
           <Link href="/help-center" className="text-sm text-zinc-600 transition-colors hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white">Docs</Link>
         </div>
-
         {loading ? (
           <div className="h-9 w-28 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
         ) : user ? (
