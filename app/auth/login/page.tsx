@@ -31,7 +31,7 @@ export default function LoginPage() {
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
         <section className="relative hidden overflow-hidden bg-zinc-950 px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
           <div className="absolute inset-0 ff-grid opacity-30" />
-          <div className="relative z-10 flex items-center gap-2.5">
+          <div className="relative z-10 flex cursor-pointer items-center gap-2.5" onClick={() => router.push('/')}>
             <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-950"><span className="h-2.5 w-2.5 rounded-[3px] bg-current" /></span>
             <span className="font-semibold tracking-tight">FrameFlux</span>
           </div>
@@ -45,7 +45,7 @@ export default function LoginPage() {
 
         <section className="flex items-center justify-center px-5 py-10 sm:px-8">
           <div className="w-full max-w-md">
-            <Link href="/" className="mb-10 inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white lg:hidden"><ArrowLeft className="h-4 w-4" /> Back to home</Link>
+            <Link href="/" className="mb-10 inline-flex cursor-pointer items-center gap-2 text-sm text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white lg:hidden"><ArrowLeft className="h-4 w-4" /> Back to home</Link>
             <div className="mb-8 lg:mt-0">
               <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-950 text-white shadow-sm dark:bg-white dark:text-zinc-950 lg:hidden"><span className="h-3 w-3 rounded-[3px] bg-current" /></div>
               <h2 className="text-3xl font-semibold tracking-[-0.03em] text-zinc-950 dark:text-white">Welcome back</h2>
@@ -54,11 +54,11 @@ export default function LoginPage() {
             {error && <Alert className="mb-5 border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300"><AlertDescription>{error}</AlertDescription></Alert>}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2"><Label htmlFor="email">Email</Label><div className="relative"><Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" /><Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} className="h-11 rounded-lg pl-10" required disabled={loading} /></div></div>
-              <div className="space-y-2"><div className="flex items-center justify-between"><Label htmlFor="password">Password</Label><Link href="/auth/forgot-password" className="text-xs font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">Forgot password?</Link></div><div className="relative"><Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" /><Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 rounded-lg pl-10 pr-10" required disabled={loading} /><button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></div>
-              <Button type="submit" className="h-11 w-full rounded-lg" disabled={loading}>{loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</> : 'Sign in'}</Button>
+              <div className="space-y-2"><div className="flex items-center justify-between"><Label htmlFor="password">Password</Label><Link href="/auth/forgot-password" className="cursor-pointer text-xs font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">Forgot password?</Link></div><div className="relative"><Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" /><Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} className="h-11 rounded-lg pl-10 pr-10" required disabled={loading} /><button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" aria-label={showPassword ? 'Hide password' : 'Show password'}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></div>
+              <Button type="submit" className="h-11 w-full cursor-pointer rounded-lg" disabled={loading}>{loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...</> : 'Sign in'}</Button>
             </form>
-            <p className="mt-7 text-center text-sm text-zinc-500 dark:text-zinc-400">New to FrameFlux? <Link href="/auth/signup" className="font-medium text-zinc-950 hover:underline dark:text-white">Create an account</Link></p>
-            <p className="mt-10 text-center text-[11px] leading-5 text-zinc-400 dark:text-zinc-500">By continuing, you agree to our Terms of Service and Privacy Policy.</p>
+            <p className="mt-7 text-center text-sm text-zinc-500 dark:text-zinc-400">New to FrameFlux? <Link href="/auth/signup" className="cursor-pointer font-medium text-zinc-950 hover:underline dark:text-white">Create an account</Link></p>
+            <p className="mt-10 text-center text-[11px] leading-5 text-zinc-400 dark:text-zinc-500">By continuing, you agree to our <Link href="/terms" className="cursor-pointer hover:text-zinc-600 hover:underline dark:hover:text-zinc-300">Terms of Service</Link> and <Link href="/privacy" className="cursor-pointer hover:text-zinc-600 hover:underline dark:hover:text-zinc-300">Privacy Policy</Link>.</p>
           </div>
         </section>
       </div>
