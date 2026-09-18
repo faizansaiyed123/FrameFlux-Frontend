@@ -1,3 +1,4 @@
+// Sequential feature gate: Favorites
 import { test, expect, APIRequestContext, Page } from '@playwright/test';
 import fs from 'node:fs/promises';
 import { execFile } from 'node:child_process';
