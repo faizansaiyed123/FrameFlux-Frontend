@@ -107,7 +107,15 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
       expect(st.status,f+': '+JSON.stringify(st)).toBe('completed');
       return;
     }
-    const op=l.includes('trim')?'trim':l.includes('cut')?'cut':l.includes('keep')?'keep':l.includes('delete')?'delete':'extract';
+    if (l.includes('delete')) {
+      const response=await ok(await ctx.request.post(API+`/media/${m.id}/clips/delete`,{headers:{Authorization:'Bearer '+a.token},data:{clips:[{start:0.2,end:1.2}]}}),f);
+      const body=await response.json();
+      expect(body.operation,f).toBe('delete_clips');
+      const st=await waitForMedia(ctx.request,a.token,m.id,25_000);
+      expect(st.status,f+': '+JSON.stringify(st)).toBe('completed');
+      return;
+    }
+    const op=l.includes('trim')?'trim':l.includes('cut')?'cut':'extract';
     await ok(await ctx.request.post(API+`/media/${m.id}/edit`,{headers:{Authorization:'Bearer '+a.token},data:{operation:op,start:0.2,end:1.2}}),f); return;
   }
   if (l.includes('overlay')) { const a=await auth(ctx.request,'atomic-overlay'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'); await ok(await ctx.request.post(API+`/media/${m.id}/overlay`,{headers:{Authorization:'Bearer '+a.token},data:{type:l.includes('image')||l.includes('watermark')?'image':'text',text:'FrameFlux',x:10,y:10,duration:1}}),f); return; }
@@ -299,7 +307,7 @@ const atomicItems=sections.flatMap(s=>s.items.map((feature,i)=>({section:s.title
 
 test.describe('ATOMIC CHECKLIST — one test result for every checklist entry', () => {
   for (const item of atomicItems) {
-    const define = item.sectionNumber === 4 && item.index === 3 ? test.only : test;
+    const define = item.sectionNumber === 4 && item.index === 4 ? test.only : test;
     define(`${String(item.sectionNumber).padStart(2,'0')}.${String(item.index).padStart(2,'0')} ${item.section} :: ${item.feature}`, async ({request,page}) => {
       await exercise(item.section,item.feature,{request,page});
     });
