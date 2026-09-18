@@ -12,20 +12,20 @@ export type AuthContext = {
 };
 
 export async function createUser(request: APIRequestContext, prefix = 'qa'): Promise<AuthContext> {
-  const email = \`${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}@example.com\`;
+  const email = `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}@example.com`;
   const password = 'TestPass123!';
-  const signup = await request.post(\`${API}/auth/signup\`, {
+  const signup = await request.post(`${API}/auth/signup`, {
     data: { email, password, full_name: 'Exhaustive QA User' },
   });
   expect(signup.ok(), await signup.text()).toBeTruthy();
 
-  const login = await request.post(\`${API}/auth/login\`, {
+  const login = await request.post(`${API}/auth/login`, {
     data: { email, password },
   });
   expect(login.ok(), await login.text()).toBeTruthy();
   const loginBody = await login.json();
 
-  const me = await request.get(\`${API}/auth/me\`, {
+  const me = await request.get(`${API}/auth/me`, {
     headers: { Authorization: 'Bearer ' + loginBody.access_token },
   });
   expect(me.ok(), await me.text()).toBeTruthy();
@@ -36,7 +36,7 @@ export async function createUser(request: APIRequestContext, prefix = 'qa'): Pro
 
 export async function uploadMedia(request: APIRequestContext, token: string, filePath: string) {
   const file = fs.readFileSync(filePath);
-  const response = await request.post(\`${API}/media/upload\`, {
+  const response = await request.post(`${API}/media/upload`, {
     headers: { Authorization: 'Bearer ' + token },
     multipart: {
       file: {
@@ -59,7 +59,7 @@ export async function waitForMedia(
   const deadline = Date.now() + timeoutMs;
   let last: any = null;
   while (Date.now() < deadline) {
-    const response = await request.get(\`${API}/media/${mediaId}/status\`, {
+    const response = await request.get(`${API}/media/${mediaId}/status`, {
       headers: { Authorization: 'Bearer ' + token },
     });
     expect(response.ok(), await response.text()).toBeTruthy();
@@ -67,7 +67,7 @@ export async function waitForMedia(
     if (last.status === 'completed' || last.status === 'failed') return last;
     await new Promise((resolve) => setTimeout(resolve, 1000));
   }
-  throw new Error(\`Timed out waiting for media ${mediaId}. Last status: ${JSON.stringify(last)}\`);
+  throw new Error(`Timed out waiting for media ${mediaId}. Last status: ${JSON.stringify(last)}`);
 }
 
 export async function expectBlob(
