@@ -43,7 +43,9 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
   const fmt=fmtFor(f);
   if (section.includes('VIDEO → VIDEO') && VIDEO_FORMATS.includes(fmt||'')) {
     const a=await auth(ctx.request,'atomic-vfmt'), m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4');
-    await ok(await ctx.request.post(API+`/media/${m.id}/convert`,{headers:{Authorization:'Bearer '+a.token},data:{format:fmt,width:160,height:120,fps:24,quality:5,video_codec:'h264',audio_codec:'aac'}}),f);
+    const videoCodec = fmt === 'webm' ? 'vp9' : 'h264';
+    const audioCodec = fmt === 'webm' ? 'opus' : 'aac';
+    await ok(await ctx.request.post(API+`/media/${m.id}/convert`,{headers:{Authorization:'Bearer '+a.token},data:{format:fmt,width:160,height:120,fps:24,quality:5,video_codec:videoCodec,audio_codec:audioCodec}}),f);
     const st=await waitForMedia(ctx.request,a.token,m.id,25_000); expect(st.status,f+': '+JSON.stringify(st)).toBe('completed'); return;
   }
   if (section.includes('AUDIO → AUDIO') && AUDIO_FORMATS.includes(fmt||'')) {
@@ -288,7 +290,7 @@ const atomicItems=sections.flatMap(s=>s.items.map((feature,i)=>({section:s.title
 
 test.describe('ATOMIC CHECKLIST — one test result for every checklist entry', () => {
   for (const item of atomicItems) {
-    const define = item.sectionNumber === 2 && item.index === 5 ? test.only : test;
+    const define = item.sectionNumber === 3 && item.index === 3 ? test.only : test;
     define(`${String(item.sectionNumber).padStart(2,'0')}.${String(item.index).padStart(2,'0')} ${item.section} :: ${item.feature}`, async ({request,page}) => {
       await exercise(item.section,item.feature,{request,page});
     });
