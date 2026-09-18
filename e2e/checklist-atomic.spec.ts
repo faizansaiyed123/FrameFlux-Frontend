@@ -99,7 +99,15 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
     const a=await auth(ctx.request,'atomic-edit'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4');
     if (l==='merge videos'||l==='reorder clips'||l==='add multiple clips'){ const b=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample2.mp4'); const route=l==='reorder clips'?'/reorder':'/merge'; await ok(await ctx.request.post(API+`/media/${m.id}${route}`,{headers:{Authorization:'Bearer '+a.token},data:{media_ids:[m.id,b.id],order:[m.id,b.id]}}),f); return; }
     if (l==='freeze frame'){ await ok(await ctx.request.post(API+`/media/${m.id}/freeze`,{headers:{Authorization:'Bearer '+a.token},data:{timestamp:0.5,duration:0.5}}),f); return; }
-    const op=l.includes('trim')?'trim':l.includes('cut')?'cut':l.includes('split')?'split':l.includes('keep')?'keep':l.includes('delete')?'delete':'extract';
+    if (l.includes('split')) {
+      const response=await ok(await ctx.request.post(API+`/media/${m.id}/split`,{headers:{Authorization:'Bearer '+a.token},data:{split_points:[1]}}),f);
+      const body=await response.json();
+      expect(body.operation,f).toBe('split');
+      const st=await waitForMedia(ctx.request,a.token,m.id,25_000);
+      expect(st.status,f+': '+JSON.stringify(st)).toBe('completed');
+      return;
+    }
+    const op=l.includes('trim')?'trim':l.includes('cut')?'cut':l.includes('keep')?'keep':l.includes('delete')?'delete':'extract';
     await ok(await ctx.request.post(API+`/media/${m.id}/edit`,{headers:{Authorization:'Bearer '+a.token},data:{operation:op,start:0.2,end:1.2}}),f); return;
   }
   if (l.includes('overlay')) { const a=await auth(ctx.request,'atomic-overlay'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'); await ok(await ctx.request.post(API+`/media/${m.id}/overlay`,{headers:{Authorization:'Bearer '+a.token},data:{type:l.includes('image')||l.includes('watermark')?'image':'text',text:'FrameFlux',x:10,y:10,duration:1}}),f); return; }
@@ -291,7 +299,7 @@ const atomicItems=sections.flatMap(s=>s.items.map((feature,i)=>({section:s.title
 
 test.describe('ATOMIC CHECKLIST — one test result for every checklist entry', () => {
   for (const item of atomicItems) {
-    const define = item.sectionNumber === 3 && item.index === 8 ? test.only : test;
+    const define = item.sectionNumber === 4 && item.index === 3 ? test.only : test;
     define(`${String(item.sectionNumber).padStart(2,'0')}.${String(item.index).padStart(2,'0')} ${item.section} :: ${item.feature}`, async ({request,page}) => {
       await exercise(item.section,item.feature,{request,page});
     });
