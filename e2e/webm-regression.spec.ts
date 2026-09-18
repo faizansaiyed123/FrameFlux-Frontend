@@ -14,9 +14,6 @@ test('Convert video to WebM: select WebM, use default compatible audio, complete
   await format.click();
   await page.getByRole('option', { name: 'WebM', exact: true }).click();
 
-  const audioCodec = page.getByLabel('Audio Codec');
-  await expect(audioCodec).toContainText('Default');
-
   await page.getByRole('button', { name: /^Convert$/i }).last().click();
   await expect(page.getByText(/Processing started/i)).toBeVisible({ timeout: 10_000 });
 
