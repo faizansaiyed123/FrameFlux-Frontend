@@ -71,7 +71,11 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
     form.append('files',new Blob([fs.readFileSync('e2e/fixtures/sample.mp4')],{type:'video/mp4'}),'sample.mp4');
     form.append('files',new Blob([fs.readFileSync('e2e/fixtures/sample.mp3')],{type:'audio/mpeg'}),'sample.mp3');
     form.append('files',new Blob([fs.readFileSync('e2e/fixtures/sample.png')],{type:'image/png'}),'sample.png');
-    const r=await fetch(API+'/media/upload-multiple',{method:'POST',headers:{Authorization:'Bearer '+a.token},body:form}); expect(r.ok,await r.text()).toBeTruthy(); expect((await r.json()).length).toBe(3); return;
+    const r=await fetch(API+'/media/upload-multiple',{method:'POST',headers:{Authorization:'Bearer '+a.token},body:form});
+    const body=await r.text();
+    expect(r.ok,body).toBeTruthy();
+    expect(JSON.parse(body).length).toBe(3);
+    return;
   }
   if (l.includes('pause upload') || l.includes('resume upload') || l.includes('retry upload') || l.includes('cancel upload') || l.includes('large-file')) {
     await ui(ctx,'/app/dashboard/media',[/Upload media/i]); return;
@@ -284,7 +288,7 @@ const atomicItems=sections.flatMap(s=>s.items.map((feature,i)=>({section:s.title
 
 test.describe('ATOMIC CHECKLIST — one test result for every checklist entry', () => {
   for (const item of atomicItems) {
-    const define = item.sectionNumber === 1 && item.index === 10 ? test.only : test;
+    const define = item.sectionNumber === 2 && item.index === 5 ? test.only : test;
     define(`${String(item.sectionNumber).padStart(2,'0')}.${String(item.index).padStart(2,'0')} ${item.section} :: ${item.feature}`, async ({request,page}) => {
       await exercise(item.section,item.feature,{request,page});
     });
