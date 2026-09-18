@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Mix original [+] new audio'
+  FEATURE_GREP: 'Mix original [+] new audio|Audio delay'
 
 jobs:
   feature:
