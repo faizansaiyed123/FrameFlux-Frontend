@@ -30,7 +30,7 @@ test('Convert video to WebM: select WebM, use default compatible audio, complete
 
   const status = await waitForMedia(request, auth.token, media.id, 60_000);
   expect(status.status, JSON.stringify(status)).toBe('completed');
-  expect(status.processed_filename).toMatch(/\\.webm$/i);
+  expect(status.processed_filename).toMatch(/\.webm$/i);
 
   const download = await request.get(
     API + `/media/${media.id}/download?download_type=processed`,
