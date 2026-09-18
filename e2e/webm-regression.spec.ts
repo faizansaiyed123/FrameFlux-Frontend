@@ -10,13 +10,11 @@ test('Convert video to WebM: select WebM, use default compatible audio, complete
   await page.goto(`/app/dashboard/media/${media.id}`);
   await page.getByRole('tab', { name: 'Processing', exact: true }).click();
 
-  await page.getByRole('button', { name: /^Convert$/i }).click();
-
   const format = page.getByRole('combobox').first();
   await format.click();
   await page.getByRole('option', { name: 'WebM', exact: true }).click();
 
-  const audioCodec = page.getByRole('combobox').nth(2);
+  const audioCodec = page.getByLabel('Audio Codec');
   await expect(audioCodec).toContainText('Default');
 
   await page.getByRole('button', { name: /^Convert$/i }).last().click();
