@@ -18,7 +18,7 @@ const CODECS: Record<string,string> = {'H.264':'h264','H.265 / HEVC':'h265','VP8
 const RATIOS = ['16:9','9:16','4:3','1:1'];
 const execFileAsync = promisify(execFile);
 const TARGET_SECTION_NUMBER = 5;
-const TARGET_FEATURE = 'Audio delay';
+const TARGET_FEATURE = 'Audio offset';
 
 async function ok(r: Awaited<ReturnType<APIRequestContext['get'] | APIRequestContext['post'] | APIRequestContext['patch'] | APIRequestContext['put'] | APIRequestContext['delete']>>, label:string) {
   expect(r.ok(), label + ': ' + await r.text()).toBeTruthy();
