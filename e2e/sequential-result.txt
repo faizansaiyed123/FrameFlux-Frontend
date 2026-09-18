@@ -1,1 +1,1 @@
-PASS|04\.04 VIDEO EDITING :: Delete selected section|4ea627218d9a7a141448c9f65e488d5073f15d61
+PASS|04\.05 VIDEO EDITING :: Keep selected section|5067961de47dded8ce77ccb877e5d387f938fb03
