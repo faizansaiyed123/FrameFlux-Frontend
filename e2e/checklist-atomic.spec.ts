@@ -1,4 +1,4 @@
-// Sequential feature gate: Favorites
+// Sequential feature gate: Mix original + new audio
 import { test, expect, APIRequestContext, Page } from '@playwright/test';
 import fs from 'node:fs/promises';
 import { execFile } from 'node:child_process';
@@ -171,7 +171,8 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
       return;
     }
     if (l.includes('volume')) { await ok(await ctx.request.post(API+`/audio/${m.id}/volume?volume=0.8`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
-    if (l.includes('replace')||l.includes('add ')||l.includes('mix')) { const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3'); await ok(await ctx.request.post(API+`/audio/${m.id}/replace-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_id:au.id,mix:l.includes('mix'),mute_original:l.includes('mute')}}),f); return; }
+    if (l.includes('mix')) { const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3'); await expectBlob(await ctx.request.post(API+`/audio/${m.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_path:au.stored_filename,mix:true,mix_volume:0.5,output_format:'mp4'}}),'video/'); return; }
+    if (l.includes('replace')||l.includes('add ')) { const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3'); await ok(await ctx.request.post(API+`/audio/${m.id}/replace-audio?audio_path=${encodeURIComponent(au.stored_filename)}`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
     await ok(await ctx.request.post(API+`/media/${m.id}/edit`,{headers:{Authorization:'Bearer '+a.token},data:{operation:l.includes('remove')?'remove_audio':'fade',fade_in:l.includes('in')?0.2:0,fade_out:l.includes('out')?0.2:0,offset:0.1}}),f); return;
   }
 
