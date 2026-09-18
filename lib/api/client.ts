@@ -864,9 +864,12 @@ class ApiClient {
   }
 
   async replaceAudio(mediaId: string, audioPath: string, fadeIn?: number, fadeOut?: number) {
-    return this.request<{ output_filename: string }>(`/audio/${mediaId}/replace-audio`, {
+    const query = new URLSearchParams({ audio_path: audioPath });
+    if (fadeIn !== undefined) query.set('fade_in', String(fadeIn));
+    if (fadeOut !== undefined) query.set('fade_out', String(fadeOut));
+
+    return this.request<{ output_filename: string }>(`/audio/${mediaId}/replace-audio?${query.toString()}`, {
       method: 'POST',
-      body: JSON.stringify({ audio_path: audioPath, fade_in: fadeIn, fade_out: fadeOut }),
     });
   }
 
