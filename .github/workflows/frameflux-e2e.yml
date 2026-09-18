@@ -2,6 +2,9 @@ name: FrameFlux E2E
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - qa/full-e2e-testing
 
 concurrency:
   group: frameflux-e2e-${{ github.event.pull_request.number || github.ref }}
