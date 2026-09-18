@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '03\.03 VIDEO → VIDEO CONVERSION :: WebM'
+  FEATURE_GREP: '03\.08 VIDEO → VIDEO CONVERSION :: MPEG'
 
 jobs:
   feature:
