@@ -45,7 +45,7 @@ test.describe('FrameFlux real-user end-to-end flow', () => {
     await page.getByRole('tab', { name: 'Tools' }).click();
     await expect(page.getByText('Compress Media')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Extract Audio' })).toBeVisible();
-    await expect(page.getByText('Generate Thumbnail')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Generate Thumbnail' })).toBeVisible();
     await expect(page.getByText('Generate Preview')).toBeVisible();
     await expect(page.getByText('Subtitles')).toBeVisible();
     await expect(page.getByText('Generate GIF')).toBeVisible();
