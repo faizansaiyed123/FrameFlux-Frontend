@@ -1,13 +1,1 @@
-FAIL|02\\.05 UPLOAD :: Upload multiple files|64d26e43bc475d8e9afc7431fe2dc837b604f054
---- PLAYWRIGHT OUTPUT ---
-[WebServer] ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
-Error: No tests found.
-Make sure that arguments are regular expressions matching test files.
-You may need to escape symbols like "$" or "*" and quote the arguments.
-
---- BACKEND LOG ---
-INFO:     Started server process [4803]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:43280 - "GET /health HTTP/1.1" 200 OK
+PASS|02\.05 UPLOAD :: Upload multiple files|7dba4862c75a97018b00764a8defde76e949a177
