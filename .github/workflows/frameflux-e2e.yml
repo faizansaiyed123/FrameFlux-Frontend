@@ -1,0 +1,156 @@
+name: FrameFlux E2E
+
+on:
+  push:
+    branches:
+      - qa/full-e2e-testing
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: frameflux
+          POSTGRES_USER: frameflux
+          POSTGRES_PASSWORD: frameflux
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U frameflux -d frameflux"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: faizansaiyed123/FrameFlux-Backend
+          ref: main
+          path: backend
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv sync --frozen
+
+      - name: Configure backend
+        working-directory: backend
+        run: |
+          mkdir -p storage/uploads storage/processed storage/temp
+          cat > .env <<'EOF'
+          APP_NAME=FrameFlux API
+          APP_VERSION=0.1.0
+          DATABASE_URL=postgresql+asyncpg://frameflux:frameflux@127.0.0.1:5432/frameflux
+          REDIS_URL=redis://127.0.0.1:6379/0
+          APP_ORIGIN=http://127.0.0.1:3000
+          ENVIRONMENT=test
+          DEBUG=true
+          FFMPEG_BINARY=ffmpeg
+          FFPROBE_BINARY=ffprobe
+          UPLOAD_DIR=storage/uploads
+          PROCESSED_DIR=storage/processed
+          TEMP_DIR=storage/temp
+          JWT_SECRET_KEY=frameflux-e2e-test-secret-change-me
+          MAX_UPLOAD_SIZE_BYTES=524288000
+          MAX_CHUNK_SIZE_BYTES=52428800
+          EOF
+
+      - name: Run database migrations
+        working-directory: backend
+        run: uv run alembic upgrade head
+
+      - name: Start backend API
+        working-directory: backend
+        run: |
+          nohup uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 > ../backend.log 2>&1 &
+          echo $! > ../backend.pid
+
+      - name: Start background worker
+        working-directory: backend
+        run: |
+          nohup uv run arq app.infrastructure.worker.WorkerSettings > ../worker.log 2>&1 &
+          echo $! > ../worker.pid
+
+      - name: Wait for backend
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8000/health >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+          cat backend.log || true
+          cat worker.log || true
+          exit 1
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Generate deterministic browser fixtures
+        run: |
+          mkdir -p e2e/fixtures
+          ffmpeg -hide_banner -loglevel error             -f lavfi -i color=c=blue:s=320x240:r=24             -f lavfi -i anullsrc=r=44100:cl=mono             -t 2 -c:v libx264 -pix_fmt yuv420p -c:a aac             e2e/fixtures/sample.mp4
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run real-user browser tests
+        run: npx playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frameflux-playwright-report
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+
+      - name: Upload service logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frameflux-service-logs
+          path: |
+            backend.log
+            worker.log
+          if-no-files-found: ignore
