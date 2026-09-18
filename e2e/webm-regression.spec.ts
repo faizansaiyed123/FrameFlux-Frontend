@@ -10,6 +10,8 @@ test('Convert video to WebM: select WebM, use default compatible audio, complete
   await page.goto(`/app/dashboard/media/${media.id}`);
   await page.getByRole('tab', { name: 'Processing', exact: true }).click();
 
+  await page.getByRole('button', { name: /^Export$/i }).click();
+  await expect(page.getByRole('heading', { name: 'Export Settings', exact: true })).toBeVisible();
   const format = page.getByRole('combobox').first();
   await format.click();
   await page.getByRole('option', { name: 'WebM', exact: true }).click();
