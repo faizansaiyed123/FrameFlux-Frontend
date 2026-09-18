@@ -489,9 +489,10 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
         {/* Add Audio */}
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <div className="space-y-2">
-            <Label className="text-[10px] text-zinc-500">Add Audio</Label>
+            <Label htmlFor="addAudioFile" className="text-[10px] text-zinc-500">Add Audio</Label>
             <p className="text-[10px] text-zinc-400">Mix a separate uploaded audio file with the existing audio track.</p>
             <Input
+              id="addAudioFile"
               value={addAudioFile}
               onChange={(e) => setAddAudioFile(e.target.value)}
               placeholder="e.g. music.mp3"
