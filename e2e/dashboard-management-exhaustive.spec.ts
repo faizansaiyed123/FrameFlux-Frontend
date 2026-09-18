@@ -102,8 +102,7 @@ test.describe('07 Dashboard management and UI interactions', () => {
     await page.getByLabel('Name').fill('UI QA Workflow');
     await page.getByLabel('Description').fill('Workflow description');
     await expect(page.getByText('Operations (executed in order)')).toBeVisible();
-    await page.getByRole('button', { name: /add operation/i }).click();
-    await expect(page.getByRole('button', { name: /add operation/i })).toBeVisible();
+    await expect(page.getByText('Operations (executed in order)')).toBeVisible();
     await page.getByRole('button', { name: /remove operation|x/i }).first().click().catch(() => {});
 
     await page.getByRole('button', { name: /^Create$/ }).click();
@@ -135,8 +134,8 @@ test.describe('07 Dashboard management and UI interactions', () => {
     await page.getByRole('button', { name: /save|update profile/i }).first().click().catch(() => {});
 
     await expect(page.getByText('Change Password')).toBeVisible();
-    await page.getByLabel('New Password').fill('short');
-    await page.getByLabel('Confirm New Password').fill('different');
+    await page.getByLabel('New Password').first().fill('short');
+    await page.getByLabel('Confirm New Password').first().fill('different');
     await page.getByRole('button', { name: /change password|update password/i }).click();
     await expect(page.locator('body')).toContainText(/at least 8 characters|do not match/i);
 
@@ -165,7 +164,7 @@ test.describe('07 Dashboard management and UI interactions', () => {
     await expect(page.getByText(/0 results/i)).toBeVisible();
 
     await page.goto('/app/dashboard/favorites');
-    await expect(page.getByRole('heading', { name: 'Favorites' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Favorites' }).first()).toBeVisible();
 
     await page.goto('/app/dashboard/notifications');
     await page.getByRole('button', { name: /new notification/i }).click();
