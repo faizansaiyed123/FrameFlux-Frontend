@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '04\.05 VIDEO EDITING :: Keep selected section'
+  FEATURE_GREP: '04\.08 VIDEO EDITING :: Reorder clips'
 
 jobs:
   feature:
