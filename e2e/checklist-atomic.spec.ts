@@ -18,7 +18,7 @@ const CODECS: Record<string,string> = {'H.264':'h264','H.265 / HEVC':'h265','VP8
 const RATIOS = ['16:9','9:16','4:3','1:1'];
 const execFileAsync = promisify(execFile);
 const TARGET_SECTION_NUMBER = 5;
-const TARGET_FEATURE = 'Audio offset';
+const TARGET_FEATURE = 'Fade audio in';
 
 async function ok(r: Awaited<ReturnType<APIRequestContext['get'] | APIRequestContext['post'] | APIRequestContext['patch'] | APIRequestContext['put'] | APIRequestContext['delete']>>, label:string) {
   expect(r.ok(), label + ': ' + await r.text()).toBeTruthy();
@@ -171,6 +171,8 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
       return;
     }
     if (l.includes('volume')) { await ok(await ctx.request.post(API+`/audio/${m.id}/volume?volume=0.8`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
+    if (l.includes('fade in')) { await ok(await ctx.request.post(API+`/audio/${m.id}/volume?volume=1&fade_in=0.2`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
+    if (l.includes('fade out')) { await ok(await ctx.request.post(API+`/audio/${m.id}/volume?volume=1&fade_out=0.2`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
     if (l.includes('delay') || l.includes('offset')) { const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3'); await expectBlob(await ctx.request.post(API+`/audio/${m.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_path:au.stored_filename,audio_offset:0.1,output_format:'mp4'}}),'video/'); return; }
     if (l.includes('mix')) { const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3'); await expectBlob(await ctx.request.post(API+`/audio/${m.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_path:au.stored_filename,mix:true,mix_volume:0.5,output_format:'mp4'}}),'video/'); return; }
     if (l.includes('replace')||l.includes('add ')) { const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3'); await ok(await ctx.request.post(API+`/audio/${m.id}/replace-audio?audio_path=${encodeURIComponent(au.stored_filename)}`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
