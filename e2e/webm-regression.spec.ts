@@ -14,7 +14,16 @@ test('Convert video to WebM: select WebM, use default compatible audio, complete
   await format.click();
   await page.getByRole('option', { name: 'WebM', exact: true }).click();
 
-  await page.getByRole('button', { name: /^Convert$/i }).last().click();
+  let requestPayload: Record<string, unknown> | null = null;
+  await page.route(`**/media/${media.id}/convert`, async (route) => {
+    requestPayload = JSON.parse(route.request().postData() || '{}');
+    await route.continue();
+  });
+
+  await page.getByRole('button', { name: /^Start Conversion$/i }).click();
+  await expect.poll(() => requestPayload).toBeTruthy();
+  expect(requestPayload?.format).toBe('webm');
+  expect(requestPayload?.video_codec).toBe('vp9');
   await expect(page.getByText(/Processing started/i)).toBeVisible({ timeout: 10_000 });
 
   const status = await waitForMedia(request, auth.token, media.id, 60_000);
