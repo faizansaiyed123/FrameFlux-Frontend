@@ -1,1 +1,1 @@
-PASS|04\.05 VIDEO EDITING :: Keep selected section|5067961de47dded8ce77ccb877e5d387f938fb03
+PASS|04\.08 VIDEO EDITING :: Reorder clips|73f057972f8df08ba6d1b762338f295ad1f9aeaa
