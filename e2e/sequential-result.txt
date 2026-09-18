@@ -1,1 +1,163 @@
-PASS|Upload multiple files: select three files, upload, and verify all appear|29b143a657f4d45dd7ababa4cff33427a8a709da
+FAIL|Add audio: mix separately uploaded audio with video and download result|ef04b5dcbc052573aff367121d97cbc367234687
+--- PLAYWRIGHT OUTPUT ---
+--- BACKEND LOG ---
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/app/main.py", line 51, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 96, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 154, in simple_response
+    await self.app(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 352, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/app/features/media/routes.py", line 1047, in list_media_versions
+    result = await db.execute(
+             ^^^^^^^^^^^^^^^^^
+        select(MediaVersion).where(MediaVersion.media_id == media_id).order_by(MediaVersion.created_at.desc())
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/ext/asyncio/session.py", line 463, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 201, in greenlet_spawn
+    result = context.throw(*sys.exc_info())
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2365, in execute
+    return self._execute_internal(
+           ~~~~~~~~~~~~~~~~~~~~~~^
+        statement,
+        ^^^^^^^^^^
+    ...<4 lines>...
+        _add_event=_add_event,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/orm/session.py", line 2251, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self,
+        ^^^^^
+    ...<4 lines>...
+        conn,
+        ^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+        statement, params or {}, execution_options=execution_options
+    )
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+        self,
+        distilled_parameters,
+        execution_options or NO_OPTIONS,
+    )
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/sql/elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self, distilled_params, execution_options
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+        dialect,
+    ...<8 lines>...
+        cache_hit=cache_hit,
+    )
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        dialect, context, statement, parameters
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        e, str_statement, effective_parameters, cursor, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        cursor, str_statement, effective_parameters, context
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 580, in execute
+    self._adapt_connection.await_(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self._prepare_and_execute(operation, parameters)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 132, in await_only
+    return current.parent.switch(awaitable)  # type: ignore[no-any-return,attr-defined] # noqa: E501
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 196, in greenlet_spawn
+    value = await result
+            ^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 558, in _prepare_and_execute
+    self._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 508, in _handle_exception
+    self._adapt_connection._handle_exception(error)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/sqlalchemy/dialects/postgresql/asyncpg.py", line 792, in _handle_exception
+    raise translated_error from error
+sqlalchemy.exc.ProgrammingError: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.UndefinedTableError'>: relation "media_versions" does not exist
+[SQL: SELECT media_versions.id, media_versions.media_id, media_versions.version_number, media_versions.label, media_versions.stored_filename, media_versions.original_filename, media_versions.file_size, media_versions.mime_type, media_versions.duration, media_versions.width, media_versions.height, media_versions.video_codec, media_versions.audio_codec, media_versions.fps, media_versions.processing_status, media_versions.processing_error, media_versions.is_current, media_versions.created_at, media_versions.created_by_id 
+FROM media_versions 
+WHERE media_versions.media_id = $1::UUID ORDER BY media_versions.created_at DESC]
+[parameters: (UUID('f25e9822-dfe8-4103-a34d-0fb0bf85e83c'),)]
+(Background on this error at: https://sqlalche.me/e/20/f405)
