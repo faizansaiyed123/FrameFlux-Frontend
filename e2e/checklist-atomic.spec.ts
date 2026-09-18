@@ -17,8 +17,8 @@ const FPS = [24,25,30,50,60];
 const CODECS: Record<string,string> = {'H.264':'h264','H.265 / HEVC':'h265','VP8':'vp8','VP9':'vp9','AV1':'av1'};
 const RATIOS = ['16:9','9:16','4:3','1:1'];
 const execFileAsync = promisify(execFile);
-const TARGET_SECTION_NUMBER = 5;
-const TARGET_FEATURE = 'Fade audio out';
+const TARGET_SECTION_NUMBER = 6;
+const TARGET_FEATURE = 'Add external audio';
 
 async function ok(r: Awaited<ReturnType<APIRequestContext['get'] | APIRequestContext['post'] | APIRequestContext['patch'] | APIRequestContext['put'] | APIRequestContext['delete']>>, label:string) {
   expect(r.ok(), label + ': ' + await r.text()).toBeTruthy();
@@ -182,7 +182,7 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
   // External audio sync.
   if (section.includes('EXTERNAL AUDIO SYNC') || l.includes('sync external') || l.includes('synchronized video')) {
     const a=await auth(ctx.request,'atomic-sync'),v=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'),au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3');
-    await ok(await ctx.request.post(API+`/audio/${v.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_id:au.id,offset_ms:100,mix:false,match_duration:true,trim_audio:true,trim_video:false,start_position:0}}),f); return;
+    await expectBlob(await ctx.request.post(API+`/audio/${v.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_path:au.stored_filename,audio_offset:0,output_format:'mp4'}}),'video/'); return;
   }
 
   // Compression.
