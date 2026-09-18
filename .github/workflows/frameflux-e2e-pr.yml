@@ -104,7 +104,8 @@ jobs:
           from app.infrastructure.database import Base, engine
 
           async def main():
-              await Base.metadata.create_all(engine)
+              async with engine.begin() as conn:
+                  await conn.run_sync(Base.metadata.create_all)
               await engine.dispose()
 
           asyncio.run(main())
