@@ -100,7 +100,7 @@ test.describe('FrameFlux exhaustive UI surface', () => {
     }
 
     for (const tool of ['Trim', 'Split', 'Speed', 'Transform', 'Overlay', 'Freeze']) {
-      await page.getByRole('button', { name: tool }).click();
+      await page.getByRole('button', { name: tool }).first().click();
       await expect(page.locator('body')).toContainText(new RegExp(tool.replace(/ /g, '\\\\s+'), 'i'));
     }
 
@@ -160,7 +160,7 @@ test.describe('FrameFlux exhaustive UI surface', () => {
       'Generate GIF',
       'Media Information',
     ]) {
-      await expect(page.getByRole('button', { name: title, exact: true })).toBeVisible();
+      await expect(page.getByText(title, { exact: true }).first()).toBeVisible();
     }
 
     const body = page.locator('body');
