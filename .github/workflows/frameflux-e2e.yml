@@ -5,15 +5,13 @@ on:
   push:
     branches:
       - qa/full-e2e-testing
-    paths-ignore:
-      - e2e/sequential-result.txt
 
 concurrency:
   group: frameflux-e2e-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   e2e:
@@ -168,30 +166,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run real-user browser tests
-        id: e2e
-        continue-on-error: true
-        run: |
-          set +e
-          npx playwright test e2e/checklist-atomic.spec.ts 2>&1 | tee target-test.log
-          exit ${PIPESTATUS[0]}
-
-      - name: Record sequential target result
-        if: always()
-        run: |
-          if [ "${{ steps.e2e.outcome }}" = "success" ]; then
-            printf 'PASS|Fade audio in|%s\n' "${GITHUB_SHA}" > e2e/sequential-result.txt
-          else
-            printf 'FAIL|Fade audio in|%s\n' "${GITHUB_SHA}" > e2e/sequential-result.txt
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add e2e/sequential-result.txt
-          git diff --cached --quiet || git commit -m "qa: record sequential target result [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}" || true
-
-      - name: Fail workflow when target fails
-        if: steps.e2e.outcome != 'success'
-        run: exit 1
+        run: npx playwright test
 
       - name: Upload Playwright report
         if: always()
