@@ -1,1 +1,1 @@
-PASS|Favorites: add, list, and remove a media favorite|e3d48877b35d6bacb3fb2382a0d6e17e9edb0bd2
+PASS|Upload multiple files: select three files, upload, and verify all appear|1fa06311ae276f953d4d4bbb0e531c54cf812d79
