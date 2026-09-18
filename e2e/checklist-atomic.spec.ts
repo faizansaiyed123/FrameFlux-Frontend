@@ -16,6 +16,7 @@ const FPS = [24,25,30,50,60];
 const CODECS: Record<string,string> = {'H.264':'h264','H.265 / HEVC':'h265','VP8':'vp8','VP9':'vp9','AV1':'av1'};
 const RATIOS = ['16:9','9:16','4:3','1:1'];
 const execFileAsync = promisify(execFile);
+const TARGET_SECTION_NUMBER = 5;
 const TARGET_FEATURE = 'Replace audio';
 
 async function ok(r: Awaited<ReturnType<APIRequestContext['get'] | APIRequestContext['post'] | APIRequestContext['patch'] | APIRequestContext['put'] | APIRequestContext['delete']>>, label:string) {
@@ -339,7 +340,7 @@ const atomicItems=sections.flatMap(s=>s.items.map((feature,i)=>({section:s.title
 
 test.describe('ATOMIC CHECKLIST — one test result for every checklist entry', () => {
   for (const item of atomicItems) {
-    const define = item.sectionNumber === 4 && item.index === 4 ? test.only : test;
+    const define = item.sectionNumber === TARGET_SECTION_NUMBER && item.feature === TARGET_FEATURE ? test.only : test;
     define(`${String(item.sectionNumber).padStart(2,'0')}.${String(item.index).padStart(2,'0')} ${item.section} :: ${item.feature}`, async ({request,page}) => {
       await exercise(item.section,item.feature,{request,page});
     });
