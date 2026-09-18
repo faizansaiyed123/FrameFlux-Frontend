@@ -1,1 +1,4 @@
-PASS|Fade audio in|7f8688d556c2437a0b9a40b8232ab3658a9f96e5
+PASS|Fade audio in|281f09d7cf2e6fb5bdf8f8e85ddf391e12dc5e84
+PASS|Fade audio out|d9a55c671b14b2c7d4cfb2dedfbb551b0736a3a6
+PASS|Add external audio|7f8688d556c2437a0b9a40b8232ab3658a9f96e5
+TARGET|Replace original audio
