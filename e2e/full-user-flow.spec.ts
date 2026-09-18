@@ -15,7 +15,7 @@ test.describe('FrameFlux real-user end-to-end flow', () => {
     await expect(page.getByRole('heading', { name: /create your account/i })).toBeVisible();
     await page.getByLabel(/full name/i).fill('QA Browser User');
     await page.getByLabel(/email/i).fill(email);
-    await page.getByLabel(/password/i).fill(password);
+    await page.getByRole('textbox', { name: 'Password' }).fill(password);
     await page.getByRole('button', { name: /create account/i }).click();
     await page.waitForURL(/\/app\/dashboard$/, { timeout: 60_000 });
     await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
@@ -67,8 +67,8 @@ test.describe('FrameFlux real-user end-to-end flow', () => {
     // Export dialog open/close and option interaction
     await page.getByRole('button', { name: /^export$/i }).first().click();
     await expect(page.getByRole('heading', { name: /export settings/i })).toBeVisible();
-    await expect(page.getByText('Output Format')).toBeVisible();
-    await expect(page.getByText('Resolution Preset').first()).toBeVisible({ timeout: 15_000 }).catch(() => {});
+    await expect(page.getByText('Format').first()).toBeVisible();
+    await expect(page.getByText('Quality').first()).toBeVisible();
     await page.getByRole('button', { name: /cancel/i }).click();
     await expect(page.getByRole('heading', { name: /export settings/i })).toHaveCount(0);
   });
