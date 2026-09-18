@@ -8,18 +8,17 @@ test.describe('12 Remaining checklist coverage', () => {
   test('multiple media upload, subtitle upload and batch upload/status', async ({ request }) => {
     const auth = await createUser(request, 'remaining-upload');
 
-    const multiple = await request.post(API + '/media/upload-multiple', {
+    const form = new FormData();
+    form.append('files', new Blob([fs.readFileSync('e2e/fixtures/sample.mp4')], { type: 'video/mp4' }), 'sample.mp4');
+    form.append('files', new Blob([fs.readFileSync('e2e/fixtures/sample.mp3')], { type: 'audio/mpeg' }), 'sample.mp3');
+    form.append('files', new Blob([fs.readFileSync('e2e/fixtures/sample.png')], { type: 'image/png' }), 'sample.png');
+    const multipleRaw = await fetch(API + '/media/upload-multiple', {
+      method: 'POST',
       headers: { Authorization: 'Bearer ' + auth.token },
-      multipart: {
-        files: [
-          { name: 'sample.mp4', mimeType: 'video/mp4', buffer: fs.readFileSync('e2e/fixtures/sample.mp4') },
-          { name: 'sample.mp3', mimeType: 'audio/mpeg', buffer: fs.readFileSync('e2e/fixtures/sample.mp3') },
-          { name: 'sample.png', mimeType: 'image/png', buffer: fs.readFileSync('e2e/fixtures/sample.png') },
-        ],
-      },
+      body: form,
     });
-    expect(multiple.ok(), await multiple.text()).toBeTruthy();
-    expect((await multiple.json()).length).toBe(3);
+    expect(multipleRaw.ok, await multipleRaw.text()).toBeTruthy();
+    expect((await multipleRaw.json()).length).toBe(3);
 
     const subtitle = await request.post(API + '/subtitles/upload', {
       headers: { Authorization: 'Bearer ' + auth.token },
