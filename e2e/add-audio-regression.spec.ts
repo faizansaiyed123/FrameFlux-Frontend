@@ -19,9 +19,9 @@ test('Add audio: mix separately uploaded audio with video and download result', 
   await expect(field).toBeVisible();
   await field.fill(audioPath);
 
-  const download = await page.waitForEvent('download', async () => {
-    await page.getByRole('button', { name: /^Add Audio$/i }).click();
-  });
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: /^Add Audio$/i }).click();
+  const download = await downloadPromise;
 
   await expect(download.suggestedFilename()).toContain('_with_audio.mp4');
   await expect(page.getByText(new RegExp('Audio added and mixed', 'i'))).toBeVisible({ timeout: 30_000 });
