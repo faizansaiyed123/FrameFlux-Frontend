@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '04\.08 VIDEO EDITING :: Reorder clips'
+  FEATURE_GREP: '05\.01 VIDEO AUDIO CONTROL :: Remove audio'
 
 jobs:
   feature:
