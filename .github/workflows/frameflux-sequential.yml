@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Convert video to WebM: select WebM, use default compatible audio, complete conversion, download result'
+  FEATURE_GREP: 'Convert video to MPEG: select MPEG, complete conversion, download result'
 
 jobs:
   feature:
@@ -177,7 +177,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/webm-regression.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/mpeg-regression.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
