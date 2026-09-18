@@ -115,3 +115,11 @@ export function mimeFor(filePath: string) {
   };
   return map[ext] || 'application/octet-stream';
 }
+export async function uploadViaMediaDialog(page: Page, filePath: string, expectedName: string) {
+  await page.getByRole('button', { name: /upload media/i }).click();
+  const input = page.locator('input[type="file"]#file').last();
+  await input.setInputFiles(filePath);
+  await expect(page.getByText(expectedName, { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: /^upload$/i }).click();
+  await page.waitForURL(/\/app\/dashboard\/media\/[^/?]+\?from_upload=1$/, { timeout: 120_000 });
+}
