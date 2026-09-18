@@ -89,7 +89,7 @@ jobs:
       - name: Apply test-only schema compatibility patch
         working-directory: backend
         run: |
-          PGPASSWORD=frameflux psql -h 127.0.0.1 -U frameflux -d frameflux -v ON_ERROR_STOP=1 -c "ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences VARCHAR(255);"
+          PGPASSWORD=frameflux psql -h 127.0.0.1 -U frameflux -d frameflux -v ON_ERROR_STOP=1 -c "ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS folder VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS tags TEXT;"
 
       - name: Start backend
         working-directory: backend
