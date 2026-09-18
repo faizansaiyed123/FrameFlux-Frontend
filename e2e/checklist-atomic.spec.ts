@@ -182,7 +182,10 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
   // External audio sync.
   if (section.includes('EXTERNAL AUDIO SYNC') || l.includes('sync external') || l.includes('synchronized video')) {
     const a=await auth(ctx.request,'atomic-sync'),v=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'),au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3');
-    await expectBlob(await ctx.request.post(API+`/audio/${v.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_path:au.stored_filename,audio_offset:0,output_format:'mp4'}}),'video/'); return;
+    const data:any={audio_path:au.stored_filename,audio_offset:0,output_format:'mp4'};
+    if (l === 'keep original audio') { data.mix=true; data.mix_volume=1.0; }
+    if (l.includes('mix original + external audio')) { data.mix=true; data.mix_volume=0.5; }
+    await expectBlob(await ctx.request.post(API+`/audio/${v.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data}),'video/'); return;
   }
 
   // Compression.
