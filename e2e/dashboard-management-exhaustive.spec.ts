@@ -198,7 +198,7 @@ test.describe('08 Responsive, keyboard and accessibility affordances', () => {
     { name: 'tablet', width: 1024, height: 768 },
     { name: 'mobile', width: 390, height: 844 },
   ]) {
-    test(\`dashboard is usable at ${viewport.name} viewport\`, async ({ page, request }) => {
+    test(`dashboard is usable at ${viewport.name} viewport`, async ({ page, request }) => {
       const auth = await createUser(request, 'responsive');
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await setAuthenticatedBrowser(page, auth.email, auth.password);
