@@ -117,6 +117,17 @@ jobs:
         run: |
           uv run python - <<'PY'
           import asyncio
+          # Import every ORM module so all current models are registered on Base.metadata.
+          from app.features.media.models import Media, MediaVersion
+          from app.features.jobs.models import ProcessingJob
+          from app.features.presets.models import Preset
+          from app.features.workflows.models import Workflow
+          from app.features.projects.models import Project
+          from app.features.favorites.models import Favorite
+          from app.features.notifications.models import Notification
+          from app.features.sharing.models import ShareLink
+          from app.features.history.models import ProcessingHistory
+          from app.features.ui.models import UserPreference
           from app.infrastructure.database import Base, engine
 
           async def main():
