@@ -1,1 +1,1 @@
-PASS|Add audio: mix separately uploaded audio with video and download result|61ae489e025812b2857834cffe1a7936b373ea43
+PASS|Upload multiple files: select three files, upload, and verify all appear|f6c40dad0e9cc7d2c3357f29b2b26346f7c08d4f
