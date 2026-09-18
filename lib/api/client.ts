@@ -325,6 +325,35 @@ class ApiClient {
     });
   }
 
+  async uploadMultipleMedia(files: File[]) {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    return this.request<{
+      id: string;
+      user_id: string | null;
+      original_filename: string;
+      stored_filename: string;
+      media_type: string;
+      mime_type: string;
+      file_size: number;
+      project_id: string | null;
+      processing_status: string;
+      processed_filename: string | null;
+      processing_error: string | null;
+      duration: number | null;
+      width: number | null;
+      height: number | null;
+      video_codec: string | null;
+      audio_codec: string | null;
+      fps: string | null;
+      created_at: string;
+    }[]>('/media/upload-multiple', {
+      method: 'POST',
+      headers: {},
+      body: formData,
+    });
+  }
+
   async listMedia(params?: {
     search?: string;
     media_type?: string;
