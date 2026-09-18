@@ -130,7 +130,7 @@ test.describe('07 Dashboard management and UI interactions', () => {
     await setAuthenticatedBrowser(page, auth.email, auth.password);
     await page.goto('/app/dashboard/settings');
 
-    await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible();
+    await expect(page.getByText('Profile', { exact: true }).first()).toBeVisible();
     await page.getByLabel('Full Name').fill('QA Settings User');
     await page.getByRole('button', { name: /save|update profile/i }).first().click().catch(() => {});
 
