@@ -284,7 +284,7 @@ const atomicItems=sections.flatMap(s=>s.items.map((feature,i)=>({section:s.title
 
 test.describe('ATOMIC CHECKLIST — one test result for every checklist entry', () => {
   for (const item of atomicItems) {
-    test(`${String(item.sectionNumber).padStart(2,'0')}.${String(item.index).padStart(2,'0')} ${item.section} :: ${item.feature}`, async ({request,page}) => {
+    test.only(`${String(item.sectionNumber).padStart(2,'0')}.${String(item.index).padStart(2,'0')} ${item.section} :: ${item.feature}`, async ({request,page}) => {
       await exercise(item.section,item.feature,{request,page});
     });
   }
