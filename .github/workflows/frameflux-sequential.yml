@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '02\\.05 UPLOAD :: Upload multiple files'
+  FEATURE_GREP: '02\.05 UPLOAD :: Upload multiple files'
 
 jobs:
   feature:
