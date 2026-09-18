@@ -320,7 +320,7 @@ test.describe('03 Audio processing matrix', () => {
     const auth = await createUser(request, 'audio-extract');
     for (const format of audioFormats) {
       const media = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp4');
-      await expectBlob(await request.get(`${API}/audio/${media.id}/extract?format=${format}&bitrate=192k&sample_rate=44100&channels=2`, {
+      await expectBlob(await request.get(`${API}/audio/${media.id}/extract?format=${format}&bitrate=192k&sample_rate=${format === 'opus' ? 48000 : 44100}&channels=2`, {
         headers: { Authorization: 'Bearer ' + auth.token },
       }), 'audio/');
       await expectBlob(await request.get(`${API}/audio/${media.id}/extract?format=${format}&start=0.2&end=1.2&channels=2`, {
@@ -335,7 +335,7 @@ test.describe('03 Audio processing matrix', () => {
       const media = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp3');
       const res = await request.post(`${API}/audio/${media.id}/convert`, {
         headers: { Authorization: 'Bearer ' + auth.token, 'Content-Type': 'application/json' },
-        data: { format, bitrate: '192k', sample_rate: 44100, channels: 2, quality: 'medium' },
+        data: { format, bitrate: '192k', sample_rate: format === 'opus' ? 48000 : 44100, channels: 2, quality: 'medium' },
       });
       expect(res.ok(), `${format}: ${await res.text()}`).toBeTruthy();
       await expectBlob(res, 'audio/');
@@ -363,10 +363,10 @@ test.describe('03 Audio processing matrix', () => {
     const video = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp4');
     const audio = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp3');
 
-    let res = await postJson(request, auth.token, `/audio/${video.id}/volume`, { volume: 0.75, fade_in: 0.2, fade_out: 0.2 });
+    let res = await postJson(request, auth.token, `/audio/${video.id}/volume?volume=0.75&fade_in=0.2&fade_out=0.2`, {});
     expect(await res.json()).toHaveProperty('output_filename');
 
-    res = await postJson(request, auth.token, `/audio/${video.id}/replace-audio`, { audio_path: audio.stored_filename, fade_in: 0.2, fade_out: 0.2 });
+    res = await postJson(request, auth.token, `/audio/${video.id}/replace-audio?audio_path=${encodeURIComponent(audio.stored_filename)}&fade_in=0.2&fade_out=0.2`, {});
     expect(await res.json()).toHaveProperty('output_filename');
 
     res = await postJson(request, auth.token, `/audio/${video.id}/sync-audio`, {
