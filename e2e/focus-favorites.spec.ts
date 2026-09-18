@@ -32,4 +32,3 @@ test('Favorites — add, list, display and remove', async ({ request, page }) =>
   expect(finalList.ok(), await finalList.text()).toBeTruthy();
   expect((await finalList.json()).some((item: any) => item.media_id === media.id)).toBeFalsy();
 });
-\n// Sequential feature verification: Favorites only.\n
