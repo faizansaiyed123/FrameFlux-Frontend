@@ -97,7 +97,7 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
   // Video editing / audio-video operations.
   if (section.includes('VIDEO EDITING') || ['trim video','cut video','split video','delete selected section','keep selected section','extract selected section','merge videos','reorder clips','add multiple clips','freeze frame','crop video','resize video','rotate video','flip video'].includes(l)) {
     const a=await auth(ctx.request,'atomic-edit'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4');
-    if (l==='merge videos'||l==='reorder clips'||l==='add multiple clips'){ const b=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample2.mp4'); const route=l==='reorder clips'?'/reorder':'/merge'; await ok(await ctx.request.post(API+`/media/${m.id}${route}`,{headers:{Authorization:'Bearer '+a.token},data:{media_ids:[m.id,b.id],order:[m.id,b.id]}}),f); return; }
+    if (l==='merge videos'||l==='reorder clips'||l==='add multiple clips'){ const b=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample2.mp4'); const route=l==='reorder clips'?'/clips/reorder':l==='add multiple clips'?'/clips/append':'/merge'; await ok(await ctx.request.post(API+`/media/${m.id}${route}`,{headers:{Authorization:'Bearer '+a.token},data:{media_ids:[b.id,m.id]}}),f); return; }
     if (l==='freeze frame'){ await ok(await ctx.request.post(API+`/media/${m.id}/freeze`,{headers:{Authorization:'Bearer '+a.token},data:{timestamp:0.5,duration:0.5}}),f); return; }
     if (l.includes('split')) {
       const response=await ok(await ctx.request.post(API+`/media/${m.id}/split`,{headers:{Authorization:'Bearer '+a.token},data:{split_points:[1]}}),f);
