@@ -1,4 +1,4 @@
-import { test, expect, APIRequestContext, Page, TestInfo } from '@playwright/test';
+import { test, expect, APIRequestContext, Page } from '@playwright/test';
 import fs from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -133,11 +133,8 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
       expect(st.status,f+': '+JSON.stringify(st)).toBe('completed');
       expect(st.processed_filename,f).toBeTruthy();
       const processed=await ok(await ctx.request.get(API+`/media/${m.id}/processed`,{headers:{Authorization:'Bearer '+a.token}}),f);
-      const filePath=ctx.request?undefined:undefined;
       const body=await processed.body();
-      const tmp=ctx.page?await ctx.page.evaluate(()=>null):null;
-      void filePath; void tmp;
-      const outputPath=`test-results-remove-audio-${m.id}.mp4`;
+      const outputPath=`/tmp/frameflux-remove-audio-${m.id}.mp4`;
       await fs.writeFile(outputPath,body);
       const probe=await execFileAsync('ffprobe',['-v','error','-select_streams','a','-show_entries','stream=codec_type','-of','default=nw=1:nk=1',outputPath]);
       expect(probe.stdout.trim(),f).toBe('');
