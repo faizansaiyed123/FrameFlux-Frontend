@@ -163,7 +163,9 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run current failed feature only
-        run: npx playwright test e2e/checklist-atomic.spec.ts --grep "$FEATURE_GREP"
+        run: |
+          set -o pipefail
+          npx playwright test e2e/checklist-atomic.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
@@ -178,7 +180,13 @@ jobs:
       - name: Record feature FAIL
         if: failure()
         run: |
-          printf '%s\n' "FAIL|$FEATURE_GREP|${GITHUB_SHA}" > e2e/sequential-result.txt
+          {
+            printf '%s\n' "FAIL|$FEATURE_GREP|${GITHUB_SHA}"
+            printf '%s\n' "--- PLAYWRIGHT OUTPUT ---"
+            tail -n 240 sequential-feature.log || true
+            printf '%s\n' "--- BACKEND LOG ---"
+            tail -n 160 backend.log || true
+          } > e2e/sequential-result.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add e2e/sequential-result.txt
