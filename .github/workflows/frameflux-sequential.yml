@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '03\.08 VIDEO → VIDEO CONVERSION :: MPEG'
+  FEATURE_GREP: '04\.03 VIDEO EDITING :: Split video'
 
 jobs:
   feature:
