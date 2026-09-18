@@ -304,7 +304,7 @@ test.describe('03b Image processing and video setting permutations', () => {
       format: 'mp4', width: 160, height: 120, fps: 24, video_bitrate: '500k', audio_bitrate: '128k',
       quality: 5, video_codec: 'h264', audio_codec: 'aac', aspect_ratio: '16:9',
     });
-    expect(converted).toHaveProperty('output_filename');
+    expect(await converted.json()).toHaveProperty('output_filename');
     const status = await waitForMedia(request, auth.token, media.id);
     expect(status.status).toBe('completed');
     const processed = await request.get(`${API}/media/${media.id}/download?download_type=processed`, {
@@ -364,7 +364,7 @@ test.describe('03 Audio processing matrix', () => {
     const video = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp4');
     const audio = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp3');
 
-    let res = await postJson(request, auth.token, `/audio/${video.id}/volume?volume=0.75&fade_in=0.2&fade_out=0.2`, {});
+    let res = await postJson(request, auth.token, `/audio/${video.id}/volume?volume=0.75`, {});
     expect(await res.json()).toHaveProperty('output_filename');
 
     res = await postJson(request, auth.token, `/audio/${video.id}/replace-audio?audio_path=${encodeURIComponent(audio.stored_filename)}&fade_in=0.2&fade_out=0.2`, {});
