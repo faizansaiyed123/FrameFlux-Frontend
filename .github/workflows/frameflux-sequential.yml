@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Favorites: add, list, and remove a media favorite'
+  FEATURE_GREP: 'Upload multiple files: select three files, upload, and verify all appear'
 
 jobs:
   feature:
@@ -165,7 +165,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/favorites-regression.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/upload-multiple-regression.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
