@@ -46,10 +46,10 @@ test.describe('FrameFlux real-user end-to-end flow', () => {
     await expect(page.getByText('Compress Media')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Extract Audio' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Generate Thumbnail' })).toBeVisible();
-    await expect(page.getByText('Generate Preview')).toBeVisible();
-    await expect(page.getByText('Subtitles')).toBeVisible();
-    await expect(page.getByText('Generate GIF')).toBeVisible();
-    await expect(page.getByText('Media Information')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Generate Preview' })).toBeVisible();
+    await expect(page.getByText('Subtitles', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Generate GIF', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Media Information', { exact: true }).first()).toBeVisible();
 
     // Open the actual editor.
     await page.getByRole('tab', { name: 'Processing' }).click();
