@@ -873,6 +873,47 @@ class ApiClient {
     });
   }
 
+  async addAudio(mediaId: string, audioPath: string, options?: {
+    audioOffset?: number;
+    videoDuration?: number;
+    audioDuration?: number;
+    fadeIn?: number;
+    fadeOut?: number;
+    volume?: number;
+    mixVolume?: number;
+    outputFormat?: 'mp4' | 'webm';
+  }) {
+    const data = {
+      audio_path: audioPath,
+      audio_offset: options?.audioOffset ?? 0,
+      video_duration: options?.videoDuration,
+      audio_duration: options?.audioDuration,
+      fade_in: options?.fadeIn,
+      fade_out: options?.fadeOut,
+      volume: options?.volume ?? 1,
+      mix: true,
+      mix_volume: options?.mixVolume ?? 0.5,
+      output_format: options?.outputFormat ?? 'mp4',
+    };
+
+    const response = await fetch(this.baseUrl + '/audio/' + mediaId + '/sync-audio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}),
+      },
+      credentials: 'include',
+      mode: 'cors',
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Add audio failed' }));
+      throw new Error(error.detail || 'HTTP error ' + response.status);
+    }
+
+    return response.blob();
+  }
   async syncAudioVideo(mediaId: string, data: {
     audio_path: string;
     audio_offset?: number;
