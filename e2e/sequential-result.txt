@@ -1,31 +1,6 @@
-FAIL|Add audio: mix separately uploaded audio with video and download result|ef04b5dcbc052573aff367121d97cbc367234687
+FAIL|Add audio: mix separately uploaded audio with video and download result|2811b0f5507c6efa083538a5fa8843ee51a64e8c
 --- PLAYWRIGHT OUTPUT ---
 --- BACKEND LOG ---
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/app/main.py", line 51, in dispatch
-    response = await call_next(request)
-               ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/base.py", line 168, in call_next
-    raise app_exc from app_exc.__cause__ or app_exc.__context__
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/base.py", line 144, in coro
-    await self.app(scope, receive_or_disconnect, send_no_error)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 96, in __call__
-    await self.simple_response(scope, receive, send, request_headers=headers)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 154, in simple_response
-    await self.app(scope, receive, send)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
-    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
-    raise exc
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
-    await app(scope, receive, sender)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
-    await self.app(scope, receive, send)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/routing.py", line 670, in __call__
-    await self.middleware_stack(scope, receive, send)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 2734, in app
-    await route.handle(scope, receive, send)
-  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1780, in handle
-    await self.original_router.handle(scope, receive, send)
   File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 2789, in handle
     await included_router._handle_selected(scope, receive, send)
   File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1800, in _handle_selected
@@ -159,5 +134,30 @@ sqlalchemy.exc.ProgrammingError: (sqlalchemy.dialects.postgresql.asyncpg.Program
 [SQL: SELECT media_versions.id, media_versions.media_id, media_versions.version_number, media_versions.label, media_versions.stored_filename, media_versions.original_filename, media_versions.file_size, media_versions.mime_type, media_versions.duration, media_versions.width, media_versions.height, media_versions.video_codec, media_versions.audio_codec, media_versions.fps, media_versions.processing_status, media_versions.processing_error, media_versions.is_current, media_versions.created_at, media_versions.created_by_id 
 FROM media_versions 
 WHERE media_versions.media_id = $1::UUID ORDER BY media_versions.created_at DESC]
-[parameters: (UUID('f25e9822-dfe8-4103-a34d-0fb0bf85e83c'),)]
+[parameters: (UUID('303266eb-930f-4201-9e90-a2b2f9a37df8'),)]
 (Background on this error at: https://sqlalche.me/e/20/f405)
+2026-09-18 14:57:53,901 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:42100 - "OPTIONS /media/303266eb-930f-4201-9e90-a2b2f9a37df8/download?download_type=original HTTP/1.1" 200 OK
+INFO:     127.0.0.1:42110 - "OPTIONS /media/303266eb-930f-4201-9e90-a2b2f9a37df8/download?download_type=original HTTP/1.1" 200 OK
+2026-09-18 14:57:54,129 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 14:57:54,132 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-18 14:57:54,132 INFO sqlalchemy.engine.Engine [cached since 6.101s ago] (UUID('894dc435-9fc5-4d2b-8cba-dbcc4159d524'),)
+2026-09-18 14:57:54,134 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+FROM media 
+WHERE media.id = $1::UUID
+2026-09-18 14:57:54,134 INFO sqlalchemy.engine.Engine [cached since 0.5771s ago] (UUID('303266eb-930f-4201-9e90-a2b2f9a37df8'),)
+INFO:     127.0.0.1:42064 - "GET /media/303266eb-930f-4201-9e90-a2b2f9a37df8/download?download_type=original HTTP/1.1" 200 OK
+2026-09-18 14:57:54,151 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 14:57:54,160 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 14:57:54,161 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-18 14:57:54,161 INFO sqlalchemy.engine.Engine [cached since 6.13s ago] (UUID('894dc435-9fc5-4d2b-8cba-dbcc4159d524'),)
+2026-09-18 14:57:54,163 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+FROM media 
+WHERE media.id = $1::UUID
+2026-09-18 14:57:54,164 INFO sqlalchemy.engine.Engine [cached since 0.6071s ago] (UUID('303266eb-930f-4201-9e90-a2b2f9a37df8'),)
+INFO:     127.0.0.1:42100 - "GET /media/303266eb-930f-4201-9e90-a2b2f9a37df8/download?download_type=original HTTP/1.1" 200 OK
+2026-09-18 14:57:54,170 INFO sqlalchemy.engine.Engine ROLLBACK
