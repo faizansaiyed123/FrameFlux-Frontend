@@ -233,7 +233,8 @@ test.describe('02 Video conversion and editing matrix', () => {
     const media = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp4');
     for (const [endpoint, data] of [
       [`/video/${media.id}/adjust`, { brightness: 0.1, contrast: 1, saturation: 1, gamma: 1, hue: 0 }],
-      [`/video/${media.id}/filter`, { operation: 'grayscale', intensity: 1 }],
+      [`/video/${media.id}/filter`, { operation: 'sharpen', intensity: 1 }],
+      [`/video/${media.id}/filter`, { operation: 'blur', intensity: 1 }],
       [`/video/${media.id}/fade`, { fade_type: 'in', duration: 0.5, start_time: 0 }],
       [`/video/${media.id}/reverse`, { output_format: 'mp4' }],
     ] as const) {
