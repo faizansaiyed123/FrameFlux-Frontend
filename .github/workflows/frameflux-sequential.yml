@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '05\.07 VIDEO AUDIO CONTROL :: Mix original + new audio'
+  FEATURE_GREP: 'Mix original + new audio'
 
 jobs:
   feature:
