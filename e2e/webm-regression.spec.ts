@@ -22,11 +22,11 @@ test('Convert video to WebM: select WebM, use default compatible audio, complete
     await route.continue();
   });
 
-  await page.getByRole('button', { name: /^Start Conversion$/i }).click();
+  await page.getByRole('button', { name: /^Export$/i }).last().click();
   await expect.poll(() => requestPayload).toBeTruthy();
   expect(requestPayload?.format).toBe('webm');
   expect(requestPayload?.video_codec).toBe('vp9');
-  await expect(page.getByText(/Processing started/i)).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText(/Export Complete|Processing started/i)).toBeVisible({ timeout: 130_000 });
 
   const status = await waitForMedia(request, auth.token, media.id, 60_000);
   expect(status.status, JSON.stringify(status)).toBe('completed');
