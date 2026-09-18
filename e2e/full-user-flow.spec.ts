@@ -83,8 +83,11 @@ test.describe('FrameFlux real-user end-to-end flow', () => {
     await expect(page.getByRole('heading', { name: 'Split Clip' })).toBeVisible();
 
     // Create a second clip through the real timeline/playhead UI.
-    const timeline = page.getByText('Timeline').locator('..').locator('..');
-    await page.mouse.click(300, 480);
+    const timeline = page.locator('div.overflow-x-auto.cursor-crosshair').first();
+    const timelineBox = await timeline.boundingBox();
+    expect(timelineBox).not.toBeNull();
+    if (!timelineBox) throw new Error('Timeline was not measurable');
+    await page.mouse.click(timelineBox.x + timelineBox.width * 0.25, timelineBox.y + timelineBox.height * 0.65);
     await page.getByRole('button', { name: 'Split' }).click();
     await expect(page.getByText(/2 clips/)).toBeVisible({ timeout: 15_000 });
 
