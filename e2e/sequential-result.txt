@@ -1,15 +1,1 @@
-FAIL|02\\.05 UPLOAD :: Upload multiple files|a6034b6e00806113e1dd4ac1eb69b198f58e9a12
---- PLAYWRIGHT OUTPUT ---
-[WebServer] ⚠ Slow filesystem detected. The benchmark took 295ms. If /home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/.next/dev is a network drive, consider moving it to a local folder.
-[WebServer] See more: https://nextjs.org/docs/app/guides/local-development
-[WebServer] ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
-Error: No tests found.
-Make sure that arguments are regular expressions matching test files.
-You may need to escape symbols like "$" or "*" and quote the arguments.
-
---- BACKEND LOG ---
-INFO:     Started server process [4693]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:33724 - "GET /health HTTP/1.1" 200 OK
+PASS|02\.05 UPLOAD :: Upload multiple files|a9838555ccfc0c3f706c179b1285223429be3912
