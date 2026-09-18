@@ -29,8 +29,14 @@ test.describe('11 Upload UX edge cases', () => {
     const dropTarget = page.locator('div.border-2.border-dashed').first();
     await expect(dropTarget).toBeVisible();
 
-    const input = page.locator('input[type="file"]#file').last();
-    await input.setInputFiles(path.resolve('e2e/fixtures/sample.mp4'));
+    const bytes = Array.from(require('node:fs').readFileSync(path.resolve('e2e/fixtures/sample.mp4')));
+    await page.evaluate((data) => {
+      const target = document.querySelector('div.border-2.border-dashed');
+      if (!target) throw new Error('Drop target not found');
+      const transfer = new DataTransfer();
+      transfer.items.add(new File([new Uint8Array(data)], 'sample.mp4', { type: 'video/mp4' }));
+      target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: transfer }));
+    }, bytes);
     await expect(page.getByText('sample.mp4', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: /^upload$/i })).toBeEnabled();
   });
