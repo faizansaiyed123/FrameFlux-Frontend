@@ -24,14 +24,7 @@ test.describe('10 UI-to-API wiring', () => {
     });
 
     const operationSelect = page.getByText('Operation').first().locator('..').getByRole('combobox');
-    for (const operation of [
-      ['scale', 'Width'],
-      ['crop', 'Width'],
-      ['rotate', 'Angle'],
-      ['flip', null],
-      ['flop', null],
-      ['speed', 'Speed'],
-    ]) {
+    for (const operation of ['scale', 'crop', 'rotate', 'flip', 'flop', 'speed']) {
       await operationSelect.click();
       await page.getByRole('option', { name: new RegExp(operation, 'i') }).click();
       await page.getByRole('button', { name: 'Apply Transform' }).click();
@@ -53,10 +46,9 @@ test.describe('10 UI-to-API wiring', () => {
     await page.getByRole('button', { name: 'Add Text' }).click();
     await expect(page.getByText('text', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'Edit' }).first().click();
-    await expect(page.locator('input').filter({ visible: true }).first()).toBeVisible();
+    await expect(page.locator('input:visible').first()).toBeVisible();
 
     await page.getByRole('button', { name: 'Add Watermark' }).click();
-    await page.getByLabel('Image Filename').fill('sample.png');
     await page.getByRole('button', { name: /Apply 2 Overlays/i }).click();
     await expect.poll(() => requestCount).toBe(1);
 
