@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - qa/full-e2e-testing
+    paths-ignore:
+      - e2e/sequential-result.txt
   workflow_dispatch:
 
 concurrency:
@@ -11,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 env:
   FEATURE_GREP: '01\.10 ACCOUNT & DASHBOARD :: Favorites'
@@ -162,6 +164,26 @@ jobs:
 
       - name: Run current failed feature only
         run: npx playwright test e2e/checklist-atomic.spec.ts --grep "$FEATURE_GREP"
+
+      - name: Record feature PASS
+        if: success()
+        run: |
+          printf '%s\n' "PASS|$FEATURE_GREP|${GITHUB_SHA}" > e2e/sequential-result.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/sequential-result.txt
+          git commit -m "qa: record sequential feature pass"
+          git push origin HEAD:qa/full-e2e-testing
+
+      - name: Record feature FAIL
+        if: failure()
+        run: |
+          printf '%s\n' "FAIL|$FEATURE_GREP|${GITHUB_SHA}" > e2e/sequential-result.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/sequential-result.txt
+          git commit -m "qa: record sequential feature failure"
+          git push origin HEAD:qa/full-e2e-testing
 
       - name: Upload evidence
         if: always()
