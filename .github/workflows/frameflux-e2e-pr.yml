@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: frameflux-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -90,6 +94,21 @@ jobs:
         working-directory: backend
         run: |
           PGPASSWORD=frameflux psql -h 127.0.0.1 -U frameflux -d frameflux -v ON_ERROR_STOP=1 -c "ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS folder VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS tags TEXT;"
+
+      - name: Create missing model tables for exhaustive tests
+        working-directory: backend
+        run: |
+          uv run python - <<'PY'
+          import asyncio
+          from app.main import app
+          from app.infrastructure.database import Base, engine
+
+          async def main():
+              await Base.metadata.create_all(engine)
+              await engine.dispose()
+
+          asyncio.run(main())
+          PY
 
       - name: Start backend
         working-directory: backend
