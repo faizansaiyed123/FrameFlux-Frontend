@@ -325,6 +325,35 @@ class ApiClient {
     });
   }
 
+  async uploadMultipleMedia(files: File[]) {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    return this.request<{
+      id: string;
+      user_id: string | null;
+      original_filename: string;
+      stored_filename: string;
+      media_type: string;
+      mime_type: string;
+      file_size: number;
+      project_id: string | null;
+      processing_status: string;
+      processed_filename: string | null;
+      processing_error: string | null;
+      duration: number | null;
+      width: number | null;
+      height: number | null;
+      video_codec: string | null;
+      audio_codec: string | null;
+      fps: string | null;
+      created_at: string;
+    }[]>('/media/upload-multiple', {
+      method: 'POST',
+      headers: {},
+      body: formData,
+    });
+  }
+
   async listMedia(params?: {
     search?: string;
     media_type?: string;
@@ -835,12 +864,56 @@ class ApiClient {
   }
 
   async replaceAudio(mediaId: string, audioPath: string, fadeIn?: number, fadeOut?: number) {
-    return this.request<{ output_filename: string }>(`/audio/${mediaId}/replace-audio`, {
+    const query = new URLSearchParams({ audio_path: audioPath });
+    if (fadeIn !== undefined) query.set('fade_in', String(fadeIn));
+    if (fadeOut !== undefined) query.set('fade_out', String(fadeOut));
+
+    return this.request<{ output_filename: string }>(`/audio/${mediaId}/replace-audio?${query.toString()}`, {
       method: 'POST',
-      body: JSON.stringify({ audio_path: audioPath, fade_in: fadeIn, fade_out: fadeOut }),
     });
   }
 
+  async addAudio(mediaId: string, audioPath: string, options?: {
+    audioOffset?: number;
+    videoDuration?: number;
+    audioDuration?: number;
+    fadeIn?: number;
+    fadeOut?: number;
+    volume?: number;
+    mixVolume?: number;
+    outputFormat?: 'mp4' | 'webm';
+  }) {
+    const data = {
+      audio_path: audioPath,
+      audio_offset: options?.audioOffset ?? 0,
+      video_duration: options?.videoDuration,
+      audio_duration: options?.audioDuration,
+      fade_in: options?.fadeIn,
+      fade_out: options?.fadeOut,
+      volume: options?.volume ?? 1,
+      mix: true,
+      mix_volume: options?.mixVolume ?? 0.5,
+      output_format: options?.outputFormat ?? 'mp4',
+    };
+
+    const response = await fetch(this.baseUrl + '/audio/' + mediaId + '/sync-audio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}),
+      },
+      credentials: 'include',
+      mode: 'cors',
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Add audio failed' }));
+      throw new Error(error.detail || 'HTTP error ' + response.status);
+    }
+
+    return response.blob();
+  }
   async syncAudioVideo(mediaId: string, data: {
     audio_path: string;
     audio_offset?: number;

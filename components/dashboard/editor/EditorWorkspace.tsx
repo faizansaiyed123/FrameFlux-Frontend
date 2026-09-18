@@ -339,7 +339,7 @@ function ExportModal({ config, onChange, onExport, exporting, onClose }: { confi
         <DialogHeader><DialogTitle>Export Settings</DialogTitle></DialogHeader>
         <div className="space-y-4 py-2">
           <div><Label>Format</Label>
-            <Select value={config.format} onValueChange={(v) => update({ format: v })}>
+            <Select value={config.format} onValueChange={(v) => update({ format: v, ...(v === 'webm' ? { videoCodec: 'vp9', audioCodec: 'keep' } : {}) })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{formats.map((f) => (<SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>))}</SelectContent>
             </Select>

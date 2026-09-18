@@ -1,0 +1,218 @@
+name: FrameFlux Sequential Feature Fix
+
+on:
+  push:
+    branches:
+      - qa/full-e2e-testing
+    paths-ignore:
+      - e2e/sequential-result.txt
+  workflow_dispatch:
+
+concurrency:
+  group: frameflux-sequential-feature
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  FEATURE_GREP: 'Convert video to WebM: select WebM, use default compatible audio, complete conversion, download result'
+
+jobs:
+  feature:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: frameflux
+          POSTGRES_USER: frameflux
+          POSTGRES_PASSWORD: frameflux
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U frameflux -d frameflux"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: faizansaiyed123/FrameFlux-Backend
+          ref: main
+          path: backend
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+          uv sync --frozen
+
+      - name: Configure backend
+        working-directory: backend
+        run: |
+          mkdir -p storage/uploads storage/processed storage/temp
+          cat > .env <<'EOF'
+          APP_NAME=FrameFlux API
+          APP_VERSION=0.1.0
+          DATABASE_URL=postgresql+asyncpg://frameflux:frameflux@127.0.0.1:5432/frameflux
+          REDIS_URL=redis://127.0.0.1:6379/0
+          APP_ORIGIN=http://localhost:3000
+          ENVIRONMENT=test
+          DEBUG=true
+          FFMPEG_BINARY=ffmpeg
+          FFPROBE_BINARY=ffprobe
+          UPLOAD_DIR=storage/uploads
+          PROCESSED_DIR=storage/processed
+          TEMP_DIR=storage/temp
+          JWT_SECRET_KEY=frameflux-e2e-test-secret-change-me
+          MAX_UPLOAD_SIZE_BYTES=524288000
+          MAX_CHUNK_SIZE_BYTES=52428800
+          EOF
+
+      - name: Run database migrations
+        working-directory: backend
+        run: uv run alembic upgrade head
+
+      - name: Apply test-only schema compatibility patch
+        working-directory: backend
+        run: |
+          PGPASSWORD=frameflux psql -h 127.0.0.1 -U frameflux -d frameflux -v ON_ERROR_STOP=1 -c "ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS folder VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS tags TEXT;"
+
+      - name: Create current model tables for tests
+        working-directory: backend
+        run: |
+          uv run python - <<'PY'
+          import asyncio
+          # Import every ORM module so all current models are registered on Base.metadata.
+          from app.features.auth.models import User
+          from app.features.media.models import Media, MediaVersion
+          from app.features.jobs.models import ProcessingJob
+          from app.features.presets.models import Preset
+          from app.features.workflows.models import Workflow
+          from app.features.projects.models import Project
+          from app.features.favorites.models import Favorite
+          from app.features.notifications.models import Notification
+          from app.features.sharing.models import ShareLink
+          from app.features.history.models import ProcessingHistory
+          from app.features.ui.models import UserPreference
+          from app.infrastructure.database import Base, engine
+
+          async def main():
+              async with engine.begin() as conn:
+                  await conn.run_sync(Base.metadata.create_all)
+              await engine.dispose()
+
+          asyncio.run(main())
+          PY
+
+      - name: Start backend API
+        working-directory: backend
+        run: |
+          nohup uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 > ../backend.log 2>&1 &
+
+      - name: Start background worker
+        working-directory: backend
+        run: |
+          nohup uv run arq app.infrastructure.worker.WorkerSettings > ../worker.log 2>&1 &
+
+      - name: Wait for backend
+        run: |
+          for i in {1..60}; do
+            if curl -fsS http://127.0.0.1:8000/health >/dev/null 2>&1; then exit 0; fi
+            sleep 2
+          done
+          cat backend.log || true
+          cat worker.log || true
+          exit 1
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Generate media fixtures
+        run: |
+          mkdir -p e2e/fixtures
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=blue:s=320x240:r=24 -f lavfi -i anullsrc=r=44100:cl=mono -t 2 -c:v libx264 -pix_fmt yuv420p -c:a aac e2e/fixtures/sample.mp4
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=green:s=320x240:r=24 -f lavfi -i anullsrc=r=44100:cl=mono -t 2 -c:v libx264 -pix_fmt yuv420p -c:a aac e2e/fixtures/sample2.mp4
+          ffmpeg -hide_banner -loglevel error -f lavfi -i sine=frequency=880:sample_rate=44100 -t 3 -c:a pcm_s16le e2e/fixtures/sample.wav
+          ffmpeg -hide_banner -loglevel error -i e2e/fixtures/sample.wav -c:a libmp3lame -b:a 192k e2e/fixtures/sample.mp3
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=red:s=320x240 -frames:v 1 e2e/fixtures/sample.png
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run current failed feature only
+        run: |
+          set -o pipefail
+          npx playwright test e2e/webm-regression.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
+
+      - name: Record feature PASS
+        if: success()
+        run: |
+          printf '%s\n' "PASS|$FEATURE_GREP|${GITHUB_SHA}" > e2e/sequential-result.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/sequential-result.txt
+          git commit -m "qa: record sequential feature pass"
+          git push origin HEAD:qa/full-e2e-testing
+
+      - name: Record feature FAIL
+        if: failure()
+        run: |
+          {
+            printf '%s\n' "FAIL|$FEATURE_GREP|${GITHUB_SHA}"
+            printf '%s\n' "--- PLAYWRIGHT OUTPUT ---"
+            tail -n 240 sequential-feature.log || true
+            printf '%s\n' "--- BACKEND LOG ---"
+            tail -n 160 backend.log || true
+          } > e2e/sequential-result.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add e2e/sequential-result.txt
+          git commit -m "qa: record sequential feature failure"
+          git push origin HEAD:qa/full-e2e-testing
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frameflux-sequential-feature-evidence
+          path: |
+            playwright-report
+            test-results
+            backend.log
+            worker.log
+          if-no-files-found: ignore
