@@ -10,6 +10,7 @@ test('Add audio: mix separately uploaded audio with video and download result', 
   await setAuthenticatedBrowser(page, auth.email, auth.password);
   await page.goto(`/app/dashboard/media/${video.id}`);
 
+  await page.getByRole('tab', { name: 'Processing', exact: true }).click();
   await page.getByRole('button', { name: /^Audio$/i }).click();
   const audioPath = audio.stored_filename;
 
