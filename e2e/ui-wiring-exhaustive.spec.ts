@@ -49,7 +49,7 @@ test.describe('10 UI-to-API wiring', () => {
     await expect(page.locator('input:visible').first()).toBeVisible();
 
     await page.getByRole('button', { name: 'Add Watermark' }).click();
-    await page.getByRole('button', { name: /Apply 2 Overlays/i }).click();
+    await page.getByRole('button', { name: /Apply 2 Overlay/i }).click();
     await expect.poll(() => requestCount).toBe(1);
 
     await page.getByRole('button', { name: 'Remove' }).first().click();
