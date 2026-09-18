@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '04\.03 VIDEO EDITING :: Split video'
+  FEATURE_GREP: '04\.04 VIDEO EDITING :: Delete selected section'
 
 jobs:
   feature:
