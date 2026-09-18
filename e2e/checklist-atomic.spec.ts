@@ -1,4 +1,7 @@
-import { test, expect, APIRequestContext, Page } from '@playwright/test';
+import { test, expect, APIRequestContext, Page, TestInfo } from '@playwright/test';
+import fs from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { API, createUser, expectBlob, uploadMedia, setAuthenticatedBrowser, waitForMedia } from './qa-helpers';
 
 test.describe.configure({ mode: 'parallel', timeout: 120_000 });
@@ -12,6 +15,8 @@ const VIDEO_RES = ['144p','240p','360p','480p','720p','1080p','1440p','2160p'];
 const FPS = [24,25,30,50,60];
 const CODECS: Record<string,string> = {'H.264':'h264','H.265 / HEVC':'h265','VP8':'vp8','VP9':'vp9','AV1':'av1'};
 const RATIOS = ['16:9','9:16','4:3','1:1'];
+const execFileAsync = promisify(execFile);
+const TARGET_FEATURE = 'Remove audio';
 
 async function ok(r: Awaited<ReturnType<APIRequestContext['get'] | APIRequestContext['post'] | APIRequestContext['patch'] | APIRequestContext['put'] | APIRequestContext['delete']>>, label:string) {
   expect(r.ok(), label + ': ' + await r.text()).toBeTruthy();
@@ -121,6 +126,24 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
   if (l.includes('overlay')) { const a=await auth(ctx.request,'atomic-overlay'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'); await ok(await ctx.request.post(API+`/media/${m.id}/overlay`,{headers:{Authorization:'Bearer '+a.token},data:{type:l.includes('image')||l.includes('watermark')?'image':'text',text:'FrameFlux',x:10,y:10,duration:1}}),f); return; }
   if (l.includes('audio') && (l.includes('remove')||l.includes('add ')||l.includes('replace')||l.includes('mix')||l.includes('mute')||l.includes('volume')||l.includes('delay')||l.includes('offset')||l.includes('fade'))) {
     const a=await auth(ctx.request,'atomic-va'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4');
+    if (l==='remove audio') {
+      const response=await ok(await ctx.request.post(API+`/quick-actions/${m.id}/execute?action_id=remove-audio`,{headers:{Authorization:'Bearer '+a.token}}),f);
+      expect((await response.json()).status,f).toBe('queued');
+      const st=await waitForMedia(ctx.request,a.token,m.id,30_000);
+      expect(st.status,f+': '+JSON.stringify(st)).toBe('completed');
+      expect(st.processed_filename,f).toBeTruthy();
+      const processed=await ok(await ctx.request.get(API+`/media/${m.id}/processed`,{headers:{Authorization:'Bearer '+a.token}}),f);
+      const filePath=ctx.request?undefined:undefined;
+      const body=await processed.body();
+      const tmp=ctx.page?await ctx.page.evaluate(()=>null):null;
+      void filePath; void tmp;
+      const outputPath=`test-results-remove-audio-${m.id}.mp4`;
+      await fs.writeFile(outputPath,body);
+      const probe=await execFileAsync('ffprobe',['-v','error','-select_streams','a','-show_entries','stream=codec_type','-of','default=nw=1:nk=1',outputPath]);
+      expect(probe.stdout.trim(),f).toBe('');
+      await fs.rm(outputPath,{force:true});
+      return;
+    }
     if (l.includes('volume')) { await ok(await ctx.request.post(API+`/audio/${m.id}/volume?volume=0.8`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
     if (l.includes('replace')||l.includes('add ')||l.includes('mix')) { const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3'); await ok(await ctx.request.post(API+`/audio/${m.id}/replace-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_id:au.id,mix:l.includes('mix'),mute_original:l.includes('mute')}}),f); return; }
     await ok(await ctx.request.post(API+`/media/${m.id}/edit`,{headers:{Authorization:'Bearer '+a.token},data:{operation:l.includes('remove')?'remove_audio':'fade',fade_in:l.includes('in')?0.2:0,fade_out:l.includes('out')?0.2:0,offset:0.1}}),f); return;
