@@ -243,6 +243,76 @@ test.describe('02 Video conversion and editing matrix', () => {
   });
 });
 
+test.describe('03b Image processing and video setting permutations', () => {
+  test('image conversion across JPG/PNG/WebP/GIF/BMP/TIFF plus compression', async ({ request }) => {
+    const auth = await createUser(request, 'image');
+    const image = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.png');
+    for (const format of ['jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tiff']) {
+      const response = await request.post(`${API}/images/${image.id}/convert`, {
+        headers: { Authorization: 'Bearer ' + auth.token },
+        data: { format, width: 160, height: 120, quality: 80 },
+      });
+      expect(response.ok(), format + ': ' + await response.text()).toBeTruthy();
+      await expectBlob(response, 'image/');
+    }
+    const compressed = await request.post(`${API}/images/${image.id}/compress?quality=70&max_width=160&max_height=120`, {
+      headers: { Authorization: 'Bearer ' + auth.token },
+    });
+    expect(compressed.ok(), await compressed.text()).toBeTruthy();
+    expect(await compressed.json()).toHaveProperty('output_filename');
+  });
+
+  test('video conversion permutations cover resolution, FPS, bitrate, quality, codecs and aspect ratios', async ({ request }) => {
+    const auth = await createUser(request, 'video-options');
+    const resolutions = [
+      { width: 160, height: 90, resolution: '144p' },
+      { width: 160, height: 120, resolution: '240p' },
+      { width: 160, height: 120, resolution: '360p' },
+      { width: 160, height: 120, resolution: '480p' },
+    ];
+    const fpsValues = [24, 25, 30, 50, 60];
+    const aspectRatios = ['16:9', '9:16', '4:3', '1:1'];
+    const codecs = ['h264', 'h265', 'vp8', 'vp9', 'av1'];
+
+    for (const resSpec of resolutions) {
+      for (const fps of fpsValues) {
+        const media = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp4');
+        const response = await request.post(`${API}/media/${media.id}/convert`, {
+          headers: { Authorization: 'Bearer ' + auth.token },
+          data: {
+            format: 'mp4', width: resSpec.width, height: resSpec.height, resolution: resSpec.resolution,
+            fps, video_bitrate: '500k', audio_bitrate: '128k', video_codec: 'h264', audio_codec: 'aac',
+            aspect_ratio: aspectRatios[fps % aspectRatios.length], quality: 5,
+          },
+        });
+        expect(response.ok(), fps + ': ' + await response.text()).toBeTruthy();
+      }
+    }
+
+    for (const codec of codecs) {
+      const media = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp4');
+      const response = await request.post(`${API}/media/${media.id}/convert`, {
+        headers: { Authorization: 'Bearer ' + auth.token },
+        data: { format: 'mp4', width: 160, height: 120, fps: 24, video_codec: codec, audio_codec: 'aac', quality: 5 },
+      });
+      expect(response.ok(), codec + ': ' + await response.text()).toBeTruthy();
+    }
+
+    const media = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp4');
+    const converted = await postJson(request, auth.token, `/media/${media.id}/convert`, {
+      format: 'mp4', width: 160, height: 120, fps: 24, video_bitrate: '500k', audio_bitrate: '128k',
+      quality: 5, video_codec: 'h264', audio_codec: 'aac', aspect_ratio: '16:9',
+    });
+    expect(converted).toHaveProperty('output_filename');
+    const status = await waitForMedia(request, auth.token, media.id);
+    expect(status.status).toBe('completed');
+    const processed = await request.get(`${API}/media/${media.id}/download?download_type=processed`, {
+      headers: { Authorization: 'Bearer ' + auth.token },
+    });
+    await expectBlob(processed, 'video/');
+  });
+});
+
 test.describe('03 Audio processing matrix', () => {
   const audioFormats = ['mp3', 'wav', 'aac', 'flac', 'ogg', 'm4a', 'opus', 'aiff'];
 
