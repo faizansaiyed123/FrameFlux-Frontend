@@ -143,7 +143,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run browser E2E
-        run: npx playwright test e2e/add-audio-regression.spec.ts
+        run: npx playwright test e2e/webm-regression.spec.ts --grep "Convert video to WebM: select WebM, use default compatible audio, complete conversion, download result"
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
