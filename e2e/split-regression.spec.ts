@@ -9,7 +9,7 @@ test('Split video: choose split point, split media, complete processing', async 
   await page.goto(`/app/dashboard/media/${media.id}`);
   await page.getByRole('tab', { name: 'Processing', exact: true }).click();
 
-  await page.getByRole('button', { name: /Split$/i }).click();
+  await page.getByRole('button', { name: /^Split\b/i }).click();
   const points = page.getByLabel(/Split Points (seconds)/i);
   await points.fill('1');
   await page.getByRole('button', { name: /^Split Media$/i }).click();
