@@ -1,9 +1,7 @@
 name: FrameFlux E2E
 
 on:
-  push:
-    branches:
-      - qa/full-e2e-testing
+  workflow_dispatch:
 
 permissions:
   contents: read
