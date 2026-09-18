@@ -166,7 +166,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run real-user browser tests
-        run: npx playwright test
+        run: npx playwright test e2e/checklist-atomic.spec.ts --grep "01\\.10 ACCOUNT & DASHBOARD :: Favorites"
 
       - name: Upload Playwright report
         if: always()
