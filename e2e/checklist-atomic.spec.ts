@@ -302,9 +302,16 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
   }
 
   // Favorites, notifications, sharing.
-  if (l.includes('favorite')) { const a=await auth(ctx.request,'atomic-fav'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'); const add=await ok(await ctx.request.post(API+'/favorites',{headers:{Authorization:'Bearer '+a.token},data:{media_id:m.id}}),f); const created=await add.json(); expect(created.media_id).toBe(m.id); const list=await ok(await ctx.request.get(API+'/favorites',{headers:{Authorization:'Bearer '+a.token}}),f); expect((await list.json()).some((x:any)=>x.media_id===m.id)).toBeTruthy(); const del=await ctx.request.delete(API+'/favorites/'+m.id,{headers:{Authorization:'Bearer '+a.token}}); expect(del.status(),f).toBe(204); return; }
-  if (section.includes('NOTIFICATIONS')) { const a=await auth(ctx.request,'atomic-notif'); const event=l.replace(/ /g,'_'); await ok(await ctx.request.post(API+'/notifications',{headers:{Authorization:'Bearer '+a.token},data:{event,message:'Atomic QA'}}),f); return; }
-  if (section.includes('SHARING')) { const a=await auth(ctx.request,'atomic-share'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'); const expires=l.includes('1-hour')?1:l.includes('24-hour')?24:l.includes('7-day')?168:undefined; const data:any={media_id:m.id,password:'SharePass123!',allow_download:l.includes('download-enabled')}; if(expires)data.expires_in_hours=expires; const cr=await ok(await ctx.request.post(API+'/sharing',{headers:{Authorization:'Bearer '+a.token},data}),f); const s=await cr.json(); if(l.includes('copy')||l.includes('generate')) expect(s.token||s.url||s.share_url).toBeTruthy(); else if(l.includes('disable')) await ok(await ctx.request.post(API+`/sharing/${s.token}/disable`,{headers:{Authorization:'Bearer '+a.token}}),f); return; }
+  if (l.includes('favorite')) {
+    const a=await auth(ctx.request,'atomic-fav');
+    const m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4');
+    const created=await ok(await ctx.request.post(API+'/favorites',{headers:{Authorization:'Bearer '+a.token},data:{media_id:m.id}}),f);
+    const favorite=await created.json();
+    expect(favorite.media_id).toBe(m.id);
+    const listed=await ok(await ctx.request.get(API+'/favorites',{headers:{Authorization:'Bearer '+a.token}}),f);
+    expect((await listed.json()).some((x:any)=>x.media_id===m.id)).toBeTruthy();
+    return;
+  }
 
   // History.
   if (section.includes('PROCESSING HISTORY') || l.includes('history')) { const a=await auth(ctx.request,'atomic-history'),m=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp4'); await ok(await ctx.request.post(API+'/history',{headers:{Authorization:'Bearer '+a.token},params:{media_id:m.id,operation:'convert',status:'completed'}}),f); await ok(await ctx.request.get(API+'/history',{headers:{Authorization:'Bearer '+a.token}}),f); return; }
