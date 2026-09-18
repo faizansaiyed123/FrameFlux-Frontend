@@ -17,7 +17,7 @@ const CODECS: Record<string,string> = {'H.264':'h264','H.265 / HEVC':'h265','VP8
 const RATIOS = ['16:9','9:16','4:3','1:1'];
 const execFileAsync = promisify(execFile);
 const TARGET_SECTION_NUMBER = 5;
-const TARGET_FEATURE = 'Mute original audio';
+const TARGET_FEATURE = 'Mix original + new audio';
 
 async function ok(r: Awaited<ReturnType<APIRequestContext['get'] | APIRequestContext['post'] | APIRequestContext['patch'] | APIRequestContext['put'] | APIRequestContext['delete']>>, label:string) {
   expect(r.ok(), label + ': ' + await r.text()).toBeTruthy();
@@ -152,6 +152,11 @@ async function exercise(section:string, feature:string, ctx:Ctx) {
       const response=await ok(await ctx.request.post(API+`/audio/${m.id}/replace-audio?audio_path=${encodeURIComponent(au.stored_filename)}`,{headers:{Authorization:'Bearer '+a.token}}),f);
       const body=await response.json();
       expect(body.output_filename,f).toBeTruthy();
+      return;
+    }
+    if (l==='mix original + new audio') {
+      const au=await uploadMedia(ctx.request,a.token,'e2e/fixtures/sample.mp3');
+      await expectBlob(await ctx.request.post(API+`/audio/${m.id}/sync-audio`,{headers:{Authorization:'Bearer '+a.token},data:{audio_path:au.stored_filename,audio_offset:0,mix:true,mix_volume:0.5,output_format:'mp4'}}),'video/');
       return;
     }
     if (l==='mute original audio') {
