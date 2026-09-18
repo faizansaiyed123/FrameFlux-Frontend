@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Upload multiple files: select three files, upload, and verify all appear'
+  FEATURE_GREP: 'Convert video to WebM: select WebM, use default compatible audio, complete conversion, download result'
 
 jobs:
   feature:
@@ -177,7 +177,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/upload-multiple-regression.spec.ts --grep "$FEATURE_GREP"
+          npx playwright test e2e/webm-regression.spec.ts --grep "$FEATURE_GREP"
 
       - name: Record feature PASS
         if: success()
