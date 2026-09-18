@@ -1,163 +1,163 @@
-FAIL|Convert video to WebM: select WebM, use default compatible audio, complete conversion, download result|ecbb9aa33efe1690cbebfcac9c07b14513e50de1
+FAIL|Convert video to WebM: select WebM, use default compatible audio, complete conversion, download result|3b9cac19cd65448f994ce89ebd72f2cb187dbda6
 --- PLAYWRIGHT OUTPUT ---
 --- BACKEND LOG ---
-2026-09-18 15:33:10,548 INFO sqlalchemy.engine.Engine [cached since 0.04619s ago] (0, UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'))
-2026-09-18 15:33:10,549 INFO sqlalchemy.engine.Engine SELECT media.media_type, count(media.id) AS count_1 
+WHERE media.user_id = $2::UUID
+2026-09-18 15:39:08,781 INFO sqlalchemy.engine.Engine [cached since 0.06039s ago] (0, UUID('4803d3ce-7e84-441f-86b9-69abe091af37'))
+2026-09-18 15:39:08,783 INFO sqlalchemy.engine.Engine SELECT media.media_type, count(media.id) AS count_1 
 FROM media 
 WHERE media.user_id = $1::UUID GROUP BY media.media_type
-2026-09-18 15:33:10,550 INFO sqlalchemy.engine.Engine [cached since 0.04486s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:10,551 INFO sqlalchemy.engine.Engine SELECT media.media_type, coalesce(sum(media.file_size), $1::INTEGER) AS coalesce_1 
+2026-09-18 15:39:08,783 INFO sqlalchemy.engine.Engine [cached since 0.0577s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:08,784 INFO sqlalchemy.engine.Engine SELECT media.media_type, coalesce(sum(media.file_size), $1::INTEGER) AS coalesce_1 
 FROM media 
 WHERE media.user_id = $2::UUID GROUP BY media.media_type
-2026-09-18 15:33:10,551 INFO sqlalchemy.engine.Engine [cached since 0.03875s ago] (0, UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'))
-2026-09-18 15:33:10,552 INFO sqlalchemy.engine.Engine SELECT media.processing_status, count(media.id) AS count_1 
+2026-09-18 15:39:08,784 INFO sqlalchemy.engine.Engine [cached since 0.05334s ago] (0, UUID('4803d3ce-7e84-441f-86b9-69abe091af37'))
+2026-09-18 15:39:08,785 INFO sqlalchemy.engine.Engine SELECT media.processing_status, count(media.id) AS count_1 
 FROM media 
 WHERE media.user_id = $1::UUID GROUP BY media.processing_status
-2026-09-18 15:33:10,552 INFO sqlalchemy.engine.Engine [cached since 0.03144s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:10,553 INFO sqlalchemy.engine.Engine SELECT projects.id, projects.user_id, projects.name, projects.description, projects.created_at, projects.updated_at, count(media.id) AS media_count 
+2026-09-18 15:39:08,786 INFO sqlalchemy.engine.Engine [cached since 0.04513s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:08,787 INFO sqlalchemy.engine.Engine SELECT projects.id, projects.user_id, projects.name, projects.description, projects.created_at, projects.updated_at, count(media.id) AS media_count 
 FROM projects LEFT OUTER JOIN media ON media.project_id = projects.id 
 WHERE projects.user_id = $1::UUID GROUP BY projects.id ORDER BY projects.created_at DESC 
  LIMIT $2::INTEGER
-2026-09-18 15:33:10,553 INFO sqlalchemy.engine.Engine [cached since 0.02519s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'), 5)
-2026-09-18 15:33:10,553 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:08,788 INFO sqlalchemy.engine.Engine [cached since 0.03921s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'), 5)
+2026-09-18 15:39:08,790 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.user_id = $1::UUID ORDER BY media.created_at DESC 
  LIMIT $2::INTEGER
-2026-09-18 15:33:10,554 INFO sqlalchemy.engine.Engine [cached since 0.01799s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'), 5)
-INFO:     127.0.0.1:48502 - "GET /dashboard/overview HTTP/1.1" 200 OK
-2026-09-18 15:33:10,556 INFO sqlalchemy.engine.Engine ROLLBACK
-2026-09-18 15:33:11,893 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:11,893 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+2026-09-18 15:39:08,790 INFO sqlalchemy.engine.Engine [cached since 0.0305s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'), 5)
+INFO:     127.0.0.1:44930 - "GET /dashboard/overview HTTP/1.1" 200 OK
+2026-09-18 15:39:08,793 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:10,778 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:10,780 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
 FROM users 
 WHERE users.id = $1::UUID
-2026-09-18 15:33:11,893 INFO sqlalchemy.engine.Engine [cached since 3.48s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-INFO:     127.0.0.1:48502 - "GET /auth/me HTTP/1.1" 200 OK
-2026-09-18 15:33:11,897 INFO sqlalchemy.engine.Engine ROLLBACK
-INFO:     127.0.0.1:48484 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48504 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/status HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48520 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/versions HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48528 - "OPTIONS /sharing HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48542 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48548 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/status HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48484 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/versions HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48504 - "OPTIONS /sharing HTTP/1.1" 200 OK
-2026-09-18 15:33:12,022 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,022 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+2026-09-18 15:39:10,780 INFO sqlalchemy.engine.Engine [cached since 5.41s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+INFO:     127.0.0.1:44930 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-18 15:39:10,783 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:44920 - "OPTIONS /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44942 - "OPTIONS /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44958 - "OPTIONS /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/versions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44970 - "OPTIONS /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44920 - "OPTIONS /sharing HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44974 - "OPTIONS /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/versions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44990 - "OPTIONS /sharing HTTP/1.1" 200 OK
+2026-09-18 15:39:11,021 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,021 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
 FROM users 
 WHERE users.id = $1::UUID
-2026-09-18 15:33:12,022 INFO sqlalchemy.engine.Engine [cached since 3.609s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,034 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:11,022 INFO sqlalchemy.engine.Engine [cached since 5.651s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,027 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.id = $1::UUID
-2026-09-18 15:33:12,035 INFO sqlalchemy.engine.Engine [generated in 0.00150s] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-INFO:     127.0.0.1:48502 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35 HTTP/1.1" 200 OK
-2026-09-18 15:33:12,128 INFO sqlalchemy.engine.Engine ROLLBACK
-2026-09-18 15:33:12,133 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,133 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+2026-09-18 15:39:11,027 INFO sqlalchemy.engine.Engine [generated in 0.00050s] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+INFO:     127.0.0.1:44930 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272 HTTP/1.1" 200 OK
+2026-09-18 15:39:11,113 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:11,202 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,202 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
 FROM users 
 WHERE users.id = $1::UUID
-2026-09-18 15:33:12,133 INFO sqlalchemy.engine.Engine [cached since 3.72s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,133 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,133 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
-FROM users 
-WHERE users.id = $1::UUID
-2026-09-18 15:33:12,133 INFO sqlalchemy.engine.Engine [cached since 3.72s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,173 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:11,202 INFO sqlalchemy.engine.Engine [cached since 5.832s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,204 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.id = $1::UUID
-2026-09-18 15:33:12,173 INFO sqlalchemy.engine.Engine [cached since 0.14s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-2026-09-18 15:33:12,175 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:11,205 INFO sqlalchemy.engine.Engine [cached since 0.1777s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+2026-09-18 15:39:11,205 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,205 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-18 15:39:11,206 INFO sqlalchemy.engine.Engine [cached since 5.835s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+INFO:     127.0.0.1:45014 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272 HTTP/1.1" 200 OK
+2026-09-18 15:39:11,208 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,208 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-18 15:39:11,209 INFO sqlalchemy.engine.Engine [cached since 5.838s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,209 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,209 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-18 15:39:11,210 INFO sqlalchemy.engine.Engine [cached since 5.84s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,212 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.id = $1::UUID
-2026-09-18 15:33:12,175 INFO sqlalchemy.engine.Engine [cached since 0.1415s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-2026-09-18 15:33:12,178 INFO sqlalchemy.engine.Engine SELECT media_versions.id, media_versions.media_id, media_versions.version_number, media_versions.label, media_versions.stored_filename, media_versions.original_filename, media_versions.file_size, media_versions.mime_type, media_versions.duration, media_versions.width, media_versions.height, media_versions.video_codec, media_versions.audio_codec, media_versions.fps, media_versions.processing_status, media_versions.processing_error, media_versions.is_current, media_versions.created_at, media_versions.created_by_id 
-FROM media_versions 
-WHERE media_versions.media_id = $1::UUID ORDER BY media_versions.created_at DESC
-2026-09-18 15:33:12,178 INFO sqlalchemy.engine.Engine [generated in 0.00013s] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-2026-09-18 15:33:12,179 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,179 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
-FROM users 
-WHERE users.id = $1::UUID
-2026-09-18 15:33:12,179 INFO sqlalchemy.engine.Engine [cached since 3.766s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,181 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,181 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
-FROM users 
-WHERE users.id = $1::UUID
-2026-09-18 15:33:12,181 INFO sqlalchemy.engine.Engine [cached since 3.768s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-INFO:     127.0.0.1:48560 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/versions HTTP/1.1" 200 OK
-2026-09-18 15:33:12,188 INFO sqlalchemy.engine.Engine SELECT share_links.id, share_links.user_id, share_links.media_id, share_links.token, share_links.password, share_links.expires_at, share_links.is_active, share_links.allow_download, share_links.view_count, share_links.allowed_domains, share_links.created_at 
+2026-09-18 15:39:11,212 INFO sqlalchemy.engine.Engine [cached since 0.1856s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+2026-09-18 15:39:11,213 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:11,217 INFO sqlalchemy.engine.Engine SELECT share_links.id, share_links.user_id, share_links.media_id, share_links.token, share_links.password, share_links.expires_at, share_links.is_active, share_links.allow_download, share_links.view_count, share_links.allowed_domains, share_links.created_at 
 FROM share_links 
 WHERE share_links.user_id = $1::UUID
-2026-09-18 15:33:12,188 INFO sqlalchemy.engine.Engine [generated in 0.00045s] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,191 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:11,217 INFO sqlalchemy.engine.Engine [generated in 0.00029s] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,219 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.id = $1::UUID
-2026-09-18 15:33:12,191 INFO sqlalchemy.engine.Engine [cached since 0.1573s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-2026-09-18 15:33:12,193 INFO sqlalchemy.engine.Engine ROLLBACK
-INFO:     127.0.0.1:48564 - "GET /sharing HTTP/1.1" 200 OK
-2026-09-18 15:33:12,199 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,199 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
-FROM users 
-WHERE users.id = $1::UUID
-2026-09-18 15:33:12,199 INFO sqlalchemy.engine.Engine [cached since 3.786s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-INFO:     127.0.0.1:48578 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35 HTTP/1.1" 200 OK
-2026-09-18 15:33:12,204 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
-FROM media 
-WHERE media.id = $1::UUID
-2026-09-18 15:33:12,204 INFO sqlalchemy.engine.Engine [cached since 0.1705s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-INFO:     127.0.0.1:48486 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/status HTTP/1.1" 200 OK
-2026-09-18 15:33:12,205 INFO sqlalchemy.engine.Engine ROLLBACK
-2026-09-18 15:33:12,206 INFO sqlalchemy.engine.Engine SELECT media_versions.id, media_versions.media_id, media_versions.version_number, media_versions.label, media_versions.stored_filename, media_versions.original_filename, media_versions.file_size, media_versions.mime_type, media_versions.duration, media_versions.width, media_versions.height, media_versions.video_codec, media_versions.audio_codec, media_versions.fps, media_versions.processing_status, media_versions.processing_error, media_versions.is_current, media_versions.created_at, media_versions.created_by_id 
+2026-09-18 15:39:11,219 INFO sqlalchemy.engine.Engine [cached since 0.1924s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+2026-09-18 15:39:11,224 INFO sqlalchemy.engine.Engine SELECT media_versions.id, media_versions.media_id, media_versions.version_number, media_versions.label, media_versions.stored_filename, media_versions.original_filename, media_versions.file_size, media_versions.mime_type, media_versions.duration, media_versions.width, media_versions.height, media_versions.video_codec, media_versions.audio_codec, media_versions.fps, media_versions.processing_status, media_versions.processing_error, media_versions.is_current, media_versions.created_at, media_versions.created_by_id 
 FROM media_versions 
 WHERE media_versions.media_id = $1::UUID ORDER BY media_versions.created_at DESC
-2026-09-18 15:33:12,206 INFO sqlalchemy.engine.Engine [cached since 0.02814s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-2026-09-18 15:33:12,208 INFO sqlalchemy.engine.Engine ROLLBACK
-2026-09-18 15:33:12,209 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,209 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+2026-09-18 15:39:11,224 INFO sqlalchemy.engine.Engine [generated in 0.00048s] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+INFO:     127.0.0.1:45004 - "GET /sharing HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45010 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/versions HTTP/1.1" 200 OK
+2026-09-18 15:39:11,235 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:11,237 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:11,238 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,239 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
 FROM users 
 WHERE users.id = $1::UUID
-2026-09-18 15:33:12,209 INFO sqlalchemy.engine.Engine [cached since 3.796s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,211 INFO sqlalchemy.engine.Engine SELECT share_links.id, share_links.user_id, share_links.media_id, share_links.token, share_links.password, share_links.expires_at, share_links.is_active, share_links.allow_download, share_links.view_count, share_links.allowed_domains, share_links.created_at 
+2026-09-18 15:39:11,239 INFO sqlalchemy.engine.Engine [cached since 5.869s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,240 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,240 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-18 15:39:11,240 INFO sqlalchemy.engine.Engine [cached since 5.87s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+INFO:     127.0.0.1:44924 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/status HTTP/1.1" 200 OK
+2026-09-18 15:39:11,244 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+FROM media 
+WHERE media.id = $1::UUID
+2026-09-18 15:39:11,244 INFO sqlalchemy.engine.Engine [cached since 0.2169s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+2026-09-18 15:39:11,244 INFO sqlalchemy.engine.Engine SELECT share_links.id, share_links.user_id, share_links.media_id, share_links.token, share_links.password, share_links.expires_at, share_links.is_active, share_links.allow_download, share_links.view_count, share_links.allowed_domains, share_links.created_at 
 FROM share_links 
 WHERE share_links.user_id = $1::UUID
-2026-09-18 15:33:12,211 INFO sqlalchemy.engine.Engine [cached since 0.02314s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,211 INFO sqlalchemy.engine.Engine ROLLBACK
-INFO:     127.0.0.1:48502 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/versions HTTP/1.1" 200 OK
-2026-09-18 15:33:12,213 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,213 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+2026-09-18 15:39:11,244 INFO sqlalchemy.engine.Engine [cached since 0.02766s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,249 INFO sqlalchemy.engine.Engine SELECT media_versions.id, media_versions.media_id, media_versions.version_number, media_versions.label, media_versions.stored_filename, media_versions.original_filename, media_versions.file_size, media_versions.mime_type, media_versions.duration, media_versions.width, media_versions.height, media_versions.video_codec, media_versions.audio_codec, media_versions.fps, media_versions.processing_status, media_versions.processing_error, media_versions.is_current, media_versions.created_at, media_versions.created_by_id 
+FROM media_versions 
+WHERE media_versions.media_id = $1::UUID ORDER BY media_versions.created_at DESC
+2026-09-18 15:39:11,250 INFO sqlalchemy.engine.Engine [cached since 0.02585s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+INFO:     127.0.0.1:45014 - "GET /sharing HTTP/1.1" 200 OK
+2026-09-18 15:39:11,252 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:45004 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/versions HTTP/1.1" 200 OK
+2026-09-18 15:39:11,254 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,254 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
 FROM users 
 WHERE users.id = $1::UUID
-2026-09-18 15:33:12,213 INFO sqlalchemy.engine.Engine [cached since 3.8s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-INFO:     127.0.0.1:48560 - "GET /sharing HTTP/1.1" 200 OK
-2026-09-18 15:33:12,214 INFO sqlalchemy.engine.Engine ROLLBACK
-2026-09-18 15:33:12,215 INFO sqlalchemy.engine.Engine ROLLBACK
-2026-09-18 15:33:12,216 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:11,254 INFO sqlalchemy.engine.Engine [cached since 5.884s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,255 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:11,256 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.id = $1::UUID
-2026-09-18 15:33:12,216 INFO sqlalchemy.engine.Engine [cached since 0.1825s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-INFO:     127.0.0.1:48578 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/status HTTP/1.1" 200 OK
-2026-09-18 15:33:12,219 INFO sqlalchemy.engine.Engine ROLLBACK
-INFO:     127.0.0.1:48548 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/download?download_type=original HTTP/1.1" 200 OK
-INFO:     127.0.0.1:48528 - "OPTIONS /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/download?download_type=original HTTP/1.1" 200 OK
-2026-09-18 15:33:12,347 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,347 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+2026-09-18 15:39:11,256 INFO sqlalchemy.engine.Engine [cached since 0.2296s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+2026-09-18 15:39:11,257 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:45010 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/status HTTP/1.1" 200 OK
+2026-09-18 15:39:11,260 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:44990 - "OPTIONS /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/download?download_type=original HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44974 - "OPTIONS /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/download?download_type=original HTTP/1.1" 200 OK
+2026-09-18 15:39:11,488 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,489 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
 FROM users 
 WHERE users.id = $1::UUID
-2026-09-18 15:33:12,347 INFO sqlalchemy.engine.Engine [cached since 3.934s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,349 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:11,489 INFO sqlalchemy.engine.Engine [cached since 6.119s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,492 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.id = $1::UUID
-2026-09-18 15:33:12,350 INFO sqlalchemy.engine.Engine [cached since 0.3162s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-INFO:     127.0.0.1:48504 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/download?download_type=original HTTP/1.1" 200 OK
-2026-09-18 15:33:12,367 INFO sqlalchemy.engine.Engine ROLLBACK
-2026-09-18 15:33:12,374 INFO sqlalchemy.engine.Engine BEGIN (implicit)
-2026-09-18 15:33:12,374 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+2026-09-18 15:39:11,492 INFO sqlalchemy.engine.Engine [cached since 0.4653s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+INFO:     127.0.0.1:44970 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/download?download_type=original HTTP/1.1" 200 OK
+2026-09-18 15:39:11,521 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-18 15:39:11,522 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
 FROM users 
 WHERE users.id = $1::UUID
-2026-09-18 15:33:12,374 INFO sqlalchemy.engine.Engine [cached since 3.96s ago] (UUID('7cc5b824-8628-4295-b3bb-6e7fc8974d1c'),)
-2026-09-18 15:33:12,376 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+2026-09-18 15:39:11,522 INFO sqlalchemy.engine.Engine [cached since 6.151s ago] (UUID('4803d3ce-7e84-441f-86b9-69abe091af37'),)
+2026-09-18 15:39:11,524 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:11,525 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
 FROM media 
 WHERE media.id = $1::UUID
-2026-09-18 15:33:12,376 INFO sqlalchemy.engine.Engine [cached since 0.343s ago] (UUID('477e042c-a2e3-494a-9c75-dbab5cbf4f35'),)
-INFO:     127.0.0.1:48528 - "GET /media/477e042c-a2e3-494a-9c75-dbab5cbf4f35/download?download_type=original HTTP/1.1" 200 OK
-2026-09-18 15:33:12,380 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-18 15:39:11,525 INFO sqlalchemy.engine.Engine [cached since 0.4983s ago] (UUID('224dbacf-cbd9-46a0-adf3-9f35b2ac3272'),)
+INFO:     127.0.0.1:44974 - "GET /media/224dbacf-cbd9-46a0-adf3-9f35b2ac3272/download?download_type=original HTTP/1.1" 200 OK
+2026-09-18 15:39:11,531 INFO sqlalchemy.engine.Engine ROLLBACK
