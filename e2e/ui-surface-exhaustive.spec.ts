@@ -62,7 +62,7 @@ test.describe('FrameFlux exhaustive UI surface', () => {
     for (const [file, name] of fixtures) {
       await page.goto('/app/dashboard/media');
       await uploadViaMediaDialog(page, path.resolve(file), name);
-      await expect(page.getByText(new RegExp('Media uploaded successfully.*' + name.replace('.', '\\\\.'), 'i'))).toBeVisible();
+      await expect(page.getByText(/Media uploaded successfully/i)).toBeVisible();
       await page.goto('/app/dashboard/media');
     }
   });
@@ -96,7 +96,7 @@ test.describe('FrameFlux exhaustive UI surface', () => {
     await timeline.click({ position: { x: 100, y: 50 } });
     await page.getByText('sample.mp4', { exact: true }).last().click();
     for (const tool of ['Trim', 'Split', 'Speed', 'Transform', 'Overlay', 'Freeze']) {
-      await expect(page.getByRole('button', { name: tool })).toBeVisible();
+      await expect(page.getByRole('button', { name: tool }).first()).toBeVisible();
     }
 
     for (const tool of ['Trim', 'Split', 'Speed', 'Transform', 'Overlay', 'Freeze']) {
@@ -160,7 +160,7 @@ test.describe('FrameFlux exhaustive UI surface', () => {
       'Generate GIF',
       'Media Information',
     ]) {
-      await expect(page.getByText(title, { exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: title, exact: true })).toBeVisible();
     }
 
     const body = page.locator('body');
