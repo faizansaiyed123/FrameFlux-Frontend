@@ -1,1 +1,1 @@
-PASS|Split video: choose split point, split media, complete processing|1fe61ca3f414b8a860c5ad59b76afb36eab95ac7
+PASS|Delete selected section|Keep selected section|Reorder clips|e69ab3723ea7e624bc90db5f7f06971334590bf7
