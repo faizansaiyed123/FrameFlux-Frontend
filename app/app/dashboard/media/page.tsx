@@ -86,18 +86,26 @@ export default function MediaPage() {
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
 
-  const handleFileSelect = (selectedFile: File | null) => {
-    if (selectedFile) {
-      const validTypes = ['video/', 'audio/', 'image/'];
-      const isValid = validTypes.some((type) => selectedFile.type.startsWith(type));
-      if (!isValid) {
-        setError('Invalid file type. Please select a video, audio, or image file.');
-        return;
-      }
-      setFile(selectedFile);
+  const handleFilesSelect = (selected: File[] | FileList) => {
+    const incoming = Array.from(selected);
+    if (incoming.length === 0) return;
+
+    const validTypes = ['video/', 'audio/', 'image/'];
+    const invalid = incoming.find(
+      (item) => !validTypes.some((type) => item.type.startsWith(type))
+    );
+
+    if (invalid) {
+      setError('Invalid file type. Please select only video, audio, or image files.');
+      return;
     }
+
+    setSelectedFiles(incoming);
+    setFile(incoming[0] ?? null);
+    setError(null);
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -114,8 +122,8 @@ export default function MediaPage() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFilesSelect(e.dataTransfer.files);
     }
   };
 
@@ -143,6 +151,15 @@ export default function MediaPage() {
     if (!file) return;
     setUploading(true);
     try {
+      if (selectedFiles.length > 1) {
+        await api.uploadMultipleMedia(selectedFiles);
+        setUploadOpen(false);
+        setSelectedFiles([]);
+        setFile(null);
+        await fetchMedia();
+        return;
+      }
+
       const uploader = new ResumableUploader();
       await uploader.init(file);
       await uploader.uploadAll((progress) => {
@@ -150,6 +167,7 @@ export default function MediaPage() {
       });
       const media = await uploader.finalize();
       setUploadOpen(false);
+      setSelectedFiles([]);
       setFile(null);
       router.push(`/app/dashboard/media/${media.id}?from_upload=1`);
     } catch (err) {
@@ -370,8 +388,9 @@ export default function MediaPage() {
                 <input
                   id="file"
                   type="file"
+                  multiple
                   accept="video/*,audio/*,image/*"
-                  onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+                  onChange={(e) => handleFilesSelect(e.target.files || [])}
                   disabled={uploading}
                   className="hidden"
                   ref={(el) => {
@@ -387,25 +406,33 @@ export default function MediaPage() {
                     <Upload className="h-5 w-5" />
                   </div>
                   <p className="text-base font-semibold tracking-tight text-zinc-950 dark:text-white">
-                    Drag & drop a file here
+                    Drag & drop files here
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     or click to browse your computer
                   </p>
                   <span className="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-3.5 text-xs font-medium text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
-                    Choose file
+                    Choose file(s)
                   </span>
-                  <p className="mt-4 text-[11px] text-zinc-400">Video · Audio · Image</p>
+                  <p className="mt-4 text-[11px] text-zinc-400">Video · Audio · Image · Multiple files supported</p>
                 </label>
 
-                {file && (
-                  <div className="mt-5 flex min-w-0 items-center gap-3 rounded-xl border border-indigo-200/80 bg-white p-3 text-left shadow-sm dark:border-indigo-900/60 dark:bg-zinc-950">
+                {selectedFiles.length > 0 && (
+                  <div className="mt-5 rounded-xl border border-indigo-200/80 bg-white p-3 text-left shadow-sm dark:border-indigo-900/60 dark:bg-zinc-950">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                       <Film className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-zinc-950 dark:text-white">{file.name}</p>
-                      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                      <p className="text-sm font-medium text-zinc-950 dark:text-white">
+                        {selectedFiles.length} file{selectedFiles.length === 1 ? '' : 's'} selected
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        {selectedFiles.map((selectedFile) => (
+                          <p key={selectedFile.name + selectedFile.size} className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                            {selectedFile.name}
+                          </p>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -414,7 +441,7 @@ export default function MediaPage() {
           </div>
 
           <DialogFooter className="flex flex-col-reverse gap-2 border-t border-zinc-200/80 px-5 py-4 dark:border-zinc-800/80 sm:flex-row sm:justify-end sm:px-6">
-            <Button variant="outline" onClick={() => { setUploadOpen(false); setFile(null); }} disabled={uploading} className="h-10 w-full rounded-lg sm:w-auto" style={{ cursor: 'pointer' }}>
+            <Button variant="outline" onClick={() => { setUploadOpen(false); setFile(null); setSelectedFiles([]); }} disabled={uploading} className="h-10 w-full rounded-lg sm:w-auto" style={{ cursor: 'pointer' }}>
               Cancel
             </Button>
             <Button onClick={handleUpload} disabled={uploading || !file} className="h-10 w-full rounded-lg sm:w-auto" style={{ cursor: 'pointer' }}>

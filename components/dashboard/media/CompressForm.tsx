@@ -37,6 +37,7 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
         height,
         compression_preset: quality,
         video_bitrate: bitrate || undefined,
+        target_size_mb: targetSize ? Number(targetSize) : undefined,
         resolution: resolution !== 'original' ? resolution : undefined,
       });
       onProcessed();

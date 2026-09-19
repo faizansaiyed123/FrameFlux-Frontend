@@ -17,6 +17,10 @@ export function AudioExtractForm({ mediaId }: Props) {
   const [format, setFormat] = useState('mp3');
   const [bitrate, setBitrate] = useState('192k');
   const [sampleRate, setSampleRate] = useState('');
+  const [channels, setChannels] = useState('2');
+  const [quality, setQuality] = useState('medium');
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
 
   const handleExtract = async () => {
     setLoading(true);
@@ -24,6 +28,10 @@ export function AudioExtractForm({ mediaId }: Props) {
       const blob = await api.extractAudio(mediaId, {
         format, bitrate,
         sample_rate: sampleRate ? parseInt(sampleRate) : undefined,
+        channels: channels ? parseInt(channels) : undefined,
+        quality_preset: quality,
+        start: start ? parseFloat(start) : undefined,
+        end: end ? parseFloat(end) : undefined,
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -85,6 +93,37 @@ export function AudioExtractForm({ mediaId }: Props) {
           max="384000"
           className="text-xs h-7"
         />
+      </div>
+      <div className="space-y-2">
+        <Label>Channels</Label>
+        <Select value={channels} onValueChange={setChannels}>
+          <SelectTrigger><SelectValue placeholder="Select channels" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">Mono</SelectItem>
+            <SelectItem value="2">Stereo</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label>Quality</Label>
+        <Select value={quality} onValueChange={setQuality}>
+          <SelectTrigger><SelectValue placeholder="Select quality" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low">Low</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="high">High</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
+          <Label>Start (optional)</Label>
+          <Input type="number" min="0" step="0.01" value={start} onChange={(e) => setStart(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>End (optional)</Label>
+          <Input type="number" min="0" step="0.01" value={end} onChange={(e) => setEnd(e.target.value)} />
+        </div>
       </div>
       <Button onClick={handleExtract} disabled={loading} className="w-full">
         {loading ? (
