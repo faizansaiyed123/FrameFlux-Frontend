@@ -1,1 +1,13 @@
-PASS|Upload video|Separate audio file|Add external audio|Replace original audio|Keep original audio|Mix original \\+ external audio|Mute original audio|Match audio duration to video|Match video duration to audio|Trim audio automatically|Trim video automatically|Choose audio starting position|Audio delay adjustment|Audio offset adjustment|Fine/millisecond timing adjustment|Preview synchronization|Export synchronized video|7f6fa367b68fb59fccd078ca6edcd6769fd84e8e
+FAIL|Compress video|3c29dcc04895e2982726f82fd5205c36ed718a6a
+--- PLAYWRIGHT OUTPUT ---
+[WebServer] ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+Error: No tests found.
+Make sure that arguments are regular expressions matching test files.
+You may need to escape symbols like "$" or "*" and quote the arguments.
+
+--- BACKEND LOG ---
+INFO:     Started server process [4898]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:42766 - "GET /health HTTP/1.1" 200 OK
