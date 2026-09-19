@@ -379,6 +379,7 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                 { id: 'trim', label: 'Trim', icon: Scissors },
                 { id: 'split', label: 'Split', icon: Split },
                 { id: 'speed', label: 'Speed', icon: Gauge },
+                { id: 'reorder', label: 'Reorder', icon: ListOrdered },
               ].map((tool) => {
                 const Icon = tool.icon;
                 const isActive = activeTool === tool.id;
