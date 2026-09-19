@@ -24,8 +24,13 @@ import {
   Scissors,
   Split,
   Gauge,
+  ListOrdered,
+  ArrowUp,
+  ArrowDown,
+  Plus,
 } from 'lucide-react';
 import { Timeline } from './Timeline';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Clip } from './EditorWorkspace';
 
 interface AudioWorkspaceProps {
@@ -59,6 +64,9 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
     },
   ]);
   const [processing, setProcessing] = useState(false);
+  const [reorderMedia, setReorderMedia] = useState<Media[]>([]);
+  const [selectedAudioToAdd, setSelectedAudioToAdd] = useState('');
+  const [reorderError, setReorderError] = useState('');
 
   useEffect(() => {
     let objectUrl: string | null = null;
@@ -195,6 +203,61 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
   }, [activeTool, clips, selectedClipId, currentTime, media.id, onProcessed]);
 
   const selectedClip = clips.find((c) => c.id === selectedClipId) || null;
+
+  useEffect(() => {
+    if (activeTool !== 'reorder') return;
+    api.listMedia({ media_type: 'audio' })
+      .then((items) => setReorderMedia(items.filter((item) => !clips.some((clip) => clip.mediaId === item.id))))
+      .catch(() => setReorderError('Unable to load audio clips.'));
+  }, [activeTool, clips]);
+
+  const addAudioClip = useCallback(() => {
+    const item = reorderMedia.find((candidate) => candidate.id === selectedAudioToAdd);
+    if (!item) return;
+    setClips((prev) => [
+      ...prev,
+      {
+        id: item.id,
+        mediaId: item.id,
+        name: item.original_filename,
+        start: 0,
+        end: item.duration || 0,
+        duration: item.duration || 0,
+        color: '#6366f1',
+      },
+    ]);
+    setSelectedAudioToAdd('');
+  }, [reorderMedia, selectedAudioToAdd]);
+
+  const moveClip = useCallback((index: number, direction: -1 | 1) => {
+    setClips((prev) => {
+      const target = index + direction;
+      if (target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }, []);
+
+  const handleReorderExport = useCallback(async () => {
+    if (clips.length < 2) {
+      setReorderError('Add at least two audio clips to reorder.');
+      return;
+    }
+    setProcessing(true);
+    setReorderError('');
+    setError('');
+    setSuccess('');
+    try {
+      await api.reorderAudioClips(media.id, clips.map((clip) => clip.mediaId));
+      setSuccess('Audio clips reordered and exported successfully.');
+      onProcessed();
+    } catch (err) {
+      setReorderError(err instanceof Error ? err.message : 'Reorder failed');
+    } finally {
+      setProcessing(false);
+    }
+  }, [clips, media.id, onProcessed]);
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
@@ -365,6 +428,66 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                       <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">{formatTime(selectedClip.end)}</p>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeTool === 'reorder' && (
+              <Card className="border-zinc-200 dark:border-zinc-800">
+                <CardContent className="p-3 space-y-3">
+                  <div>
+                    <Label className="text-[10px] text-zinc-500">Add audio clip</Label>
+                    <div className="flex gap-2 mt-1">
+                      <Select value={selectedAudioToAdd} onValueChange={setSelectedAudioToAdd}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Choose an audio file" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {reorderMedia.map((item) => (
+                            <SelectItem key={item.id} value={item.id}>{item.original_filename}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button size="sm" variant="outline" onClick={addAudioClip} disabled={!selectedAudioToAdd}>
+                        <Plus className="mr-1 h-3.5 w-3.5" />
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-[10px] text-zinc-500">Clip order</Label>
+                    {clips.map((clip, index) => (
+                      <div key={clip.id} className="flex items-center gap-2 rounded border p-2">
+                        <span className="flex-1 truncate text-xs">{index + 1}. {clip.name}</span>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7"
+                          aria-label={'Move ' + clip.name + ' up'}
+                          onClick={() => moveClip(index, -1)}
+                          disabled={index === 0}
+                        >
+                          <ArrowUp className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7"
+                          aria-label={'Move ' + clip.name + ' down'}
+                          onClick={() => moveClip(index, 1)}
+                          disabled={index === clips.length - 1}
+                        >
+                          <ArrowDown className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button onClick={handleReorderExport} disabled={processing || clips.length < 2} className="w-full">
+                    {processing ? 'Exporting...' : 'Reorder & Export'}
+                  </Button>
+                  {reorderError && <p className="text-[10px] text-red-600">{reorderError}</p>}
                 </CardContent>
               </Card>
             )}
