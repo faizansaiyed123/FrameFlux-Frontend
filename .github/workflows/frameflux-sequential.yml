@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Upload video|Separate audio file|Add external audio|Replace original audio|Keep original audio|Mix original \\+ external audio|Mute original audio|Match audio duration to video|Match video duration to audio|Trim audio automatically|Trim video automatically|Choose audio starting position|Audio delay adjustment|Audio offset adjustment|Fine/millisecond timing adjustment|Preview synchronization|Export synchronized video'
+  FEATURE_GREP: 'Compress video'
 
 jobs:
   feature:
@@ -178,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/video-external-audio-sync-batch.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/video-compression-regression.spec.ts --grep "^$FEATURE_GREP$" 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
