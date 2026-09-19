@@ -10,7 +10,7 @@ test('Split video: choose split point, split media, complete processing', async 
   await page.getByRole('tab', { name: 'Processing', exact: true }).click();
 
   // The editor only exposes clip tools after a clip is selected.
-  const timelineClip = page.getByText(media.original_filename, { exact: true }).last();
+  const timelineClip = page.locator('div.cursor-move').filter({ hasText: media.original_filename }).last();
   await timelineClip.click();
 
   // Move the playhead to the middle of the 2-second fixture so Split is actionable.
@@ -19,6 +19,8 @@ test('Split video: choose split point, split media, complete processing', async 
     video.dispatchEvent(new Event('timeupdate', { bubbles: true }));
   });
 
+  // Select the Split tool, then execute the Split action.
+  await page.getByRole('button', { name: /^Split$/i }).first().click();
   await page.getByRole('button', { name: /^Split$/i }).last().click();
 
   await expect(page.getByText(/Processing started/i)).toBeVisible({ timeout: 10_000 });
