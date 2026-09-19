@@ -540,8 +540,8 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           {syncAudioOpen && (
             <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
               <div className="space-y-1">
-                <Label className="text-[9px] text-zinc-500">External Audio File (stored filename)</Label>
-                <Input value={syncAudioFile} onChange={(e) => setSyncAudioFile(e.target.value)} placeholder="e.g. soundtrack.mp3" className="text-xs h-7" />
+                <Label htmlFor="syncExternalAudioFile" className="text-[9px] text-zinc-500">External Audio File (stored filename)</Label>
+                <Input id="syncExternalAudioFile" value={syncAudioFile} onChange={(e) => setSyncAudioFile(e.target.value)} placeholder="e.g. soundtrack.mp3" className="text-xs h-7" />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
