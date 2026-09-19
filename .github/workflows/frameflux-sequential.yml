@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Compress video'
+  FEATURE_GREP: 'Favorites'
 
 jobs:
   feature:
@@ -178,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/video-compression-regression.spec.ts 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/favorites-regression.spec.ts 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
