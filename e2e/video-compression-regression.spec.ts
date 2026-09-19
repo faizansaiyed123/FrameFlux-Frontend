@@ -16,13 +16,20 @@ test('Compress video', async ({ page, request }) => {
   await page.getByText('Quality Preset').locator('..').getByRole('combobox').click();
   await page.getByRole('option', { name: /Balanced/i }).click();
 
+  const mediaId = new URL(page.url()).pathname.split('/').filter(Boolean).pop();
+  expect(mediaId).toBeTruthy();
+
   await page.getByRole('button', { name: /^Compress$/i }).click();
 
+  let finalStatus: any = null;
   await expect.poll(async () => {
-    const r = await request.get(API + '/media/' + auth.userId + '/status').catch(() => null);
-    return r?.status();
-  }, { timeout: 1000 }).toBeUndefined().catch(() => undefined);
+    const r = await request.get(API + '/media/' + mediaId + '/status', {
+      headers: { Authorization: 'Bearer ' + auth.token },
+    });
+    if (!r.ok()) return 'http_error';
+    finalStatus = await r.json();
+    return finalStatus.status;
+  }, { timeout: 120_000, intervals: [1000] }).toBe('completed');
 
-  const body = await page.locator('body').innerText();
-  expect(body).not.toContain('Compress failed');
+  expect(finalStatus.processed_filename).toBeTruthy();
 });
