@@ -1,1 +1,199 @@
-PASS|WMA audio conversion|1d63204b9ce8bb65bafe4acb31b4c8dd779de92b
+FAIL|Merge audio|a8ec0a545ff5ca5109a731a1dd73feb60197b66c
+--- PLAYWRIGHT OUTPUT ---
+[WebServer] ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+
+Running 1 test using 1 worker
+
+  ✘  1 e2e/audio-merge-regression.spec.ts:4:5 › Merge audio (426ms)
+
+
+  1) e2e/audio-merge-regression.spec.ts:4:5 › Merge audio ──────────────────────────────────────────
+
+    Error: Internal Server Error
+
+    expect(received).toBeTruthy()
+
+    Received: false
+
+      15 |   });
+      16 |
+    > 17 |   expect(response.ok(), await response.text()).toBeTruthy();
+         |                                                ^
+      18 |   const body = await response.json();
+      19 |   expect(body.output_filename).toBeTruthy();
+      20 | });
+        at /home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/e2e/audio-merge-regression.spec.ts:17:48
+
+    Error Context: test-results/audio-merge-regression-Merge-audio/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/audio-merge-regression-Merge-audio/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/audio-merge-regression-Merge-audio/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e/audio-merge-regression.spec.ts:4:5 › Merge audio ───────────────────────────────────────────
+--- BACKEND LOG ---
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:45004 - "GET /health HTTP/1.1" 200 OK
+2026-09-19 05:35:55,386 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-09-19 05:35:55,386 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-19 05:35:55,388 INFO sqlalchemy.engine.Engine select current_schema()
+2026-09-19 05:35:55,388 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-19 05:35:55,389 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-09-19 05:35:55,389 INFO sqlalchemy.engine.Engine [raw sql] ()
+2026-09-19 05:35:55,390 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,400 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE lower(users.email) = lower($1::VARCHAR)
+2026-09-19 05:35:55,400 INFO sqlalchemy.engine.Engine [generated in 0.00018s] ('merge-audio_1789796155320_1awdhd@example.com',)
+2026-09-19 05:35:55,445 INFO sqlalchemy.engine.Engine INSERT INTO users (id, email, password_hash, full_name, is_active, avatar_url, preferences) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::BOOLEAN, $6::VARCHAR, $7::VARCHAR) RETURNING users.created_at, users.updated_at
+2026-09-19 05:35:55,445 INFO sqlalchemy.engine.Engine [generated in 0.00029s] (UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'), 'merge-audio_1789796155320_1awdhd@example.com', '$argon2id$v=19$m=65536,t=3,p=4$DloiFqDAn5shqMo5rgzxGQ$eXlodZoMOmxp6YRUO88jdwWCGIlWBiVcoZMPGj+VQHE', 'Exhaustive QA User', True, None, None)
+2026-09-19 05:35:55,447 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-19 05:35:55,448 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,449 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-19 05:35:55,449 INFO sqlalchemy.engine.Engine [generated in 0.00013s] (UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'),)
+INFO:     127.0.0.1:44336 - "POST /auth/signup HTTP/1.1" 201 Created
+2026-09-19 05:35:55,452 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-19 05:35:55,469 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,470 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE lower(users.email) = lower($1::VARCHAR)
+2026-09-19 05:35:55,470 INFO sqlalchemy.engine.Engine [cached since 0.07007s ago] ('merge-audio_1789796155320_1awdhd@example.com',)
+INFO:     127.0.0.1:44336 - "POST /auth/login HTTP/1.1" 200 OK
+2026-09-19 05:35:55,513 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-19 05:35:55,522 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,523 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-19 05:35:55,523 INFO sqlalchemy.engine.Engine [generated in 0.00014s] (UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'),)
+INFO:     127.0.0.1:44336 - "GET /auth/me HTTP/1.1" 200 OK
+2026-09-19 05:35:55,525 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-19 05:35:55,574 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,575 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-19 05:35:55,575 INFO sqlalchemy.engine.Engine [cached since 0.05173s ago] (UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'),)
+2026-09-19 05:35:55,580 INFO sqlalchemy.engine.Engine INSERT INTO media (id, original_filename, stored_filename, media_type, mime_type, file_size, duration, width, height, video_codec, audio_codec, fps, user_id, project_id, folder, tags, processing_status, processed_filename, processing_error, created_at) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::BIGINT, $7::FLOAT, $8::INTEGER, $9::INTEGER, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::UUID, $14::UUID, $15::VARCHAR, $16::VARCHAR, $17::VARCHAR, $18::VARCHAR, $19::VARCHAR, $20::TIMESTAMP WITH TIME ZONE)
+2026-09-19 05:35:55,580 INFO sqlalchemy.engine.Engine [generated in 0.00024s] (UUID('5f76936a-31dd-4125-8581-72f8f73ec193'), 'sample.mp3', 'd3ed820d-7a65-4b82-8f03-1cfafc0c34c5.mp3', 'audio', 'audio/mpeg', 73395, None, None, None, None, None, None, UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'), None, None, None, 'pending', None, None, datetime.datetime(2026, 9, 19, 5, 35, 55, 580021))
+2026-09-19 05:35:55,582 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-19 05:35:55,582 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,584 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+FROM media 
+WHERE media.id = $1::UUID
+2026-09-19 05:35:55,584 INFO sqlalchemy.engine.Engine [generated in 0.00013s] (UUID('5f76936a-31dd-4125-8581-72f8f73ec193'),)
+INFO:     127.0.0.1:44336 - "POST /media/upload HTTP/1.1" 201 Created
+2026-09-19 05:35:55,587 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-19 05:35:55,595 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,596 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-19 05:35:55,596 INFO sqlalchemy.engine.Engine [cached since 0.07254s ago] (UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'),)
+2026-09-19 05:35:55,598 INFO sqlalchemy.engine.Engine INSERT INTO media (id, original_filename, stored_filename, media_type, mime_type, file_size, duration, width, height, video_codec, audio_codec, fps, user_id, project_id, folder, tags, processing_status, processed_filename, processing_error, created_at) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::BIGINT, $7::FLOAT, $8::INTEGER, $9::INTEGER, $10::VARCHAR, $11::VARCHAR, $12::VARCHAR, $13::UUID, $14::UUID, $15::VARCHAR, $16::VARCHAR, $17::VARCHAR, $18::VARCHAR, $19::VARCHAR, $20::TIMESTAMP WITH TIME ZONE)
+2026-09-19 05:35:55,599 INFO sqlalchemy.engine.Engine [cached since 0.01912s ago] (UUID('91dea3ce-7176-4d2a-9440-602abd143610'), 'sample.mp3', '03569c53-2f20-4e22-b6b7-abea5ffc66cb.mp3', 'audio', 'audio/mpeg', 73395, None, None, None, None, None, None, UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'), None, None, None, 'pending', None, None, datetime.datetime(2026, 9, 19, 5, 35, 55, 598952))
+2026-09-19 05:35:55,599 INFO sqlalchemy.engine.Engine COMMIT
+2026-09-19 05:35:55,600 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,600 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+FROM media 
+WHERE media.id = $1::UUID
+2026-09-19 05:35:55,600 INFO sqlalchemy.engine.Engine [cached since 0.01663s ago] (UUID('91dea3ce-7176-4d2a-9440-602abd143610'),)
+INFO:     127.0.0.1:44336 - "POST /media/upload HTTP/1.1" 201 Created
+2026-09-19 05:35:55,603 INFO sqlalchemy.engine.Engine ROLLBACK
+2026-09-19 05:35:55,650 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-09-19 05:35:55,650 INFO sqlalchemy.engine.Engine SELECT users.id, users.email, users.password_hash, users.full_name, users.is_active, users.created_at, users.updated_at, users.avatar_url, users.preferences 
+FROM users 
+WHERE users.id = $1::UUID
+2026-09-19 05:35:55,650 INFO sqlalchemy.engine.Engine [cached since 0.1272s ago] (UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'),)
+2026-09-19 05:35:55,653 INFO sqlalchemy.engine.Engine SELECT media.id, media.original_filename, media.stored_filename, media.media_type, media.mime_type, media.file_size, media.duration, media.width, media.height, media.video_codec, media.audio_codec, media.fps, media.user_id, media.project_id, media.folder, media.tags, media.processing_status, media.processed_filename, media.processing_error, media.created_at 
+FROM media 
+WHERE media.id = $1::UUID AND media.user_id = $2::UUID
+2026-09-19 05:35:55,653 INFO sqlalchemy.engine.Engine [generated in 0.00017s] (UUID('5f76936a-31dd-4125-8581-72f8f73ec193'), UUID('40067c44-7b2e-4e3f-be9d-3558e9be3a81'))
+2026-09-19 05:35:55,655 INFO sqlalchemy.engine.Engine ROLLBACK
+INFO:     127.0.0.1:44336 - "POST /audio/5f76936a-31dd-4125-8581-72f8f73ec193/edit HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 422, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 63, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/applications.py", line 1163, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/applications.py", line 96, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/base.py", line 193, in __call__
+    response = await self.dispatch_func(request, call_next)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/app/main.py", line 51, in dispatch
+    response = await call_next(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/base.py", line 168, in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/base.py", line 144, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/cors.py", line 88, in __call__
+    await self.app(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/routing.py", line 670, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 2734, in app
+    await route.handle(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1780, in handle
+    await self.original_router.handle(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 2789, in handle
+    await included_router._handle_selected(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1800, in _handle_selected
+    await original_route.handle(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 1279, in handle
+    await app(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 158, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 144, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 706, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 352, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/app/features/audio/routes.py", line 208, in edit_audio_endpoint
+    await asyncio.to_thread(merge_audio, data.target_files, str(output_path))
+  File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/asyncio/threads.py", line 26, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/hostedtoolcache/Python/3.13.15/x64/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/runner/work/FrameFlux-Frontend/FrameFlux-Frontend/backend/app/features/audio/processor.py", line 179, in merge_audio
+    raise FileNotFoundError(f"Audio file not found: {f}")
+FileNotFoundError: Audio file not found: d3ed820d-7a65-4b82-8f03-1cfafc0c34c5.mp3
