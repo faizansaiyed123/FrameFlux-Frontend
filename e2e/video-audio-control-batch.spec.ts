@@ -37,7 +37,15 @@ async function syncVideo(
       ...data,
     },
   });
-  await expectBlob(response, 'video/');
+  expect(response.ok(), await response.text()).toBeTruthy();
+  const body = await response.json();
+  expect(body.output_filename).toMatch(/\\.mp4$/i);
+  expect(body.media_id).toBe(videoId);
+
+  const processed = await request.get(API + '/media/' + videoId + '/processed', {
+    headers: { Authorization: 'Bearer ' + token },
+  });
+  await expectBlob(processed, 'video/');
 }
 
 test.describe('05 Video Audio Control batch', () => {
