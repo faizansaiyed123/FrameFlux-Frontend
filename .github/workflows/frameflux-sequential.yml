@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Remove audio|Add audio|Replace audio|Mute original audio|Mix original \+ new audio|Audio delay|Audio offset|Fade audio in|Fade audio out'
+  FEATURE_GREP: 'Upload video|Separate audio file|Add external audio|Replace original audio|Keep original audio|Mix original \\+ external audio|Mute original audio|Match audio duration to video|Match video duration to audio|Trim audio automatically|Trim video automatically|Choose audio starting position|Audio delay adjustment|Audio offset adjustment|Fine/millisecond timing adjustment|Preview synchronization|Export synchronized video'
 
 jobs:
   feature:
@@ -167,6 +167,7 @@ jobs:
           mkdir -p e2e/fixtures
           ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=blue:s=320x240:r=24 -f lavfi -i anullsrc=r=44100:cl=mono -t 2 -c:v libx264 -pix_fmt yuv420p -c:a aac e2e/fixtures/sample.mp4
           ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=green:s=320x240:r=24 -f lavfi -i anullsrc=r=44100:cl=mono -t 2 -c:v libx264 -pix_fmt yuv420p -c:a aac e2e/fixtures/sample2.mp4
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=purple:s=320x240:r=24 -f lavfi -i anullsrc=r=44100:cl=mono -t 4 -c:v libx264 -pix_fmt yuv420p -c:a aac e2e/fixtures/sample-long.mp4
           ffmpeg -hide_banner -loglevel error -f lavfi -i sine=frequency=880:sample_rate=44100 -t 3 -c:a pcm_s16le e2e/fixtures/sample.wav
           ffmpeg -hide_banner -loglevel error -i e2e/fixtures/sample.wav -c:a libmp3lame -b:a 192k e2e/fixtures/sample.mp3
           ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=red:s=320x240 -frames:v 1 e2e/fixtures/sample.png
@@ -177,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/video-audio-control-batch.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/video-external-audio-sync-batch.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
