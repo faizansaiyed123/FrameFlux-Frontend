@@ -166,7 +166,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run real-user browser tests
-        run: npx playwright test e2e/wma-conversion-regression.spec.ts
+        run: npx playwright test e2e/audio-fade-out-regression.spec.ts
 
       - name: Upload Playwright report
         if: always()
