@@ -17,4 +17,5 @@ test('Merge audio', async ({ request }) => {
   expect(response.ok(), await response.text()).toBeTruthy();
   const body = await response.json();
   expect(body.output_filename).toBeTruthy();
+  expect(body.output_filename).toMatch(/\.mp3$/i);
 });
