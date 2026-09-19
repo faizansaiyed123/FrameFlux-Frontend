@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Delete selected section|Keep selected section|Reorder clips'
+  FEATURE_GREP: 'Remove audio|Add audio|Replace audio|Mute original audio|Mix original \+ new audio|Audio delay|Audio offset|Fade audio in|Fade audio out'
 
 jobs:
   feature:
@@ -177,7 +177,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/video-editing-batch.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/video-audio-control-batch.spec.ts --grep "$FEATURE_GREP" 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
