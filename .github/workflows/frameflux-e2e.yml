@@ -166,7 +166,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run real-user browser tests
-        run: npx playwright test e2e/audio-merge-regression.spec.ts
+        run: npx playwright test e2e/audio-reorder-regression.spec.ts
 
       - name: Upload Playwright report
         if: always()
