@@ -11,7 +11,9 @@ test('Compress video', async ({ page, request }) => {
   await uploadViaMediaDialog(page, path.resolve('e2e/fixtures/sample-long.mp4'), 'sample-long.mp4');
 
   await page.getByRole('tab', { name: 'Tools', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Compress Media' })).toBeVisible();
+
+  // CompressForm renders a labelled Quality Preset control rather than a heading.
+  await expect(page.getByText('Quality Preset', { exact: true })).toBeVisible();
 
   await page.getByText('Quality Preset').locator('..').getByRole('combobox').click();
   await page.getByRole('option', { name: /Balanced/i }).click();
