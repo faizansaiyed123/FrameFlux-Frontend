@@ -88,7 +88,7 @@ test.describe('07 Video Compression batch', () => {
     await page.waitForURL(/\/app\/dashboard\/media\/[^/?]+\?from_upload=1$/);
 
     await page.getByRole('tab', { name: 'Tools', exact: true }).click();
-    await page.getByLabel(/Target Size \(MB, optional\)/i).fill('1');
+    await page.getByText('Target Size (MB, optional)', { exact: true }).locator('..').getByRole('spinbutton').fill('1');
 
     let payload: any = null;
     await page.route('**/media/*/compress', async route => {
