@@ -39,7 +39,7 @@ async function syncVideo(
   });
   expect(response.ok(), await response.text()).toBeTruthy();
   const body = await response.json();
-  expect(body.output_filename).toMatch(/\\.mp4$/i);
+  expect(body.output_filename).toMatch(/\.mp4$/i);
   expect(body.media_id).toBe(videoId);
 
   const processed = await request.get(API + '/media/' + videoId + '/processed', {
