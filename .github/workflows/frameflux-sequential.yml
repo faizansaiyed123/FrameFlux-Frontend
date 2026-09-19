@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: 'Merge audio'
+  FEATURE_GREP: 'Fade in audio'
 
 jobs:
   feature:
@@ -178,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/audio-merge-regression.spec.ts 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/audio-fade-in-regression.spec.ts 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
