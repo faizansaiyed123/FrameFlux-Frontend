@@ -148,7 +148,7 @@ test.describe('06 Video + External Audio Sync batch', () => {
     await page.getByLabel('External Audio File (stored filename)', { exact: true }).fill(audio.stored_filename);
     await page.getByRole('button', { name: /Preview \(5s\)/i }).click();
     await expect(page.getByRole('heading', { name: 'Sync Preview (5s)' })).toBeVisible({ timeout: 30_000 });
-    await expect(page.locator('video')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sync Preview (5s)' }).locator('..').locator('video')).toBeVisible();
   });
 
   test('Export synchronized video', async ({ request }) => {
