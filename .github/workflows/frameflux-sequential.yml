@@ -178,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/video-compression-regression.spec.ts --grep "^$FEATURE_GREP$" 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/video-compression-regression.spec.ts 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
