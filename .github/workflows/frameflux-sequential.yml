@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '09.10 Audio → Audio WMA conversion'
+  FEATURE_GREP: '05/09 Audio Fade Out'
 
 jobs:
   feature:
@@ -178,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/wma-conversion-regression.spec.ts 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/audio-fade-out-regression.spec.ts 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
