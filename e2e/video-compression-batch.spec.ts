@@ -57,7 +57,7 @@ test.describe('07 Video Compression batch', () => {
     const auth = await createUser(request, 'compression-resolution');
     const media = await uploadMedia(request, auth.token, 'e2e/fixtures/sample-long.mp4');
     const original = await expectBlob(
-      await request.get(API + '/media/' + media.id + '/download', {
+      await request.get(API + '/media/' + media.id + '/download?download_type=original', {
         headers: { Authorization: 'Bearer ' + auth.token },
       }),
       'video/',
