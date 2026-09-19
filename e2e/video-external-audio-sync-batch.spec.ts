@@ -158,3 +158,5 @@ test.describe('06 Video + External Audio Sync batch', () => {
     await syncVideo(request, auth.token, video.id, audio.stored_filename, { audio_offset: 0.1 });
   });
 });
+
+// Sequential regression: Batch 06 sync contract.
