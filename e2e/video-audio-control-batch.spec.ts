@@ -15,6 +15,13 @@ async function processedVideo(request: APIRequestContext, token: string, mediaId
   );
 }
 
+async function expectOutputFilename(response: Awaited<ReturnType<APIRequestContext['post']>>) {
+  expect(response.ok(), await response.text()).toBeTruthy();
+  const body = await response.json();
+  expect(body.output_filename).toBeTruthy();
+  return body.output_filename as string;
+}
+
 async function syncVideo(
   request: APIRequestContext,
   token: string,
@@ -76,7 +83,7 @@ test.describe('05 Video Audio Control batch', () => {
       API + '/audio/' + video.id + '/replace-audio?audio_path=' + encodeURIComponent(audio.stored_filename),
       { headers: { Authorization: 'Bearer ' + auth.token } },
     );
-    await expectBlob(response, 'video/');
+    await expectOutputFilename(response);
   });
 
   test('Mute original audio', async ({ request }) => {
@@ -136,7 +143,7 @@ test.describe('05 Video Audio Control batch', () => {
         encodeURIComponent(audio.stored_filename) + '&fade_in=0.25',
       { headers: { Authorization: 'Bearer ' + auth.token } },
     );
-    await expectBlob(response, 'video/');
+    await expectOutputFilename(response);
   });
 
   test('Fade audio out', async ({ request }) => {
@@ -149,6 +156,6 @@ test.describe('05 Video Audio Control batch', () => {
         encodeURIComponent(audio.stored_filename) + '&fade_out=0.25',
       { headers: { Authorization: 'Bearer ' + auth.token } },
     );
-    await expectBlob(response, 'video/');
+    await expectOutputFilename(response);
   });
 });
