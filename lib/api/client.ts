@@ -542,6 +542,18 @@ class ApiClient {
     });
   }
 
+  async reorderAudioClips(id: string, storedFilenames: string[]) {
+    return this.request<{
+      output_filename: string;
+    }>(`/audio/${id}/edit`, {
+      method: 'POST',
+      body: JSON.stringify({
+        operation: 'merge',
+        target_files: storedFilenames,
+      }),
+    });
+  }
+
   async mergeMedia(id: string, mediaIds: string[]) {
     return this.request<{
       media_id: string;
