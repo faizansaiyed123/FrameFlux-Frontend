@@ -22,7 +22,13 @@ async function syncVideo(
       ...data,
     },
   });
-  await expectBlob(response, 'video/');
+  expect(response.ok(), await response.text()).toBeTruthy();
+  const body = await response.json();
+  expect(body.output_filename).toBeTruthy();
+  const output = await request.get(API + '/media/' + videoId + '/download?download_type=processed', {
+    headers: { Authorization: 'Bearer ' + token },
+  });
+  await expectBlob(output, 'video/');
 }
 
 test.describe('06 Video + External Audio Sync batch', () => {
@@ -138,6 +144,7 @@ test.describe('06 Video + External Audio Sync batch', () => {
     await page.goto('/app/dashboard/media/' + video.id);
     await page.getByRole('tab', { name: 'Processing', exact: true }).click();
     await page.getByRole('button', { name: /^Audio$/i }).click();
+    await page.getByRole('button', { name: /Sync External Audio/i }).click();
     await page.getByLabel('External Audio File (stored filename)', { exact: true }).fill(audio.stored_filename);
     await page.getByRole('button', { name: /Preview \(5s\)/i }).click();
     await expect(page.getByRole('heading', { name: 'Sync Preview (5s)' })).toBeVisible({ timeout: 30_000 });
