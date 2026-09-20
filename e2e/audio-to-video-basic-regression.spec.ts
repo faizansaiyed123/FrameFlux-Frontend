@@ -105,3 +105,21 @@ test('Audio → Video: add multiple images', async ({ request }) => {
   expect(mean(early, 0)).toBeGreaterThan(mean(early, 1) + 40);
   expect(mean(late, 1)).toBeGreaterThan(mean(late, 0) + 40);
 });
+test('Audio → Video: add title', async ({ request }) => {
+  const auth = await createUser(request, 'audio-to-video-title');
+  const audio = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp3');
+
+  const response = await request.post(API + '/audio/' + audio.id + '/to-video', {
+    headers: { Authorization: 'Bearer ' + auth.token },
+    data: {
+      background_color: '#202020',
+      title: 'FrameFlux QA Title',
+      output_format: 'mp4',
+      resolution: '320x240',
+      fps: 24,
+      duration: 1,
+    },
+  });
+
+  await expectBlob(response, 'video/');
+});
