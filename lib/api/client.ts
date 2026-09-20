@@ -1123,6 +1123,26 @@ class ApiClient {
     }[]>(`/subtitles/${mediaId}/tracks`);
   }
 
+  async editSubtitle(mediaId: string, data: {
+    subtitle_path: string;
+    operation: 'update_text';
+    entry_index: number;
+    text: string;
+  }) {
+    const response = await fetch(this.baseUrl + '/subtitles/' + mediaId + '/edit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}),
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to edit subtitles' }));
+      throw new Error(error.detail || 'Failed to edit subtitles');
+    }
+    return response.blob();
+  }
   async syncSubtitles(mediaId: string, data: {
     subtitle_path: string;
     offset_seconds?: number;
