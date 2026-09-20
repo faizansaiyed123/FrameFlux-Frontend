@@ -44,7 +44,7 @@ function downloadBlob(blob: Blob, filename: string) {
 export function SubtitleForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
   const [subtitleUploading, setSubtitleUploading] = useState(false);
-  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry'>('burn');
+  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry'>('burn');
   const [subtitlePath, setSubtitlePath] = useState('');
   const [subtitleFileName, setSubtitleFileName] = useState('');
   const [fontSize, setFontSize] = useState('24');
@@ -181,6 +181,19 @@ export function SubtitleForm({ mediaId }: Props) {
           entry_index: entryIndex,
         });
         downloadBlob(blob, subtitleFileName ? 'deleted_' + subtitleFileName : 'deleted_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'split_entry') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        const splitTime = Number(addStart);
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        if (!Number.isFinite(splitTime) || splitTime < 0) { setError('Split time is required'); return; }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'split_entry',
+          entry_index: entryIndex,
+          start: splitTime,
+        });
+        downloadBlob(blob, subtitleFileName ? 'split_' + subtitleFileName : 'split_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Operation failed');
@@ -202,6 +215,7 @@ export function SubtitleForm({ mediaId }: Props) {
       case 'edit_timing':
       case 'add_entry':
       case 'delete_entry':
+      case 'split_entry':
         return Download;
       default:
         return null;
@@ -222,6 +236,8 @@ export function SubtitleForm({ mediaId }: Props) {
         return 'Add Entry & Download';
       case 'delete_entry':
         return 'Delete Entry & Download';
+      case 'split_entry':
+        return 'Split Entry & Download';
       default:
         return 'Run & Download';
     }
@@ -236,7 +252,7 @@ export function SubtitleForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Action</Label>
-        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry')}>
+        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry')}>
           <SelectTrigger>
             <SelectValue placeholder="Select action" />
           </SelectTrigger>
@@ -249,6 +265,7 @@ export function SubtitleForm({ mediaId }: Props) {
             <SelectItem value="edit_timing"><SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Timing</SelectItem>
             <SelectItem value="add_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Add Subtitle Entry</SelectItem>
             <SelectItem value="delete_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Delete Subtitle Entry</SelectItem>
+            <SelectItem value="split_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Split Subtitle Entry</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -332,6 +349,33 @@ export function SubtitleForm({ mediaId }: Props) {
 
 
 
+
+      {action === 'split_entry' && (
+        <div className="grid gap-3">
+          <div className="space-y-2">
+            <Label>Subtitle Entry (1-based)</Label>
+            <Input
+              aria-label="Split Subtitle Entry"
+              type="number"
+              min="1"
+              step="1"
+              value={editEntryIndex}
+              onChange={(e) => setEditEntryIndex(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Split Time (seconds)</Label>
+            <Input
+              aria-label="Split Time"
+              type="number"
+              min="0"
+              step="0.001"
+              value={addStart}
+              onChange={(e) => setAddStart(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
       {action === 'delete_entry' && (
         <div className="space-y-2">
           <Label>Subtitle Entry (1-based)</Label>
