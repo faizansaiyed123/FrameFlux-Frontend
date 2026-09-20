@@ -123,3 +123,23 @@ test('Audio → Video: add title', async ({ request }) => {
 
   await expectBlob(response, 'video/');
 });
+
+
+test('Audio → Video: add artist name', async ({ request }) => {
+  const auth = await createUser(request, 'audio-to-video-artist');
+  const audio = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp3');
+
+  const response = await request.post(API + '/audio/' + audio.id + '/to-video', {
+    headers: { Authorization: 'Bearer ' + auth.token },
+    data: {
+      background_color: '#202020',
+      artist: 'FrameFlux QA Artist',
+      output_format: 'mp4',
+      resolution: '320x240',
+      fps: 24,
+      duration: 1,
+    },
+  });
+
+  await expectBlob(response, 'video/');
+});
