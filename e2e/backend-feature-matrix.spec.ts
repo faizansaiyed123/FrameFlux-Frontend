@@ -166,8 +166,6 @@ test.describe('02 Video conversion and editing matrix', () => {
           height: 120,
           fps: 24,
           quality: 5,
-          video_codec: 'h264',
-          audio_codec: 'aac',
         },
       });
       expect(res.ok(), `${format}: ${await res.text()}`).toBeTruthy();
