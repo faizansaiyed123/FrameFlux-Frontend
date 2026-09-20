@@ -30,7 +30,7 @@ test('Audio editing reorder clips', async ({ page, request }) => {
   await expect(moveUpButtons).toHaveCount(2);
   await moveUpButtons.nth(1).click();
 
-  const orderRows = clipOrder.locator('span').filter({ hasText: /^[12]\\. sample\\.mp3$/ });
+  const orderRows = clipOrder.locator('span').filter({ hasText: /^[12]\. sample\.mp3$/ });
   await expect(orderRows.nth(0)).toHaveText('1. sample.mp3');
   await expect(orderRows.nth(1)).toHaveText('2. sample.mp3');
 
