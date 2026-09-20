@@ -54,11 +54,10 @@ test('a real user can choose subtitle position from the Tools UI and apply it', 
   await position.click();
   await page.getByRole('option', { name: 'Top', exact: true }).click();
 
-  const response = await page.waitForResponse(
+  const responsePromise = page.waitForResponse(
     response => response.url().includes('/subtitles/') && response.url().includes('/burn') && response.status() === 200
   );
-  await Promise.all([
-    response,
-    subtitlesCard.getByRole('button', { name: 'Run & Download', exact: true }).click(),
-  ]);
+  await subtitlesCard.getByRole('button', { name: 'Run & Download', exact: true }).click();
+  const response = await responsePromise;
+  expect(await response.json()).toHaveProperty('version_number');
 });
