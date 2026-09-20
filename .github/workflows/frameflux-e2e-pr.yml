@@ -144,7 +144,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run browser E2E
-        run: npx playwright test e2e/audio-fade-out-regression.spec.ts --grep "Fade out audio" --workers=1 --reporter=list --retries=0
+        run: npx playwright test e2e/audio-to-video-custom-text-regression.spec.ts --grep "Add custom text" --workers=1 --reporter=list --retries=0
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
