@@ -144,7 +144,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run browser E2E
-        run: npx playwright test e2e/backend-feature-matrix.spec.ts --grep "convert video through every declared output format" --workers=1 --reporter=list --retries=0
+        run: npx playwright test e2e/backend-feature-matrix.spec.ts --grep "split, keep clips, delete clips, merge, reorder and append" --workers=1 --reporter=list --retries=0
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
