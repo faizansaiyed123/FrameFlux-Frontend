@@ -17,7 +17,7 @@ permissions:
 
 env:
   # Current sequential feature is re-run after each verified backend or focused-test selector fix.
-  FEATURE_GREP: '15.17 EXISTING SUBTITLE FILES :: Adjust timing if necessary'
+  FEATURE_GREP: '15.24 EXISTING SUBTITLE FILES :: Add subtitle track to video'
 
 jobs:
   feature:
@@ -179,7 +179,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/subtitle-timing-regression.spec.ts --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/subtitle-mux-regression.spec.ts --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
