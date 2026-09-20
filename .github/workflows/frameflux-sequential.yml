@@ -17,7 +17,7 @@ permissions:
 
 env:
   # Current sequential feature is re-run after each verified backend or focused-test selector fix.
-  FEATURE_GREP: '15.28 EXISTING SUBTITLE FILES :: Subtitle timing offset'
+  FEATURE_GREP: '15.29 EXISTING SUBTITLE FILES :: Move subtitles forward/backward'
 
 jobs:
   feature:
@@ -179,7 +179,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/subtitle-offset-regression.spec.ts --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/subtitle-direction-regression.spec.ts --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
