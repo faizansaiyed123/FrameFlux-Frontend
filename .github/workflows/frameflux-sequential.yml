@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '11.06 AUDIO → VIDEO :: Add artist name'
+  FEATURE_GREP: '03. Audio extraction — all declared formats'
 
 jobs:
   feature:
@@ -178,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/audio-to-video-basic-regression.spec.ts --grep "add artist name" --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/audio-extraction-regression.spec.ts --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
