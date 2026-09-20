@@ -25,6 +25,7 @@ test('Audio editing reorder clips', async ({ page, request }) => {
   await page.getByRole('button', { name: /^Add$/i }).click();
 
   const clipOrder = page.getByText('Clip order', { exact: true }).locator('..');
+  await clipOrder.scrollIntoViewIfNeeded();
   await expect(clipOrder.getByText('1. sample.mp3', { exact: true })).toBeVisible();
   await expect(clipOrder.getByText('2. sample.mp3', { exact: true })).toBeVisible();
 
