@@ -32,8 +32,8 @@ test('subtitle timing controls are exposed in the real media tools UI', async ({
   await page.waitForURL(/\/app\/dashboard/);
   await page.goto(`/app/dashboard/media/${video.id}`);
   await page.getByRole('tab', { name: /tools/i }).click();
-  const card = page.locator('div[class*="border"]').filter({ has: page.getByText('Subtitles', { exact: true }) }).first();
-  await card.getByRole('combobox').click();
+  const card = page.getByText('Subtitles', { exact: true }).locator('xpath=ancestor::div[contains(concat(" ", normalize-space(@class), " "), " border-zinc-200 ")][1]');
+  await card.getByRole('combobox').first().click();
   await page.getByRole('option', { name: /Sync Subtitles/i }).click();
   await expect(card.getByLabel('Timing Offset')).toBeVisible();
   await expect(card.getByLabel('Timing Scale')).toBeVisible();
