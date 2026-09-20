@@ -167,7 +167,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run real-user browser tests
-        run: npx playwright test e2e/video-compression-regression.spec.ts --grep "Compress video" --workers=1 --reporter=list --retries=0
+        run: npx playwright test e2e/video-compression-batch.spec.ts --grep "Low compression" --workers=1 --reporter=list --retries=0
 
       - name: Upload Playwright report
         if: always()
