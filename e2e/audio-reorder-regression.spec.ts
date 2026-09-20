@@ -24,14 +24,15 @@ test('Audio editing reorder clips', async ({ page, request }) => {
   await page.getByRole('option', { name: 'sample.mp3' }).last().click();
   await page.getByRole('button', { name: /^Add$/i }).click();
 
-  await expect(page.getByText(/1\. sample\.mp3/)).toBeVisible();
-  await expect(page.getByText(/2\. sample\.mp3/)).toBeVisible();
+  const clipOrder = page.getByText('Clip order', { exact: true }).locator('..');
+  await expect(clipOrder.getByText('1. sample.mp3', { exact: true })).toBeVisible();
+  await expect(clipOrder.getByText('2. sample.mp3', { exact: true })).toBeVisible();
 
   const moveUpButtons = page.getByRole('button', { name: 'Move sample.mp3 up' });
   await expect(moveUpButtons).toHaveCount(2);
   await moveUpButtons.nth(1).click();
 
-  const orderRows = page.locator('text=/^[12]\\. sample\\.mp3$/');
+  const orderRows = clipOrder.locator('span').filter({ hasText: /^[12]\\. sample\\.mp3$/ });
   await expect(orderRows.nth(0)).toHaveText('1. sample.mp3');
   await expect(orderRows.nth(1)).toHaveText('2. sample.mp3');
 
