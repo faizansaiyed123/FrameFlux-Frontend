@@ -144,7 +144,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
       - name: Run browser E2E
-        run: npx playwright test e2e/audio-to-video-basic-regression.spec.ts --grep "add multiple images" --workers=1 --reporter=list
+        run: npx playwright test e2e/audio-to-video-basic-regression.spec.ts --grep "add title" --workers=1 --reporter=list
       - name: Upload evidence
         if: always()
         uses: actions/upload-artifact@v4
