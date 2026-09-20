@@ -124,7 +124,7 @@ test.describe('01 Auth, upload, resumable upload and media lifecycle', () => {
       });
       expect(response.ok(), await response.text()).toBeTruthy();
       if (i === 0) {
-        const retry = await request.post(`${API}/media/resumable/${uploadId}/retry/0?index=0`, {
+        const retry = await request.post(`${API}/media/resumable/${uploadId}/retry?index=0`, {
           headers: { Authorization: 'Bearer ' + auth.token },
           multipart: { file: { name: 'chunk.part', mimeType: 'video/mp4', buffer: buf } },
         });
