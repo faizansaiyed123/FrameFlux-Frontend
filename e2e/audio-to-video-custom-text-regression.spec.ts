@@ -9,7 +9,7 @@ test('Add custom text', async ({ request }) => {
     data: { text: 'Hello FrameFlux', output_format: 'mp4', resolution: '320x240', fps: 24 },
   });
   expect(response.ok(), await response.text()).toBeTruthy();
-  const body = await response.json();
-  expect(body).toHaveProperty('filename');
-  expect(String(body.filename)).toMatch(/\.mp4$/i);
+  const body = await response.body();
+  expect(body.byteLength).toBeGreaterThan(0);
+  expect(response.headers()['content-type']).toMatch(/video\/mp4/i);
 });
