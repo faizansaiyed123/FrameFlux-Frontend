@@ -44,7 +44,7 @@ function downloadBlob(blob: Blob, filename: string) {
 export function SubtitleForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
   const [subtitleUploading, setSubtitleUploading] = useState(false);
-  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing'>('burn');
+  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry'>('burn');
   const [subtitlePath, setSubtitlePath] = useState('');
   const [subtitleFileName, setSubtitleFileName] = useState('');
   const [fontSize, setFontSize] = useState('24');
@@ -59,6 +59,9 @@ export function SubtitleForm({ mediaId }: Props) {
   const [editText, setEditText] = useState('');
   const [editStart, setEditStart] = useState('0.5');
   const [editEnd, setEditEnd] = useState('1');
+  const [addStart, setAddStart] = useState('0');
+  const [addEnd, setAddEnd] = useState('1');
+  const [addText, setAddText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -145,6 +148,29 @@ export function SubtitleForm({ mediaId }: Props) {
           end,
         });
         downloadBlob(blob, subtitleFileName ? 'timed_' + subtitleFileName : 'timed_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'add_entry') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const start = Number(addStart);
+        const end = Number(addEnd);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start) {
+          setError('End time must be greater than start time');
+          return;
+        }
+        if (!addText.trim()) { setError('Subtitle text required'); return; }
+        const insertAfter = editEntryIndex.trim() ? Number(editEntryIndex) - 1 : undefined;
+        if (insertAfter !== undefined && (!Number.isInteger(insertAfter) || insertAfter < -1)) {
+          setError('Insert-after entry must be zero or greater');
+          return;
+        }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'add_entry',
+          entry_index: insertAfter,
+          start,
+          end,
+          text: addText,
+        });
+        downloadBlob(blob, subtitleFileName ? 'added_' + subtitleFileName : 'added_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Operation failed');
@@ -164,6 +190,7 @@ export function SubtitleForm({ mediaId }: Props) {
         return SlidersHorizontal;
       case 'edit_text':
       case 'edit_timing':
+      case 'add_entry':
         return Download;
       default:
         return null;
@@ -180,6 +207,8 @@ export function SubtitleForm({ mediaId }: Props) {
         return 'Edit & Download';
       case 'edit_timing':
         return 'Update Timing & Download';
+      case 'add_entry':
+        return 'Add Entry & Download';
       default:
         return 'Run & Download';
     }
@@ -194,7 +223,7 @@ export function SubtitleForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Action</Label>
-        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing')}>
+        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry')}>
           <SelectTrigger>
             <SelectValue placeholder="Select action" />
           </SelectTrigger>
@@ -205,6 +234,7 @@ export function SubtitleForm({ mediaId }: Props) {
             <SelectItem value="sync"><SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Sync Subtitles</SelectItem>
             <SelectItem value="edit_text"><FileText className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Text</SelectItem>
             <SelectItem value="edit_timing"><SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Timing</SelectItem>
+            <SelectItem value="add_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Add Subtitle Entry</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -286,6 +316,37 @@ export function SubtitleForm({ mediaId }: Props) {
         </div>
       )}
 
+
+      {action === 'add_entry' && (
+        <div className="grid gap-3">
+          <div className="space-y-2">
+            <Label>Insert After Entry (optional)</Label>
+            <Input
+              aria-label="Insert After Entry"
+              type="number"
+              min="1"
+              step="1"
+              value={editEntryIndex}
+              onChange={(e) => setEditEntryIndex(e.target.value)}
+              placeholder="Append when empty"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Start Time (seconds)</Label>
+              <Input aria-label="Add Start Time" type="number" min="0" step="0.001" value={addStart} onChange={(e) => setAddStart(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>End Time (seconds)</Label>
+              <Input aria-label="Add End Time" type="number" min="0" step="0.001" value={addEnd} onChange={(e) => setAddEnd(e.target.value)} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Subtitle Text</Label>
+            <Input aria-label="Add Subtitle Text" value={addText} onChange={(e) => setAddText(e.target.value)} placeholder="New subtitle text" />
+          </div>
+        </div>
+      )}
       {action === 'edit_timing' && (
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-2">
