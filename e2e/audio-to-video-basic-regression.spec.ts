@@ -37,3 +37,21 @@ test('Audio → Video: add background image', async ({ request }) => {
 
   await expectBlob(response, 'video/');
 });
+
+test('Audio → Video: add background color', async ({ request }) => {
+  const auth = await createUser(request, 'audio-to-video-background-color');
+  const audio = await uploadMedia(request, auth.token, 'e2e/fixtures/sample.mp3');
+
+  const response = await request.post(API + '/audio/' + audio.id + '/to-video', {
+    headers: { Authorization: 'Bearer ' + auth.token },
+    data: {
+      background_color: '#ff0000',
+      output_format: 'mp4',
+      resolution: '320x240',
+      fps: 24,
+      duration: 1,
+    },
+  });
+
+  await expectBlob(response, 'video/');
+});
