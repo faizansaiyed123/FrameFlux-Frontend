@@ -56,6 +56,7 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
     {
       id: media.id,
       mediaId: media.id,
+      storedFilename: media.stored_filename,
       name: media.original_filename,
       start: 0,
       end: media.duration || 0,
@@ -219,6 +220,7 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
       {
         id: item.id,
         mediaId: item.id,
+        storedFilename: item.stored_filename,
         name: item.original_filename,
         start: 0,
         end: item.duration || 0,
@@ -249,7 +251,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
     setError('');
     setSuccess('');
     try {
-      await api.reorderAudioClips(media.id, clips.map((clip) => clip.mediaId));
+      await api.reorderAudioClips(
+        media.id,
+        clips.map((clip) => clip.storedFilename || clip.mediaId),
+      );
       setSuccess('Audio clips reordered and exported successfully.');
       onProcessed();
     } catch (err) {
