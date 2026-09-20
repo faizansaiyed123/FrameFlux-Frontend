@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  FEATURE_GREP: '04 Thumbnails: single, set, select and crop'
+  FEATURE_GREP: '13 GIF'
 
 jobs:
   feature:
@@ -178,7 +178,7 @@ jobs:
       - name: Run current failed feature only
         run: |
           set -o pipefail
-          npx playwright test e2e/thumbnail-regression.spec.ts --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
+          npx playwright test e2e/gif-regression.spec.ts --workers=1 --reporter=list --retries=0 2>&1 | tee sequential-feature.log
 
       - name: Record feature PASS
         if: success()
