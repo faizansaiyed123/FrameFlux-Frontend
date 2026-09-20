@@ -166,7 +166,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run real-user browser tests
-        run: npx playwright test e2e/video-external-audio-sync-batch.spec.ts --grep "Mute original audio" --workers=1 --reporter=list --retries=0
+        run: npx playwright test e2e/video-external-audio-sync-batch.spec.ts --grep "Match audio duration to video" --workers=1 --reporter=list --retries=0
 
       - name: Upload Playwright report
         if: always()
