@@ -1125,9 +1125,11 @@ class ApiClient {
 
   async editSubtitle(mediaId: string, data: {
     subtitle_path: string;
-    operation: 'update_text';
+    operation: 'update_text' | 'update_timing';
     entry_index: number;
-    text: string;
+    text?: string;
+    start?: number;
+    end?: number;
   }) {
     const response = await fetch(this.baseUrl + '/subtitles/' + mediaId + '/edit', {
       method: 'POST',
