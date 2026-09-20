@@ -1,0 +1,22 @@
+import { test, expect } from '@playwright/test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { API, createUser, uploadMedia, expectBlob } from './qa-helpers';
+
+test('subtitle track can be added to a video as selectable soft subtitles', async ({ request }) => {
+  const user = await createUser(request, 'subtitle-mux');
+  const video = await uploadMedia(request, user.token, path.resolve('e2e/fixtures/sample.mp4'));
+  const subtitlePath = path.resolve('e2e/fixtures/mux-test.srt');
+  fs.writeFileSync(subtitlePath, '1\n00:00:00,500 --> 00:00:01,500\nSelectable Subtitle Track\n');
+  const upload = await request.post(`${API}/subtitles/upload`, {
+    headers: { Authorization: `Bearer ${user.token}` },
+    multipart: { file: { name: 'mux-test.srt', mimeType: 'application/x-subrip', buffer: fs.readFileSync(subtitlePath) } },
+  });
+  expect(upload.ok(), await upload.text()).toBeTruthy();
+  const subtitle = await upload.json();
+  const muxed = await request.post(`${API}/subtitles/${video.id}/mux?subtitle_path=${encodeURIComponent(subtitle.filename)}&language=en`, {
+    headers: { Authorization: `Bearer ${user.token}` },
+  });
+  const body = await expectBlob(muxed, 'video/mp4');
+  expect(body.length).toBeGreaterThan(1000);
+});
