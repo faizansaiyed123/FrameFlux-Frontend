@@ -1124,18 +1124,22 @@ class ApiClient {
   }
 
   async syncSubtitles(mediaId: string, data: {
+    subtitle_path: string;
     offset_seconds?: number;
     scale?: number;
     preview?: boolean;
   }) {
     const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/sync`, {
       method: 'POST',
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to sync subtitles');
-    if (data.preview) {
-      return response.json();
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to sync subtitles' }));
+      throw new Error(error.detail || 'Failed to sync subtitles');
     }
     return response.blob();
   }
