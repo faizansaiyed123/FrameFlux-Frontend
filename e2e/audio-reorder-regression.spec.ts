@@ -16,7 +16,7 @@ test('Audio editing reorder clips', async ({ page, request }) => {
   await page.getByRole('tab', { name: 'Processing', exact: true }).click();
   await expect(page.getByText('Audio Tools', { exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: /Reorder/i }).click();
+  await page.getByRole('button', { name: 'Reorder', exact: true }).click();
   await expect(page.getByText('Clip order', { exact: true })).toBeVisible();
 
   const picker = page.getByRole('combobox').last();
