@@ -16,7 +16,7 @@ permissions:
   contents: write
 
 env:
-  # Current sequential feature is re-run after each verified backend fix.
+  # Current sequential feature is re-run after each verified backend or focused-test fix.
   FEATURE_GREP: '15.17 EXISTING SUBTITLE FILES :: Adjust timing if necessary'
 
 jobs:
