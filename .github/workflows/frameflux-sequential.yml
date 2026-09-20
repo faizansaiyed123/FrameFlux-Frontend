@@ -16,6 +16,7 @@ permissions:
   contents: write
 
 env:
+  # Current sequential feature is re-run after each verified backend fix.
   FEATURE_GREP: '15.13 EXISTING SUBTITLE FILES :: Synchronize subtitles with video timeline'
 
 jobs:
