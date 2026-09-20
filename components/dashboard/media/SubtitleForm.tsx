@@ -53,6 +53,8 @@ export function SubtitleForm({ mediaId }: Props) {
   const [dragActive, setDragActive] = useState(false);
   const [tracks, setTracks] = useState<SubtitleTrack[]>([]);
   const [syncPreviewUrl, setSyncPreviewUrl] = useState<string | null>(null);
+  const [syncOffset, setSyncOffset] = useState('0');
+  const [syncScale, setSyncScale] = useState('1');
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -201,6 +203,18 @@ export function SubtitleForm({ mediaId }: Props) {
           {subtitlePath && subtitlePath !== subtitleFileName && (
             <Input value={subtitlePath} onChange={(e) => { setSubtitlePath(e.target.value); setSubtitleFileName(''); }} placeholder="or enter path manually" className="text-xs h-7" />
           )}
+        </div>
+      )}
+      {action === 'sync' && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Timing Offset (seconds)</Label>
+            <Input aria-label="Timing Offset" type="number" step="0.001" value={syncOffset} onChange={(e) => setSyncOffset(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Timing Scale</Label>
+            <Input aria-label="Timing Scale" type="number" step="0.001" min="0.001" value={syncScale} onChange={(e) => setSyncScale(e.target.value)} />
+          </div>
         </div>
       )}
       {action === 'burn' && (
