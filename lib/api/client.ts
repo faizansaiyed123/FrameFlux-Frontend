@@ -1125,7 +1125,7 @@ class ApiClient {
 
   async editSubtitle(mediaId: string, data: {
     subtitle_path: string;
-    operation: 'update_text' | 'update_timing' | 'add_entry' | 'delete_entry';
+    operation: 'update_text' | 'update_timing' | 'add_entry' | 'delete_entry' | 'split_entry';
     entry_index?: number;
     text?: string;
     start?: number;
