@@ -44,7 +44,7 @@ function downloadBlob(blob: Blob, filename: string) {
 export function SubtitleForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
   const [subtitleUploading, setSubtitleUploading] = useState(false);
-  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry'>('burn');
+  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry' | 'merge_entries'>('burn');
   const [subtitlePath, setSubtitlePath] = useState('');
   const [subtitleFileName, setSubtitleFileName] = useState('');
   const [fontSize, setFontSize] = useState('24');
@@ -194,6 +194,16 @@ export function SubtitleForm({ mediaId }: Props) {
           start: splitTime,
         });
         downloadBlob(blob, subtitleFileName ? 'split_' + subtitleFileName : 'split_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'merge_entries') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'merge_entries',
+          entry_index: entryIndex,
+        });
+        downloadBlob(blob, subtitleFileName ? 'merged_' + subtitleFileName : 'merged_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Operation failed');
@@ -216,6 +226,7 @@ export function SubtitleForm({ mediaId }: Props) {
       case 'add_entry':
       case 'delete_entry':
       case 'split_entry':
+      case 'merge_entries':
         return Download;
       default:
         return null;
@@ -238,6 +249,8 @@ export function SubtitleForm({ mediaId }: Props) {
         return 'Delete Entry & Download';
       case 'split_entry':
         return 'Split Entry & Download';
+      case 'merge_entries':
+        return 'Merge Entries & Download';
       default:
         return 'Run & Download';
     }
@@ -252,7 +265,7 @@ export function SubtitleForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Action</Label>
-        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry')}>
+        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry' | 'merge_entries')}>
           <SelectTrigger>
             <SelectValue placeholder="Select action" />
           </SelectTrigger>
@@ -266,6 +279,7 @@ export function SubtitleForm({ mediaId }: Props) {
             <SelectItem value="add_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Add Subtitle Entry</SelectItem>
             <SelectItem value="delete_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Delete Subtitle Entry</SelectItem>
             <SelectItem value="split_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Split Subtitle Entry</SelectItem>
+            <SelectItem value="merge_entries"><FileText className="mr-2 h-3.5 w-3.5" /> Merge Subtitle Entries</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -350,6 +364,21 @@ export function SubtitleForm({ mediaId }: Props) {
 
 
 
+
+      {action === 'merge_entries' && (
+        <div className="space-y-2">
+          <Label>Subtitle Entry (1-based)</Label>
+          <Input
+            aria-label="Merge Subtitle Entry"
+            type="number"
+            min="1"
+            step="1"
+            value={editEntryIndex}
+            onChange={(e) => setEditEntryIndex(e.target.value)}
+          />
+          <p className="text-xs text-zinc-500">Merges this entry with the following entry.</p>
+        </div>
+      )}
       {action === 'split_entry' && (
         <div className="grid gap-3">
           <div className="space-y-2">
