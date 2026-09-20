@@ -192,7 +192,7 @@ test.describe('02 Video conversion and editing matrix', () => {
     await queuedMediaOperation(request, auth.token, a.id, `/media/${a.id}/clips/delete`, { clips: [{ start: 1, end: 1.5 }] });
     await queuedMediaOperation(request, auth.token, a.id, `/media/${a.id}/merge`, { media_ids: [a.id, b.id] });
     await queuedMediaOperation(request, auth.token, a.id, `/media/${a.id}/clips/reorder`, { media_ids: [b.id, a.id] });
-    await queuedMediaOperation(request, auth.token, a.id, `/media/${a.id}/clips/append`, { media_ids: [b.id] });
+    await queuedMediaOperation(request, auth.token, a.id, `/media/${a.id}/clips/append`, { media_ids: [a.id, b.id] });
   });
 
   for (const operation of ['crop', 'resize', 'rotate', 'flip', 'flop', 'speed']) {
