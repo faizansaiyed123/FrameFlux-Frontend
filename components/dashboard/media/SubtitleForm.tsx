@@ -108,13 +108,7 @@ export function SubtitleForm({ mediaId }: Props) {
       } else if (action === 'sync') {
         const result = await api.syncSubtitles(mediaId, { offset_seconds: 0, scale: 1, preview: true });
         const syncResult = result as SyncPreviewResponse | undefined;
-        if (syncResult && syncResult.preview_url) {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}${syncResult.preview_url}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('access_token') || ''}` },
-          });
-          const b = await res.blob();
-          setSyncPreviewUrl(URL.createObjectURL(b));
-        }
+        
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Operation failed');
@@ -169,7 +163,7 @@ export function SubtitleForm({ mediaId }: Props) {
           </SelectContent>
         </Select>
       </div>
-      {(action === 'burn' || action === 'mux') && (
+      {(action === 'burn' || action === 'mux' || action === 'sync') && (
         <div className="space-y-2">
           <Label>Subtitle File</Label>
           <div
