@@ -44,7 +44,7 @@ function downloadBlob(blob: Blob, filename: string) {
 export function SubtitleForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
   const [subtitleUploading, setSubtitleUploading] = useState(false);
-  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync'>('burn');
+  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text'>('burn');
   const [subtitlePath, setSubtitlePath] = useState('');
   const [subtitleFileName, setSubtitleFileName] = useState('');
   const [fontSize, setFontSize] = useState('24');
@@ -55,6 +55,8 @@ export function SubtitleForm({ mediaId }: Props) {
   const [syncPreviewUrl, setSyncPreviewUrl] = useState<string | null>(null);
   const [syncOffset, setSyncOffset] = useState('0');
   const [syncScale, setSyncScale] = useState('1');
+  const [editEntryIndex, setEditEntryIndex] = useState('1');
+  const [editText, setEditText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -108,9 +110,21 @@ export function SubtitleForm({ mediaId }: Props) {
         const data = await api.listSubtitleTracks(mediaId);
         setTracks(data as SubtitleTrack[]);
       } else if (action === 'sync') {
-        const result = await api.syncSubtitles(mediaId, { offset_seconds: 0, scale: 1, preview: true });
+        const result = await api.syncSubtitles(mediaId, { offset_seconds: Number(syncOffset), scale: Number(syncScale), preview: true });
         const syncResult = result as SyncPreviewResponse | undefined;
-        
+        if (syncResult?.preview_url) setSyncPreviewUrl(syncResult.preview_url);
+      } else if (action === 'edit_text') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        if (!editText.trim()) { setError('Subtitle text required'); return; }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'update_text',
+          entry_index: entryIndex,
+          text: editText,
+        });
+        downloadBlob(blob, subtitleFileName ? 'edited_' + subtitleFileName : 'edited_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Operation failed');
@@ -128,6 +142,8 @@ export function SubtitleForm({ mediaId }: Props) {
         return List;
       case 'sync':
         return SlidersHorizontal;
+      case 'edit_text':
+        return Download;
       default:
         return null;
     }
@@ -139,6 +155,8 @@ export function SubtitleForm({ mediaId }: Props) {
         return 'List Tracks';
       case 'sync':
         return 'Preview Sync';
+      case 'edit_text':
+        return 'Edit & Download';
       default:
         return 'Run & Download';
     }
@@ -153,7 +171,7 @@ export function SubtitleForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Action</Label>
-        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync')}>
+        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text')}>
           <SelectTrigger>
             <SelectValue placeholder="Select action" />
           </SelectTrigger>
@@ -162,10 +180,11 @@ export function SubtitleForm({ mediaId }: Props) {
             <SelectItem value="mux"><Download className="mr-2 h-3.5 w-3.5" /> Mux Soft Subtitles</SelectItem>
             <SelectItem value="tracks"><List className="mr-2 h-3.5 w-3.5" /> List Tracks</SelectItem>
             <SelectItem value="sync"><SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Sync Subtitles</SelectItem>
+            <SelectItem value="edit_text"><FileText className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Text</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      {(action === 'burn' || action === 'mux' || action === 'sync') && (
+      {(action === 'burn' || action === 'mux' || action === 'sync' || action === 'edit_text') && (
         <div className="space-y-2">
           <Label>Subtitle File</Label>
           <div
@@ -214,6 +233,31 @@ export function SubtitleForm({ mediaId }: Props) {
           <div className="space-y-2">
             <Label>Timing Scale</Label>
             <Input aria-label="Timing Scale" type="number" step="0.001" min="0.001" value={syncScale} onChange={(e) => setSyncScale(e.target.value)} />
+          </div>
+        </div>
+      )}
+
+      {action === 'edit_text' && (
+        <div className="grid gap-3">
+          <div className="space-y-2">
+            <Label>Subtitle Entry (1-based)</Label>
+            <Input
+              aria-label="Subtitle Entry"
+              type="number"
+              min="1"
+              step="1"
+              value={editEntryIndex}
+              onChange={(e) => setEditEntryIndex(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Subtitle Text</Label>
+            <Input
+              aria-label="Subtitle Text"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              placeholder="Enter replacement subtitle text"
+            />
           </div>
         </div>
       )}
