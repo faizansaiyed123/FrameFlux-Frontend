@@ -12,16 +12,14 @@ test('thumbnail generation supports single, set, select and crop', async ({ requ
   expect(set.ok(), await set.text()).toBeTruthy();
   expect((await set.json()).thumbnails.length).toBeGreaterThan(0);
 
-  const selected = await request.post(API + `/thumbnails/${media.id}/select`, {
+  const selected = await request.post(API + `/thumbnails/${media.id}/select?timestamp=0.5&width=160`, {
     headers,
-    data: { timestamp: 0.5, width: 160 },
   });
   expect(selected.ok(), await selected.text()).toBeTruthy();
   expect(await selected.json()).toHaveProperty('selected');
 
-  const crop = await request.post(API + `/thumbnails/${media.id}/crop`, {
+  const crop = await request.post(API + `/thumbnails/${media.id}/crop?timestamp=0.5&x=0&y=0&width=80&height=80`, {
     headers,
-    data: { timestamp: 0.5, x: 0, y: 0, width: 80, height: 80 },
   });
   expect(crop.ok(), await crop.text()).toBeTruthy();
   expect(await crop.json()).toHaveProperty('path');
