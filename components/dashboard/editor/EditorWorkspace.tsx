@@ -26,6 +26,7 @@ import { OverlayTab } from './OverlayTab';
 export interface Clip {
   id: string;
   mediaId: string;
+  storedFilename?: string;
   name: string;
   start: number;
   end: number;
