@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -86,12 +86,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
 
   useEffect(() => {
     return () => {
-      setSyncPreviewUrl((current) => {
-        if (current?.startsWith('blob:')) URL.revokeObjectURL(current);
-        return null;
-      });
+      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
     };
-  }, []);
+  }, [syncPreviewUrl]);
 
   const handleExtract = async () => {
     setExtracting(true); setError('');
