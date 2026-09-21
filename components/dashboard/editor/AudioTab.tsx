@@ -84,6 +84,15 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
   const [syncPreviewOpen, setSyncPreviewOpen] = useState(false);
   const [syncPreviewUrl, setSyncPreviewUrl] = useState<string | null>(null);
 
+  useEffect(() => {
+    return () => {
+      setSyncPreviewUrl((current) => {
+        if (current?.startsWith('blob:')) URL.revokeObjectURL(current);
+        return null;
+      });
+    };
+  }, []);
+
   const handleExtract = async () => {
     setExtracting(true); setError('');
     try {
@@ -206,9 +215,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       if (syncAudioDuration) data.audio_duration = parseFloat(syncAudioDuration);
       if (syncFadeIn) data.fade_in = parseFloat(syncFadeIn);
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
-      const result = await api.syncAudioVideo(media.id, data);
-      setSuccess(`Audio synced: ${result.output_filename}`);
-      onProcessed?.();
+      const blob = await api.syncAudioVideo(media.id, data);
+      downloadBlob(blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_synced.' + syncOutputFormat);
+      setSuccess('Audio synced and downloaded successfully.');
     } catch (err) { setError(err instanceof Error ? err.message : 'Sync failed'); }
     finally { setSyncProcessing(false); }
   };
@@ -231,8 +240,8 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       if (syncFadeIn) data.fade_in = parseFloat(syncFadeIn);
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
       
-      const result = await api.syncAudioVideo(media.id, data);
-      const blob = await api.getProcessedMedia(media.id, result.output_filename);
+      const blob = await api.syncAudioVideo(media.id, data);
+      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
       const url = URL.createObjectURL(blob);
       setSyncPreviewUrl(url);
       setSyncPreviewOpen(true);
