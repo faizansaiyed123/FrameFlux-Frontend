@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -100,14 +101,15 @@ export default function WorkflowsPage() {
   const [runMediaId, setRunMediaId] = useState('');
   const [runMediaList, setRunMediaList] = useState<{id: string; original_filename: string}[]>([]);
   const [runMediaLoading, setRunMediaLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchWorkflows = useCallback(async () => {
     setLoading(true);
     try {
       const data = await api.listWorkflows();
       setWorkflows(data);
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load workflows');
     } finally {
       setLoading(false);
     }
@@ -135,6 +137,7 @@ export default function WorkflowsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       const payload = {
         name,
@@ -148,29 +151,31 @@ export default function WorkflowsPage() {
       }
       setDialogOpen(false);
       fetchWorkflows();
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save workflow');
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this workflow?')) return;
     try {
+      setError(null);
       await api.deleteWorkflow(id);
       fetchWorkflows();
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete workflow');
     }
   };
 
   const handleRunOpen = async (id: string) => {
     setRunWorkflowId(id);
     setRunMediaLoading(true);
+    setError(null);
     try {
       const data = await api.listMedia();
       setRunMediaList(data.map(m => ({ id: m.id, original_filename: m.original_filename })));
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load media files');
     } finally {
       setRunMediaLoading(false);
     }
@@ -180,12 +185,13 @@ export default function WorkflowsPage() {
   const handleRunConfirm = async () => {
     if (!runWorkflowId || !runMediaId) return;
     setRunning(runWorkflowId);
+    setError(null);
     try {
       await api.runWorkflow(runWorkflowId, runMediaId);
       alert('Workflow queued successfully');
       setRunDialogOpen(false);
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to run workflow');
     } finally {
       setRunning(null);
     }
@@ -202,6 +208,8 @@ export default function WorkflowsPage() {
 
   return (
     <div className="space-y-8">
+      {error && <Alert className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300"><AlertDescription>{error}</AlertDescription></Alert>}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Workflows</h1>
