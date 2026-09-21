@@ -82,7 +82,7 @@ The application has separate concerns for authentication, workspace data, media 
 
 ### Browser verification
 
-The repository uses Playwright for browser-level verification. QA work is kept separate from application code so user-flow testing can exercise the real frontend/backend boundary.
+Playwright is included as a development dependency for browser-level verification. The application can therefore be exercised against the real frontend/backend boundary without coupling QA concerns to presentation components.
 
 ## Stack
 
@@ -152,11 +152,10 @@ The application may use a public API origin for browser requests. Private databa
 ```
 FrameFlux-Frontend/
 ├── app/                 # Next.js application routes and layouts
-├── components/          # reusable product UI
-├── lib/                 # shared client/runtime utilities
-├── stores/              # client-side state
+├── components/          # dashboard, landing and shared UI
+├── hooks/               # browser/application hooks
+├── lib/api/             # centralized API + resumable-upload clients
 ├── public/              # static assets
-├── qa/                  # browser-level verification
 ├── package.json
 ├── next.config.ts
 └── tsconfig.json
