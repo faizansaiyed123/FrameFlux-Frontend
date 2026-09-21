@@ -57,7 +57,7 @@ export async function waitForMedia(
   timeoutMs = 90_000
 ) {
   const deadline = Date.now() + timeoutMs;
-  let last: any = null;
+  let last: unknown = null;
   while (Date.now() < deadline) {
     const response = await request.get(`${API}/media/${mediaId}/status`, {
       headers: { Authorization: 'Bearer ' + token },
@@ -74,10 +74,11 @@ export async function expectBlob(
   response: Awaited<ReturnType<APIRequestContext['get'] | APIRequestContext['post']>>,
   expectedPrefix?: string
 ) {
-  expect(response.ok(), await response.text()).toBeTruthy();
+  const body = await response.body();
+  const diagnostic = body.toString('utf8');
+  expect(response.ok(), diagnostic).toBeTruthy();
   const contentType = response.headers()['content-type'] || '';
   if (expectedPrefix) expect(contentType).toContain(expectedPrefix);
-  const body = await response.body();
   expect(body.length).toBeGreaterThan(0);
   return body;
 }
