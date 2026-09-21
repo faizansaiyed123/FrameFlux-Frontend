@@ -17,6 +17,7 @@ export function AudioExtractForm({ mediaId }: Props) {
   const [format, setFormat] = useState('mp3');
   const [bitrate, setBitrate] = useState('192k');
   const [sampleRate, setSampleRate] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [channels, setChannels] = useState('2');
   const [quality, setQuality] = useState('medium');
   const [start, setStart] = useState('');
@@ -24,6 +25,7 @@ export function AudioExtractForm({ mediaId }: Props) {
 
   const handleExtract = async () => {
     setLoading(true);
+    setError(null);
     try {
       const blob = await api.extractAudio(mediaId, {
         format, bitrate,
@@ -49,7 +51,8 @@ export function AudioExtractForm({ mediaId }: Props) {
   };
 
   return (
-    <div className="space-y-4">
+        <div className="space-y-4">
+      {error && <Alert className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300"><AlertDescription className="text-xs">{error}</AlertDescription></Alert>}
       <div className="space-y-2">
         <Label>Format</Label>
         <Select value={format} onValueChange={setFormat}>
