@@ -235,16 +235,16 @@ function PresetCard({ preset, onEdit, onDelete, onCopy, readonly }: { preset: Pr
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => onCopy(preset)} title="Copy settings JSON">
+          <Button variant="ghost" size="icon" onClick={() => onCopy(preset)} title="Copy settings JSON" aria-label="Copy settings JSON">
             <Copy className="h-4 w-4" />
           </Button>
           {!readonly && (
             <>
-              <Button variant="ghost" size="icon" onClick={() => onEdit(preset)}>
+              <Button variant="ghost" size="icon" onClick={() => onEdit(preset)} aria-label="Edit preset">
                 <Pencil className="h-4 w-4" />
               </Button>
               {!preset.is_builtin && (
-                <Button variant="ghost" size="icon" onClick={() => onDelete(preset.id)}>
+                <Button variant="ghost" size="icon" onClick={() => onDelete(preset.id)} aria-label="Delete preset">
                   <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                 </Button>
               )}
