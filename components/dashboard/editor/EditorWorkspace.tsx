@@ -169,7 +169,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
     finally { setProcessing(false); }
   }, [activeTool, clips, selectedClipId, currentTime, media.id, onProcessed]);
 
-  const handleExportOpen = useCallback(() => { setExportOpen(true); setExportResult(null); setResultUrl(null); setError(''); }, []);
+  const handleExportOpen = useCallback(() => { if (resultUrl) URL.revokeObjectURL(resultUrl); setExportOpen(true); setExportResult(null); setResultUrl(null); setError(''); }, [resultUrl]);
 
   const handleExport = useCallback(async () => {
     setExporting(true); setError('');
@@ -195,7 +195,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
         const blob = await api.getProcessedMedia(media.id);
         const url = URL.createObjectURL(blob);
         setResultUrl(url);
-        setExportResult({ blob, filename: media.original_filename.replace(/\.[^/.]+$/, '') + '_export.mp4' });
+        setExportResult({ blob, filename: media.original_filename.replace(/\.[^/.]+$/, '') + '_export.' + exportConfig.format });
         setExportOpen(false);
       } else {
         setError(status.error || 'Export failed'); setExporting(false);
@@ -224,8 +224,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
 
   const handleDownloadResult = useCallback(() => {
     if (!exportResult) return;
-    const url = resultUrl || URL.createObjectURL(exportResult.blob);
+    const createdUrl = resultUrl ? null : URL.createObjectURL(exportResult.blob);
+    const url = resultUrl || createdUrl!;
     const a = document.createElement('a'); a.href = url; a.download = exportResult.filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    if (createdUrl) URL.revokeObjectURL(createdUrl);
   }, [exportResult, resultUrl]);
 
   const selectedClip = clips.find((c) => c.id === selectedClipId) || null;
