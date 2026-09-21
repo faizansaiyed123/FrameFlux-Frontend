@@ -1,0 +1,158 @@
+name: FrameFlux E2E PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: frameflux-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: frameflux
+          POSTGRES_USER: frameflux
+          POSTGRES_PASSWORD: frameflux
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U frameflux -d frameflux"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+      redis:
+        image: redis:8-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 12
+
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: faizansaiyed123/FrameFlux-Backend
+          ref: main
+          path: backend
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          pip install uv
+          uv sync --frozen
+      - name: Configure backend
+        working-directory: backend
+        run: |
+          mkdir -p storage/uploads storage/processed storage/temp
+          cat > .env <<'EOF'
+          APP_NAME=FrameFlux API
+          APP_VERSION=0.1.0
+          DATABASE_URL=postgresql+asyncpg://frameflux:frameflux@127.0.0.1:5432/frameflux
+          REDIS_URL=redis://127.0.0.1:6379/0
+          APP_ORIGIN=http://localhost:3000
+          ENVIRONMENT=test
+          DEBUG=true
+          FFMPEG_BINARY=ffmpeg
+          FFPROBE_BINARY=ffprobe
+          UPLOAD_DIR=storage/uploads
+          PROCESSED_DIR=storage/processed
+          TEMP_DIR=storage/temp
+          JWT_SECRET_KEY=frameflux-e2e-test-secret-change-me
+          MAX_UPLOAD_SIZE_BYTES=524288000
+          MAX_CHUNK_SIZE_BYTES=52428800
+          EOF
+      - name: Migrate database
+        working-directory: backend
+        run: uv run alembic upgrade head
+      - name: Apply test-only schema compatibility patch
+        working-directory: backend
+        run: |
+          PGPASSWORD=frameflux psql -h 127.0.0.1 -U frameflux -d frameflux -v ON_ERROR_STOP=1 -c "ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR(255); ALTER TABLE users ADD COLUMN IF NOT EXISTS preferences VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS folder VARCHAR(255); ALTER TABLE media ADD COLUMN IF NOT EXISTS tags TEXT;"
+
+      - name: Create missing model tables for exhaustive tests
+        working-directory: backend
+        run: |
+          uv run python - <<'PY'
+          import asyncio
+          from app.main import app
+          from app.infrastructure.database import Base, engine
+
+          async def main():
+              async with engine.begin() as conn:
+                  await conn.run_sync(Base.metadata.create_all)
+              await engine.dispose()
+
+          asyncio.run(main())
+          PY
+
+      - name: Start backend
+        working-directory: backend
+        run: nohup uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 > ../backend.log 2>&1 &
+      - name: Start worker
+        working-directory: backend
+        run: nohup uv run arq app.infrastructure.worker.WorkerSettings > ../worker.log 2>&1 &
+      - name: Wait for backend
+        run: |
+          for i in {1..60}; do
+            curl -fsS http://127.0.0.1:8000/health >/dev/null 2>&1 && exit 0
+            sleep 2
+          done
+          cat backend.log || true
+          cat worker.log || true
+          exit 1
+      - name: Install frontend dependencies
+        run: npm ci
+      - name: Generate media fixtures
+        run: |
+          mkdir -p e2e/fixtures
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=blue:s=320x240:r=24 -f lavfi -i anullsrc=r=44100:cl=mono -t 2 -c:v libx264 -pix_fmt yuv420p -c:a aac e2e/fixtures/sample.mp4
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=green:s=320x240:r=24 -f lavfi -i anullsrc=r=44100:cl=mono -t 2 -c:v libx264 -pix_fmt yuv420p -c:a aac e2e/fixtures/sample2.mp4
+          ffmpeg -hide_banner -loglevel error -f lavfi -i sine=frequency=880:sample_rate=44100 -t 3 -c:a pcm_s16le e2e/fixtures/sample.wav
+          ffmpeg -hide_banner -loglevel error -i e2e/fixtures/sample.wav -c:a libmp3lame -b:a 192k e2e/fixtures/sample.mp3
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=red:s=320x240 -frames:v 1 e2e/fixtures/sample.png
+          ffmpeg -hide_banner -loglevel error -f lavfi -i color=c=green:s=320x240 -frames:v 1 e2e/fixtures/sample2.png
+          printf '%s\n' '[Script Info]' 'ScriptType: v4.00+' '[V4+ Styles]' 'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding' 'Style: Default,Arial,24,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,0,0,0,0,100,100,0,0,1,1,0,2,10,10,10,1' '[Events]' 'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text' 'Dialogue: 0,0:00:00.00,0:00:01.50,Default,,0,0,0,,Hello FrameFlux' > e2e/fixtures/sample.ass
+          printf '%s\n' 'WEBVTT' '' '00:00.000 --> 00:01.500' 'Hello FrameFlux' > e2e/fixtures/sample.vtt
+          printf '%s\n' '1' '00:00:00,000 --> 00:00:01,500' 'Hello FrameFlux' > e2e/fixtures/sample.srt
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run browser E2E
+        run: npx playwright test e2e/backend-feature-matrix.spec.ts --grep "split, keep clips, delete clips, merge, reorder and append" --workers=1 --reporter=list --retries=0
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frameflux-e2e-evidence
+          path: |
+            playwright-report
+            test-results
+            backend.log
+            worker.log
+          if-no-files-found: ignore

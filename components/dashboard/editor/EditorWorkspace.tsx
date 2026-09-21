@@ -26,6 +26,7 @@ import { OverlayTab } from './OverlayTab';
 export interface Clip {
   id: string;
   mediaId: string;
+  storedFilename?: string;
   name: string;
   start: number;
   end: number;
@@ -168,7 +169,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
     finally { setProcessing(false); }
   }, [activeTool, clips, selectedClipId, currentTime, media.id, onProcessed]);
 
-  const handleExportOpen = useCallback(() => { setExportOpen(true); setExportResult(null); setResultUrl(null); setError(''); }, []);
+  const handleExportOpen = useCallback(() => { if (resultUrl) URL.revokeObjectURL(resultUrl); setExportOpen(true); setExportResult(null); setResultUrl(null); setError(''); }, [resultUrl]);
 
   const handleExport = useCallback(async () => {
     setExporting(true); setError('');
@@ -194,7 +195,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
         const blob = await api.getProcessedMedia(media.id);
         const url = URL.createObjectURL(blob);
         setResultUrl(url);
-        setExportResult({ blob, filename: media.original_filename.replace(/\.[^/.]+$/, '') + '_export.mp4' });
+        setExportResult({ blob, filename: media.original_filename.replace(/\.[^/.]+$/, '') + '_export.' + exportConfig.format });
         setExportOpen(false);
       } else {
         setError(status.error || 'Export failed'); setExporting(false);
@@ -223,8 +224,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
 
   const handleDownloadResult = useCallback(() => {
     if (!exportResult) return;
-    const url = resultUrl || URL.createObjectURL(exportResult.blob);
+    const createdUrl = resultUrl ? null : URL.createObjectURL(exportResult.blob);
+    const url = resultUrl || createdUrl!;
     const a = document.createElement('a'); a.href = url; a.download = exportResult.filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    if (createdUrl) URL.revokeObjectURL(createdUrl);
   }, [exportResult, resultUrl]);
 
   const selectedClip = clips.find((c) => c.id === selectedClipId) || null;
@@ -240,7 +243,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
   ];
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col">
+    <div className="flex min-h-[calc(100vh-4rem)] flex-col">
       {fromUpload && (
         <div className="flex items-center gap-3 rounded-b-lg border-b border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 px-4 py-2">
           <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
@@ -269,7 +272,7 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
           </Button>
         </div>
       </div>
-      <div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
+      <div className="flex flex-1 overflow-y-auto flex-col lg:flex-row">
         <div className="flex flex-1 flex-col min-w-0">
           <div className="flex-1 bg-black flex items-center justify-center relative min-h-[120px]">
             {loadingVideo && (<div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10"><div className="text-center"><Loader2 className="h-8 w-8 animate-spin text-indigo-400 mx-auto mb-3" /><p className="text-xs text-zinc-300">Loading video...</p></div></div>)}
@@ -339,7 +342,7 @@ function ExportModal({ config, onChange, onExport, exporting, onClose }: { confi
         <DialogHeader><DialogTitle>Export Settings</DialogTitle></DialogHeader>
         <div className="space-y-4 py-2">
           <div><Label>Format</Label>
-            <Select value={config.format} onValueChange={(v) => update({ format: v })}>
+            <Select value={config.format} onValueChange={(v) => update({ format: v, ...(v === 'webm' ? { videoCodec: 'vp9', audioCodec: 'keep' } : {}) })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>{formats.map((f) => (<SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>))}</SelectContent>
             </Select>

@@ -206,7 +206,7 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="format">Output Format</Label>
-          <Select value={format} onValueChange={setFormat}>
+          <Select value={format} onValueChange={(v) => { setFormat(v); if (v === 'webm') { setVideoCodec('vp9'); setAudioCodec(''); } }}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>

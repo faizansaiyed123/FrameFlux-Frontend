@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
@@ -61,6 +61,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
   const [volumeFadeOut, setVolumeFadeOut] = useState('');
   const [adjustingVolume, setAdjustingVolume] = useState(false);
 
+  const [addAudioFile, setAddAudioFile] = useState('');
+  const [addingAudio, setAddingAudio] = useState(false);
+
   const [replaceAudioFile, setReplaceAudioFile] = useState('');
   const [replaceFadeIn, setReplaceFadeIn] = useState('');
   const [replaceFadeOut, setReplaceFadeOut] = useState('');
@@ -80,6 +83,12 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
   const [syncProcessing, setSyncProcessing] = useState(false);
   const [syncPreviewOpen, setSyncPreviewOpen] = useState(false);
   const [syncPreviewUrl, setSyncPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
+    };
+  }, [syncPreviewUrl]);
 
   const handleExtract = async () => {
     setExtracting(true); setError('');
@@ -161,6 +170,18 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
     finally { setAdjustingVolume(false); }
   };
 
+  const handleAddAudio = async () => {
+    if (!addAudioFile.trim()) { setError('Select an audio file'); return; }
+    setAddingAudio(true); setError('');
+    try {
+      const blob = await api.addAudio(media.id, addAudioFile.trim());
+      downloadBlob(blob as Blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_with_audio.mp4');
+      setSuccess(`Audio added and mixed: ${addAudioFile.trim()}`);
+      onProcessed?.();
+    } catch (err) { setError(err instanceof Error ? err.message : 'Add audio failed'); }
+    finally { setAddingAudio(false); }
+  };
+
   const handleReplaceAudio = async () => {
     if (!replaceAudioFile.trim()) { setError('Select an audio file'); return; }
     setReplacingAudio(true); setError('');
@@ -191,9 +212,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       if (syncAudioDuration) data.audio_duration = parseFloat(syncAudioDuration);
       if (syncFadeIn) data.fade_in = parseFloat(syncFadeIn);
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
-      const result = await api.syncAudioVideo(media.id, data);
-      setSuccess(`Audio synced: ${result.output_filename}`);
-      onProcessed?.();
+      const blob = await api.syncAudioVideo(media.id, data);
+      downloadBlob(blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_synced.' + syncOutputFormat);
+      setSuccess('Audio synced and downloaded successfully.');
     } catch (err) { setError(err instanceof Error ? err.message : 'Sync failed'); }
     finally { setSyncProcessing(false); }
   };
@@ -216,8 +237,8 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       if (syncFadeIn) data.fade_in = parseFloat(syncFadeIn);
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
       
-      const result = await api.syncAudioVideo(media.id, data);
-      const blob = await api.getProcessedMedia(media.id, result.output_filename);
+      const blob = await api.syncAudioVideo(media.id, data);
+      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
       const url = URL.createObjectURL(blob);
       setSyncPreviewUrl(url);
       setSyncPreviewOpen(true);
@@ -471,6 +492,24 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           </div>
         </div>
 
+        {/* Add Audio */}
+        <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
+          <div className="space-y-2">
+            <Label htmlFor="addAudioFile" className="text-[10px] text-zinc-500">Add Audio</Label>
+            <p className="text-[10px] text-zinc-400">Mix a separate uploaded audio file with the existing audio track.</p>
+            <Input
+              id="addAudioFile"
+              value={addAudioFile}
+              onChange={(e) => setAddAudioFile(e.target.value)}
+              placeholder="e.g. music.mp3"
+              className="text-xs h-7"
+            />
+            <Button onClick={handleAddAudio} disabled={addingAudio || !addAudioFile.trim()} className="w-full text-xs">
+              {addingAudio ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Adding...</> : <><Music className="mr-1 h-3.5 w-3.5" />Add Audio</>}
+            </Button>
+          </div>
+        </div>
+
         {/* Replace Audio */}
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <Button onClick={() => setAtoVideoOpen(!atoVideoOpen)} variant="outline" className="w-full justify-start text-xs">
@@ -507,8 +546,8 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           {syncAudioOpen && (
             <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
               <div className="space-y-1">
-                <Label className="text-[9px] text-zinc-500">External Audio File (stored filename)</Label>
-                <Input value={syncAudioFile} onChange={(e) => setSyncAudioFile(e.target.value)} placeholder="e.g. soundtrack.mp3" className="text-xs h-7" />
+                <Label htmlFor="syncExternalAudioFile" className="text-[9px] text-zinc-500">External Audio File (stored filename)</Label>
+                <Input id="syncExternalAudioFile" value={syncAudioFile} onChange={(e) => setSyncAudioFile(e.target.value)} placeholder="e.g. soundtrack.mp3" className="text-xs h-7" />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">

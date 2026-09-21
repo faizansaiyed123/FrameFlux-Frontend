@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -43,6 +43,8 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  Pause,
+  RotateCcw,
   FileVideo,
   Music,
   ImageIcon,
@@ -83,21 +85,43 @@ export default function MediaPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [deleting, setDeleting] = useState(false);
-  const [filter, setFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [mediaType, setMediaType] = useState<string>('all');
   const [search, setSearch] = useState('');
+  const [folder, setFolder] = useState('');
+  const [tag, setTag] = useState('');
+  const [sortBy, setSortBy] = useState<'recent' | 'name_asc' | 'name_desc' | 'size_desc' | 'duration_desc'>('recent');
+  const [minDuration, setMinDuration] = useState('');
+  const [maxDuration, setMaxDuration] = useState('');
+  const [minSizeMb, setMinSizeMb] = useState('');
+  const [maxSizeMb, setMaxSizeMb] = useState('');
+  const [resolution, setResolution] = useState('all');
+  const [uploadedAfter, setUploadedAfter] = useState('');
+  const [uploadedBefore, setUploadedBefore] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [dragActive, setDragActive] = useState(false);
+  const [uploadPaused, setUploadPaused] = useState(false);
+  const [failedChunk, setFailedChunk] = useState<number | null>(null);
+  const uploaderRef = useRef<ResumableUploader | null>(null);
 
-  const handleFileSelect = (selectedFile: File | null) => {
-    if (selectedFile) {
-      const validTypes = ['video/', 'audio/', 'image/'];
-      const isValid = validTypes.some((type) => selectedFile.type.startsWith(type));
-      if (!isValid) {
-        setError('Invalid file type. Please select a video, audio, or image file.');
-        return;
-      }
-      setFile(selectedFile);
+  const handleFilesSelect = (selected: File[] | FileList) => {
+    const incoming = Array.from(selected);
+    if (incoming.length === 0) return;
+
+    const validTypes = ['video/', 'audio/', 'image/'];
+    const invalid = incoming.find(
+      (item) => !validTypes.some((type) => item.type.startsWith(type))
+    );
+
+    if (invalid) {
+      setError('Invalid file type. Please select only video, audio, or image files.');
+      return;
     }
+
+    setSelectedFiles(incoming);
+    setFile(incoming[0] ?? null);
+    setError(null);
   };
 
   const handleDrag = (e: React.DragEvent) => {
@@ -114,8 +138,8 @@ export default function MediaPage() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFileSelect(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFilesSelect(e.dataTransfer.files);
     }
   };
 
@@ -123,7 +147,9 @@ export default function MediaPage() {
     try {
       const data = await api.listMedia({
         search: search || undefined,
-        media_type: filter !== 'all' ? filter : undefined,
+        media_type: mediaType !== 'all' ? mediaType : undefined,
+        folder: folder.trim() || undefined,
+        tag: tag.trim() || undefined,
       });
       setMedia(data);
       setError(null);
@@ -132,7 +158,7 @@ export default function MediaPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, filter]);
+  }, [search, mediaType, folder, tag]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -142,21 +168,78 @@ export default function MediaPage() {
   const handleUpload = async () => {
     if (!file) return;
     setUploading(true);
+    setUploadPaused(false);
+    setFailedChunk(null);
     try {
+      if (selectedFiles.length > 1) {
+        await api.uploadMultipleMedia(selectedFiles);
+        setUploadOpen(false);
+        setSelectedFiles([]);
+        setFile(null);
+        await fetchMedia();
+        return;
+      }
+
       const uploader = new ResumableUploader();
+      uploaderRef.current = uploader;
       await uploader.init(file);
       await uploader.uploadAll((progress) => {
         setUploadProgress(progress);
       });
       const media = await uploader.finalize();
       setUploadOpen(false);
+      setSelectedFiles([]);
       setFile(null);
       router.push(`/app/dashboard/media/${media.id}?from_upload=1`);
     } catch (err) {
+      setFailedChunk(uploaderRef.current?.failedChunkIndex ?? null);
       setError(err instanceof Error ? err.message : 'Failed to upload media');
     } finally {
       setUploading(false);
     }
+  };
+
+  const handlePauseUpload = async () => {
+    if (!uploaderRef.current) return;
+    await uploaderRef.current.pause();
+    setUploadPaused(true);
+  };
+
+  const handleResumeUpload = async () => {
+    if (!uploaderRef.current) return;
+    await uploaderRef.current.resume();
+    setUploadPaused(false);
+  };
+
+  const handleRetryUpload = async () => {
+    const uploader = uploaderRef.current;
+    if (!uploader || failedChunk === null) return;
+    setUploading(true);
+    setError(null);
+    try {
+      await uploader.retryChunk(failedChunk);
+      setFailedChunk(null);
+      await uploader.uploadAll((progress) => setUploadProgress(progress));
+      const completed = await uploader.finalize();
+      setUploadOpen(false);
+      setSelectedFiles([]);
+      setFile(null);
+      router.push(`/app/dashboard/media/${completed.id}?from_upload=1`);
+    } catch (err) {
+      setFailedChunk(uploader.failedChunkIndex);
+      setError(err instanceof Error ? err.message : 'Retry failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleCancelUpload = async () => {
+    await uploaderRef.current?.cancel();
+    uploaderRef.current = null;
+    setUploading(false);
+    setUploadPaused(false);
+    setFailedChunk(null);
+    setUploadProgress(0);
   };
 
   const handleDelete = async () => {
@@ -180,10 +263,28 @@ export default function MediaPage() {
     setDeleteOpen(true);
   };
 
-  const filtered = media.filter((item) => {
-    if (filter !== 'all' && item.processing_status !== filter) return false;
+  const filtered = [...media].filter((item) => {
+    if (statusFilter !== 'all' && item.processing_status !== statusFilter) return false;
     if (search && !item.original_filename.toLowerCase().includes(search.toLowerCase())) return false;
+    if (folder && !(item.folder || '').toLowerCase().includes(folder.toLowerCase())) return false;
+    if (tag && !(item.tags || []).some((value) => value.toLowerCase().includes(tag.toLowerCase()))) return false;
+    const duration = item.duration ?? 0;
+    if (minDuration && duration < Number(minDuration)) return false;
+    if (maxDuration && duration > Number(maxDuration)) return false;
+    const sizeMb = item.file_size / (1024 * 1024);
+    if (minSizeMb && sizeMb < Number(minSizeMb)) return false;
+    if (maxSizeMb && sizeMb > Number(maxSizeMb)) return false;
+    if (resolution !== 'all' && `${item.width ?? ''}x${item.height ?? ''}` !== resolution) return false;
+    const created = new Date(item.created_at);
+    if (uploadedAfter && created < new Date(`${uploadedAfter}T00:00:00`)) return false;
+    if (uploadedBefore && created > new Date(`${uploadedBefore}T23:59:59`)) return false;
     return true;
+  }).sort((a, b) => {
+    if (sortBy === 'name_asc') return a.original_filename.localeCompare(b.original_filename);
+    if (sortBy === 'name_desc') return b.original_filename.localeCompare(a.original_filename);
+    if (sortBy === 'size_desc') return b.file_size - a.file_size;
+    if (sortBy === 'duration_desc') return (b.duration ?? 0) - (a.duration ?? 0);
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
   if (loading) {
@@ -227,26 +328,28 @@ export default function MediaPage() {
         </Card>
       )}
 
-      <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200/80 bg-white/70 p-3 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/50 sm:flex-row">
-        <Input
-          placeholder="Search media..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="h-10 border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 sm:max-w-xs"
-        />
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="h-10 border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 sm:max-w-xs" style={{ cursor: 'pointer' }}>
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="queued">Queued</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="failed">Failed</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="rounded-2xl border border-zinc-200/80 bg-white/70 p-3 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/50">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <Input aria-label="Search media" placeholder="Search media..." value={search} onChange={(e) => setSearch(e.target.value)} className="h-10 border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950" />
+          <div><Label>Sort</Label><Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}><SelectTrigger className="h-10"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="recent">Recently uploaded</SelectItem><SelectItem value="name_asc">Name A–Z</SelectItem><SelectItem value="name_desc">Name Z–A</SelectItem><SelectItem value="size_desc">Largest files</SelectItem><SelectItem value="duration_desc">Longest media</SelectItem></SelectContent></Select></div>
+          <div><Label>Processing Status</Label><Select value={statusFilter} onValueChange={setStatusFilter}><SelectTrigger className="h-10"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All statuses</SelectItem><SelectItem value="pending">Pending</SelectItem><SelectItem value="queued">Queued</SelectItem><SelectItem value="processing">Processing</SelectItem><SelectItem value="completed">Completed</SelectItem><SelectItem value="failed">Failed</SelectItem></SelectContent></Select></div>
+          <div><Label>Media Type</Label><Select value={mediaType} onValueChange={setMediaType}><SelectTrigger className="h-10"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All types</SelectItem><SelectItem value="video">Video</SelectItem><SelectItem value="audio">Audio</SelectItem><SelectItem value="image">Image</SelectItem></SelectContent></Select></div>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div><Label htmlFor="folder-filter">Folder</Label><Input id="folder-filter" value={folder} onChange={(e) => setFolder(e.target.value)} placeholder="e.g. campaigns" /></div>
+          <div><Label htmlFor="tag-filter">Tag</Label><Input id="tag-filter" value={tag} onChange={(e) => setTag(e.target.value)} placeholder="e.g. social" /></div>
+          <div><Label>Resolution</Label><Select value={resolution} onValueChange={setResolution}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Any resolution</SelectItem><SelectItem value="640x360">360p</SelectItem><SelectItem value="854x480">480p</SelectItem><SelectItem value="1280x720">720p</SelectItem><SelectItem value="1920x1080">1080p</SelectItem><SelectItem value="3840x2160">4K</SelectItem></SelectContent></Select></div>
+          <div><Label htmlFor="date-after">Uploaded after</Label><Input id="date-after" type="date" value={uploadedAfter} onChange={(e) => setUploadedAfter(e.target.value)} /></div>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div><Label htmlFor="duration-min">Duration min (s)</Label><Input id="duration-min" type="number" min="0" value={minDuration} onChange={(e) => setMinDuration(e.target.value)} /></div>
+          <div><Label htmlFor="duration-max">Duration max (s)</Label><Input id="duration-max" type="number" min="0" value={maxDuration} onChange={(e) => setMaxDuration(e.target.value)} /></div>
+          <div><Label htmlFor="size-min">File size min (MB)</Label><Input id="size-min" type="number" min="0" step="0.1" value={minSizeMb} onChange={(e) => setMinSizeMb(e.target.value)} /></div>
+          <div><Label htmlFor="size-max">File size max (MB)</Label><Input id="size-max" type="number" min="0" step="0.1" value={maxSizeMb} onChange={(e) => setMaxSizeMb(e.target.value)} /></div>
+        </div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div><Label htmlFor="date-before">Uploaded before</Label><Input id="date-before" type="date" value={uploadedBefore} onChange={(e) => setUploadedBefore(e.target.value)} /></div>
+        </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -257,7 +360,7 @@ export default function MediaPage() {
             </div>
             <h3 className="text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">No media files</h3>
             <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-              {search || filter !== 'all' ? 'Try adjusting your search or filter criteria.' : 'Upload videos, audio, or images to start processing with FrameFlux.'}
+              {search || statusFilter !== 'all' || mediaType !== 'all' || folder || tag || minDuration || maxDuration || minSizeMb || maxSizeMb || resolution !== 'all' || uploadedAfter || uploadedBefore ? 'Try adjusting your search or filter criteria.' : 'Upload videos, audio, or images to start processing with FrameFlux.'}
             </p>
           </CardContent>
         </Card>
@@ -350,8 +453,14 @@ export default function MediaPage() {
                   <div className="h-full rounded-full bg-indigo-600 transition-all duration-300 dark:bg-indigo-500" style={{ width: `${uploadProgress}%` }} />
                 </div>
                 <div className="mt-2 flex justify-between text-[11px] text-zinc-400">
-                  <span>Uploading</span>
+                  <span>{uploadPaused ? 'Paused' : failedChunk !== null ? `Upload failed on chunk ${failedChunk + 1}` : 'Uploading'}</span>
                   <span>{uploadProgress}%</span>
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  <Button type="button" variant="outline" size="sm" onClick={handlePauseUpload} disabled={uploadPaused || !uploaderRef.current} aria-label="Pause Upload"><Pause className="mr-1 h-3.5 w-3.5" />Pause</Button>
+                  <Button type="button" variant="outline" size="sm" onClick={handleResumeUpload} disabled={!uploadPaused || !uploaderRef.current} aria-label="Resume Upload"><Play className="mr-1 h-3.5 w-3.5" />Resume</Button>
+                  <Button type="button" variant="outline" size="sm" onClick={handleRetryUpload} disabled={failedChunk === null} aria-label="Retry Upload"><RotateCcw className="mr-1 h-3.5 w-3.5" />Retry</Button>
+                  <Button type="button" variant="destructive" size="sm" onClick={handleCancelUpload} aria-label="Cancel Upload">Cancel</Button>
                 </div>
               </div>
             ) : (
@@ -370,8 +479,9 @@ export default function MediaPage() {
                 <input
                   id="file"
                   type="file"
+                  multiple
                   accept="video/*,audio/*,image/*"
-                  onChange={(e) => handleFileSelect(e.target.files?.[0] || null)}
+                  onChange={(e) => handleFilesSelect(e.target.files || [])}
                   disabled={uploading}
                   className="hidden"
                   ref={(el) => {
@@ -387,25 +497,33 @@ export default function MediaPage() {
                     <Upload className="h-5 w-5" />
                   </div>
                   <p className="text-base font-semibold tracking-tight text-zinc-950 dark:text-white">
-                    Drag & drop a file here
+                    Drag & drop files here
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     or click to browse your computer
                   </p>
                   <span className="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-3.5 text-xs font-medium text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
-                    Choose file
+                    Choose file(s)
                   </span>
-                  <p className="mt-4 text-[11px] text-zinc-400">Video · Audio · Image</p>
+                  <p className="mt-4 text-[11px] text-zinc-400">Video · Audio · Image · Multiple files supported</p>
                 </label>
 
-                {file && (
-                  <div className="mt-5 flex min-w-0 items-center gap-3 rounded-xl border border-indigo-200/80 bg-white p-3 text-left shadow-sm dark:border-indigo-900/60 dark:bg-zinc-950">
+                {selectedFiles.length > 0 && (
+                  <div className="mt-5 rounded-xl border border-indigo-200/80 bg-white p-3 text-left shadow-sm dark:border-indigo-900/60 dark:bg-zinc-950">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                       <Film className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-zinc-950 dark:text-white">{file.name}</p>
-                      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                      <p className="text-sm font-medium text-zinc-950 dark:text-white">
+                        {selectedFiles.length} file{selectedFiles.length === 1 ? '' : 's'} selected
+                      </p>
+                      <div className="mt-2 space-y-1">
+                        {selectedFiles.map((selectedFile) => (
+                          <p key={selectedFile.name + selectedFile.size} className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                            {selectedFile.name}
+                          </p>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -414,7 +532,7 @@ export default function MediaPage() {
           </div>
 
           <DialogFooter className="flex flex-col-reverse gap-2 border-t border-zinc-200/80 px-5 py-4 dark:border-zinc-800/80 sm:flex-row sm:justify-end sm:px-6">
-            <Button variant="outline" onClick={() => { setUploadOpen(false); setFile(null); }} disabled={uploading} className="h-10 w-full rounded-lg sm:w-auto" style={{ cursor: 'pointer' }}>
+            <Button variant="outline" onClick={() => { setUploadOpen(false); setFile(null); setSelectedFiles([]); setFailedChunk(null); setUploadPaused(false); }} disabled={uploading && failedChunk === null} className="h-10 w-full rounded-lg sm:w-auto" style={{ cursor: 'pointer' }}>
               Cancel
             </Button>
             <Button onClick={handleUpload} disabled={uploading || !file} className="h-10 w-full rounded-lg sm:w-auto" style={{ cursor: 'pointer' }}>

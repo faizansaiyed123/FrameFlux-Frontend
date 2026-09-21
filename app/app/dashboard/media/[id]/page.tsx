@@ -142,7 +142,7 @@ export default function MediaDetailPage() {
   }, [fetchMedia]);
 
   useEffect(() => {
-    if (!media || media.processing_status !== 'processing' && media.processing_status !== 'queued') {
+    if (!media || !['pending', 'queued', 'processing'].includes(media.processing_status)) {
       return;
     }
 

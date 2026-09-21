@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -24,12 +24,6 @@ interface SubtitleTrack {
   is_forced: boolean;
 }
 
-interface SyncPreviewResponse {
-  preview_url: string;
-  offset: number;
-  scale: number;
-}
-
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -44,7 +38,7 @@ function downloadBlob(blob: Blob, filename: string) {
 export function SubtitleForm({ mediaId }: Props) {
   const [loading, setLoading] = useState(false);
   const [subtitleUploading, setSubtitleUploading] = useState(false);
-  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync'>('burn');
+  const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry' | 'merge_entries'>('burn');
   const [subtitlePath, setSubtitlePath] = useState('');
   const [subtitleFileName, setSubtitleFileName] = useState('');
   const [fontSize, setFontSize] = useState('24');
@@ -53,8 +47,23 @@ export function SubtitleForm({ mediaId }: Props) {
   const [dragActive, setDragActive] = useState(false);
   const [tracks, setTracks] = useState<SubtitleTrack[]>([]);
   const [syncPreviewUrl, setSyncPreviewUrl] = useState<string | null>(null);
+  const [syncOffset, setSyncOffset] = useState('0');
+  const [syncScale, setSyncScale] = useState('1');
+  const [editEntryIndex, setEditEntryIndex] = useState('1');
+  const [editText, setEditText] = useState('');
+  const [editStart, setEditStart] = useState('0.5');
+  const [editEnd, setEditEnd] = useState('1');
+  const [addStart, setAddStart] = useState('0');
+  const [addEnd, setAddEnd] = useState('1');
+  const [addText, setAddText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    return () => {
+      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
+    };
+  }, [syncPreviewUrl]);
 
   const handleFileSelect = useCallback(async (file: File | undefined) => {
     if (!file) return;
@@ -91,6 +100,7 @@ export function SubtitleForm({ mediaId }: Props) {
   const handleAction = async () => {
     setLoading(true);
     setError(null);
+    if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
     setSyncPreviewUrl(null);
     try {
       if (action === 'burn') {
@@ -106,15 +116,104 @@ export function SubtitleForm({ mediaId }: Props) {
         const data = await api.listSubtitleTracks(mediaId);
         setTracks(data as SubtitleTrack[]);
       } else if (action === 'sync') {
-        const result = await api.syncSubtitles(mediaId, { offset_seconds: 0, scale: 1, preview: true });
-        const syncResult = result as SyncPreviewResponse | undefined;
-        if (syncResult && syncResult.preview_url) {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}${syncResult.preview_url}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('access_token') || ''}` },
-          });
-          const b = await res.blob();
-          setSyncPreviewUrl(URL.createObjectURL(b));
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const result = await api.syncSubtitles(mediaId, {
+          subtitle_path: subtitlePath,
+          offset_seconds: Number(syncOffset),
+          scale: Number(syncScale),
+          preview: true,
+        });
+        if (result instanceof Blob) {
+          setSyncPreviewUrl(URL.createObjectURL(result));
+        } else if (result.preview_url) {
+          setSyncPreviewUrl(result.preview_url);
         }
+      } else if (action === 'edit_text') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        if (!editText.trim()) { setError('Subtitle text required'); return; }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'update_text',
+          entry_index: entryIndex,
+          text: editText,
+        });
+        downloadBlob(blob, subtitleFileName ? 'edited_' + subtitleFileName : 'edited_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'edit_timing') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        const start = Number(editStart);
+        const end = Number(editEnd);
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start) {
+          setError('End time must be greater than start time');
+          return;
+        }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'update_timing',
+          entry_index: entryIndex,
+          start,
+          end,
+        });
+        downloadBlob(blob, subtitleFileName ? 'timed_' + subtitleFileName : 'timed_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'add_entry') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const start = Number(addStart);
+        const end = Number(addEnd);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start) {
+          setError('End time must be greater than start time');
+          return;
+        }
+        if (!addText.trim()) { setError('Subtitle text required'); return; }
+        const insertAfter = editEntryIndex.trim() ? Number(editEntryIndex) - 1 : undefined;
+        if (insertAfter !== undefined && (!Number.isInteger(insertAfter) || insertAfter < -1)) {
+          setError('Insert-after entry must be zero or greater');
+          return;
+        }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'add_entry',
+          entry_index: insertAfter,
+          start,
+          end,
+          text: addText,
+        });
+        downloadBlob(blob, subtitleFileName ? 'added_' + subtitleFileName : 'added_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'delete_entry') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'delete_entry',
+          entry_index: entryIndex,
+        });
+        downloadBlob(blob, subtitleFileName ? 'deleted_' + subtitleFileName : 'deleted_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'split_entry') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        const splitTime = Number(addStart);
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        if (!Number.isFinite(splitTime) || splitTime < 0) { setError('Split time is required'); return; }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'split_entry',
+          entry_index: entryIndex,
+          start: splitTime,
+        });
+        downloadBlob(blob, subtitleFileName ? 'split_' + subtitleFileName : 'split_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
+      } else if (action === 'merge_entries') {
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const entryIndex = Number(editEntryIndex) - 1;
+        if (!Number.isInteger(entryIndex) || entryIndex < 0) { setError('Subtitle entry must be a positive number'); return; }
+        const blob = await api.editSubtitle(mediaId, {
+          subtitle_path: subtitlePath,
+          operation: 'merge_entries',
+          entry_index: entryIndex,
+        });
+        downloadBlob(blob, subtitleFileName ? 'merged_' + subtitleFileName : 'merged_subtitles' + (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'));
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Operation failed');
@@ -132,6 +231,13 @@ export function SubtitleForm({ mediaId }: Props) {
         return List;
       case 'sync':
         return SlidersHorizontal;
+      case 'edit_text':
+      case 'edit_timing':
+      case 'add_entry':
+      case 'delete_entry':
+      case 'split_entry':
+      case 'merge_entries':
+        return Download;
       default:
         return null;
     }
@@ -143,6 +249,18 @@ export function SubtitleForm({ mediaId }: Props) {
         return 'List Tracks';
       case 'sync':
         return 'Preview Sync';
+      case 'edit_text':
+        return 'Edit & Download';
+      case 'edit_timing':
+        return 'Update Timing & Download';
+      case 'add_entry':
+        return 'Add Entry & Download';
+      case 'delete_entry':
+        return 'Delete Entry & Download';
+      case 'split_entry':
+        return 'Split Entry & Download';
+      case 'merge_entries':
+        return 'Merge Entries & Download';
       default:
         return 'Run & Download';
     }
@@ -157,7 +275,7 @@ export function SubtitleForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Action</Label>
-        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync')}>
+        <Select value={action} onValueChange={(v) => setAction(v as 'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry' | 'merge_entries')}>
           <SelectTrigger>
             <SelectValue placeholder="Select action" />
           </SelectTrigger>
@@ -166,10 +284,16 @@ export function SubtitleForm({ mediaId }: Props) {
             <SelectItem value="mux"><Download className="mr-2 h-3.5 w-3.5" /> Mux Soft Subtitles</SelectItem>
             <SelectItem value="tracks"><List className="mr-2 h-3.5 w-3.5" /> List Tracks</SelectItem>
             <SelectItem value="sync"><SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Sync Subtitles</SelectItem>
+            <SelectItem value="edit_text"><FileText className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Text</SelectItem>
+            <SelectItem value="edit_timing"><SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Timing</SelectItem>
+            <SelectItem value="add_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Add Subtitle Entry</SelectItem>
+            <SelectItem value="delete_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Delete Subtitle Entry</SelectItem>
+            <SelectItem value="split_entry"><FileText className="mr-2 h-3.5 w-3.5" /> Split Subtitle Entry</SelectItem>
+            <SelectItem value="merge_entries"><FileText className="mr-2 h-3.5 w-3.5" /> Merge Subtitle Entries</SelectItem>
           </SelectContent>
         </Select>
       </div>
-      {(action === 'burn' || action === 'mux') && (
+      {(action === 'burn' || action === 'mux' || action === 'sync' || action === 'edit_text') && (
         <div className="space-y-2">
           <Label>Subtitle File</Label>
           <div
@@ -207,6 +331,157 @@ export function SubtitleForm({ mediaId }: Props) {
           {subtitlePath && subtitlePath !== subtitleFileName && (
             <Input value={subtitlePath} onChange={(e) => { setSubtitlePath(e.target.value); setSubtitleFileName(''); }} placeholder="or enter path manually" className="text-xs h-7" />
           )}
+        </div>
+      )}
+      {action === 'sync' && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Timing Offset (seconds)</Label>
+            <Input aria-label="Timing Offset" type="number" step="0.001" value={syncOffset} onChange={(e) => setSyncOffset(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label>Timing Scale</Label>
+            <Input aria-label="Timing Scale" type="number" step="0.001" min="0.001" value={syncScale} onChange={(e) => setSyncScale(e.target.value)} />
+          </div>
+        </div>
+      )}
+
+      {action === 'edit_text' && (
+        <div className="grid gap-3">
+          <div className="space-y-2">
+            <Label>Subtitle Entry (1-based)</Label>
+            <Input
+              aria-label="Subtitle Entry"
+              type="number"
+              min="1"
+              step="1"
+              value={editEntryIndex}
+              onChange={(e) => setEditEntryIndex(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Subtitle Text</Label>
+            <Input
+              aria-label="Subtitle Text"
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              placeholder="Enter replacement subtitle text"
+            />
+          </div>
+        </div>
+      )}
+
+
+
+
+
+      {action === 'merge_entries' && (
+        <div className="space-y-2">
+          <Label>Subtitle Entry (1-based)</Label>
+          <Input
+            aria-label="Merge Subtitle Entry"
+            type="number"
+            min="1"
+            step="1"
+            value={editEntryIndex}
+            onChange={(e) => setEditEntryIndex(e.target.value)}
+          />
+          <p className="text-xs text-zinc-500">Merges this entry with the following entry.</p>
+        </div>
+      )}
+      {action === 'split_entry' && (
+        <div className="grid gap-3">
+          <div className="space-y-2">
+            <Label>Subtitle Entry (1-based)</Label>
+            <Input
+              aria-label="Split Subtitle Entry"
+              type="number"
+              min="1"
+              step="1"
+              value={editEntryIndex}
+              onChange={(e) => setEditEntryIndex(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Split Time (seconds)</Label>
+            <Input
+              aria-label="Split Time"
+              type="number"
+              min="0"
+              step="0.001"
+              value={addStart}
+              onChange={(e) => setAddStart(e.target.value)}
+            />
+          </div>
+        </div>
+      )}
+      {action === 'delete_entry' && (
+        <div className="space-y-2">
+          <Label>Subtitle Entry (1-based)</Label>
+          <Input
+            aria-label="Delete Subtitle Entry"
+            type="number"
+            min="1"
+            step="1"
+            value={editEntryIndex}
+            onChange={(e) => setEditEntryIndex(e.target.value)}
+          />
+        </div>
+      )}
+      {action === 'add_entry' && (
+        <div className="grid gap-3">
+          <div className="space-y-2">
+            <Label>Insert After Entry (optional)</Label>
+            <Input
+              aria-label="Insert After Entry"
+              type="number"
+              min="1"
+              step="1"
+              value={editEntryIndex}
+              onChange={(e) => setEditEntryIndex(e.target.value)}
+              placeholder="Append when empty"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Start Time (seconds)</Label>
+              <Input aria-label="Add Start Time" type="number" min="0" step="0.001" value={addStart} onChange={(e) => setAddStart(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label>End Time (seconds)</Label>
+              <Input aria-label="Add End Time" type="number" min="0" step="0.001" value={addEnd} onChange={(e) => setAddEnd(e.target.value)} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Subtitle Text</Label>
+            <Input aria-label="Add Subtitle Text" value={addText} onChange={(e) => setAddText(e.target.value)} placeholder="New subtitle text" />
+          </div>
+        </div>
+      )}
+      {action === 'edit_timing' && (
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Start Time (seconds)</Label>
+            <Input
+              aria-label="Edit Start Time"
+              type="number"
+              min="0"
+              step="0.001"
+              value={editStart}
+              onChange={(e) => setEditStart(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>End Time (seconds)</Label>
+            <Input
+              aria-label="Edit End Time"
+              type="number"
+              min="0"
+              step="0.001"
+              value={editEnd}
+              onChange={(e) => setEditEnd(e.target.value)}
+            />
+          </div>
         </div>
       )}
       {action === 'burn' && (

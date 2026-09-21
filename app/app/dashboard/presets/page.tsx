@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -36,6 +37,7 @@ export default function PresetsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<PresetResponse | null>(null);
   const [activeTab, setActiveTab] = useState('custom');
+  const [error, setError] = useState<string | null>(null);
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -46,8 +48,8 @@ export default function PresetsPage() {
     try {
       const data = await api.listPresets();
       setPresets(data);
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load presets');
     } finally {
       setLoading(false);
     }
@@ -87,6 +89,7 @@ export default function PresetsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       const payload = {
         name,
@@ -100,18 +103,19 @@ export default function PresetsPage() {
       }
       setDialogOpen(false);
       fetchPresets();
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save preset');
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this preset?')) return;
     try {
+      setError(null);
       await api.deletePreset(id);
       fetchPresets();
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete preset');
     }
   };
 
@@ -140,6 +144,8 @@ export default function PresetsPage() {
           New Preset
         </Button>
       </div>
+
+      {error && <Alert className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300"><AlertDescription>{error}</AlertDescription></Alert>}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
         <TabsList>
@@ -235,16 +241,16 @@ function PresetCard({ preset, onEdit, onDelete, onCopy, readonly }: { preset: Pr
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => onCopy(preset)} title="Copy settings JSON">
+          <Button variant="ghost" size="icon" onClick={() => onCopy(preset)} title="Copy settings JSON" aria-label="Copy settings JSON">
             <Copy className="h-4 w-4" />
           </Button>
           {!readonly && (
             <>
-              <Button variant="ghost" size="icon" onClick={() => onEdit(preset)}>
+              <Button variant="ghost" size="icon" onClick={() => onEdit(preset)} aria-label="Edit preset">
                 <Pencil className="h-4 w-4" />
               </Button>
               {!preset.is_builtin && (
-                <Button variant="ghost" size="icon" onClick={() => onDelete(preset.id)}>
+                <Button variant="ghost" size="icon" onClick={() => onDelete(preset.id)} aria-label="Delete preset">
                   <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                 </Button>
               )}

@@ -292,7 +292,7 @@ class ApiClient {
   }
 
   async getDashboardRecentProcessing(limit?: number) {
-    return this.request<any[]>(`/dashboard/recent-processing${limit ? `?limit=${limit}` : ''}`);
+    return this.request<unknown[]>(`/dashboard/recent-processing${limit ? `?limit=${limit}` : ''}`);
   }
 
   // Media
@@ -319,6 +319,35 @@ class ApiClient {
       fps: string | null;
       created_at: string;
     }>('/media/upload', {
+      method: 'POST',
+      headers: {},
+      body: formData,
+    });
+  }
+
+  async uploadMultipleMedia(files: File[]) {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file));
+    return this.request<{
+      id: string;
+      user_id: string | null;
+      original_filename: string;
+      stored_filename: string;
+      media_type: string;
+      mime_type: string;
+      file_size: number;
+      project_id: string | null;
+      processing_status: string;
+      processed_filename: string | null;
+      processing_error: string | null;
+      duration: number | null;
+      width: number | null;
+      height: number | null;
+      video_codec: string | null;
+      audio_codec: string | null;
+      fps: string | null;
+      created_at: string;
+    }[]>('/media/upload-multiple', {
       method: 'POST',
       headers: {},
       body: formData,
@@ -464,6 +493,7 @@ class ApiClient {
     compression_preset?: string;
     quality?: number;
     resolution?: string;
+    target_size_mb?: number;
   }) {
     return this.request<{
       media_id: string;
@@ -510,6 +540,18 @@ class ApiClient {
     }>(`/media/${id}/edit`, {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  async reorderAudioClips(id: string, storedFilenames: string[]) {
+    return this.request<{
+      output_filename: string;
+    }>(`/audio/${id}/edit`, {
+      method: 'POST',
+      body: JSON.stringify({
+        operation: 'merge',
+        target_files: storedFilenames,
+      }),
     });
   }
 
@@ -716,7 +758,7 @@ class ApiClient {
   async retryChunk(uploadId: string, index: number, chunk: Blob) {
     const formData = new FormData();
     formData.append('file', chunk);
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/retry/${index}`, {
+    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/retry?index=${index}`, {
       method: 'POST',
       headers: {},
       body: formData,
@@ -835,12 +877,56 @@ class ApiClient {
   }
 
   async replaceAudio(mediaId: string, audioPath: string, fadeIn?: number, fadeOut?: number) {
-    return this.request<{ output_filename: string }>(`/audio/${mediaId}/replace-audio`, {
+    const query = new URLSearchParams({ audio_path: audioPath });
+    if (fadeIn !== undefined) query.set('fade_in', String(fadeIn));
+    if (fadeOut !== undefined) query.set('fade_out', String(fadeOut));
+
+    return this.request<{ output_filename: string }>(`/audio/${mediaId}/replace-audio?${query.toString()}`, {
       method: 'POST',
-      body: JSON.stringify({ audio_path: audioPath, fade_in: fadeIn, fade_out: fadeOut }),
     });
   }
 
+  async addAudio(mediaId: string, audioPath: string, options?: {
+    audioOffset?: number;
+    videoDuration?: number;
+    audioDuration?: number;
+    fadeIn?: number;
+    fadeOut?: number;
+    volume?: number;
+    mixVolume?: number;
+    outputFormat?: 'mp4' | 'webm';
+  }) {
+    const data = {
+      audio_path: audioPath,
+      audio_offset: options?.audioOffset ?? 0,
+      video_duration: options?.videoDuration,
+      audio_duration: options?.audioDuration,
+      fade_in: options?.fadeIn,
+      fade_out: options?.fadeOut,
+      volume: options?.volume ?? 1,
+      mix: true,
+      mix_volume: options?.mixVolume ?? 0.5,
+      output_format: options?.outputFormat ?? 'mp4',
+    };
+
+    const response = await fetch(this.baseUrl + '/audio/' + mediaId + '/sync-audio', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}),
+      },
+      credentials: 'include',
+      mode: 'cors',
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Add audio failed' }));
+      throw new Error(error.detail || 'HTTP error ' + response.status);
+    }
+
+    return response.blob();
+  }
   async syncAudioVideo(mediaId: string, data: {
     audio_path: string;
     audio_offset?: number;
@@ -853,14 +939,19 @@ class ApiClient {
     mix_volume?: number;
     output_format?: 'mp4' | 'webm';
   }) {
-    return this.request<{
-      output_filename: string;
-      operation: string;
-      media_id: string;
-    }>(`/audio/${mediaId}/sync-audio`, {
+    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/sync-audio`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Audio sync failed' }));
+      throw new Error(error.detail || `HTTP error ${response.status}`);
+    }
+    return response.blob();
   }
 
   async convertAudio(mediaId: string, data: {
@@ -1038,18 +1129,48 @@ class ApiClient {
     }[]>(`/subtitles/${mediaId}/tracks`);
   }
 
+  async editSubtitle(mediaId: string, data: {
+    subtitle_path: string;
+    operation: 'update_text' | 'update_timing' | 'add_entry' | 'delete_entry' | 'split_entry' | 'merge_entries';
+    entry_index?: number;
+    text?: string;
+    start?: number;
+    end?: number;
+  }) {
+    const response = await fetch(this.baseUrl + '/subtitles/' + mediaId + '/edit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}),
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to edit subtitles' }));
+      throw new Error(error.detail || 'Failed to edit subtitles');
+    }
+    return response.blob();
+  }
   async syncSubtitles(mediaId: string, data: {
+    subtitle_path: string;
     offset_seconds?: number;
     scale?: number;
     preview?: boolean;
-  }) {
+  }): Promise<Blob | { preview_url: string; offset: number; scale: number }> {
     const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/sync`, {
       method: 'POST',
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to sync subtitles');
-    if (data.preview) {
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Failed to sync subtitles' }));
+      throw new Error(error.detail || 'Failed to sync subtitles');
+    }
+    const contentType = response.headers.get('content-type') || '';
+    if (data.preview && contentType.includes('application/json')) {
       return response.json();
     }
     return response.blob();
@@ -1156,9 +1277,9 @@ class ApiClient {
       container_format: string | null;
       audio_tracks: number | null;
       subtitle_tracks: number | null;
-      available_streams: any[] | null;
-      metadata: Record<string, any> | null;
-      creation_metadata: Record<string, any> | null;
+      available_streams: unknown[] | null;
+      metadata: Record<string, unknown> | null;
+      creation_metadata: Record<string, unknown> | null;
     }>(`/media-info/${mediaId}`);
   }
 
@@ -1170,15 +1291,15 @@ class ApiClient {
     });
   }
 
-  async batchProcess(mediaIds: string[], operation: string, options?: Record<string, any>) {
-    return this.request<{ job_id: string; total_items: number; operation: string; status: string; results: any[] }>('/batch/process', {
+  async batchProcess(mediaIds: string[], operation: string, options?: Record<string, unknown>) {
+    return this.request<{ job_id: string; total_items: number; operation: string; status: string; results: unknown[] }>('/batch/process', {
       method: 'POST',
       body: JSON.stringify({ media_ids: mediaIds, operation, options }),
     });
   }
 
   async getBatchStatus(jobId: string) {
-    return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: any[] }>(`/batch/${jobId}/status`);
+    return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: unknown[] }>(`/batch/${jobId}/status`);
   }
 
   // Presets
@@ -1189,20 +1310,20 @@ class ApiClient {
       name: string;
       description: string | null;
       is_builtin: boolean;
-      settings: Record<string, any>;
+      settings: Record<string, unknown>;
       created_at: string;
       updated_at: string;
     }[]>('/presets');
   }
 
-  async createPreset(data: { name: string; description?: string; settings: Record<string, any> }) {
+  async createPreset(data: { name: string; description?: string; settings: Record<string, unknown> }) {
     return this.request<{
       id: string;
       user_id: string | null;
       name: string;
       description: string | null;
       is_builtin: boolean;
-      settings: Record<string, any>;
+      settings: Record<string, unknown>;
       created_at: string;
       updated_at: string;
     }>('/presets', {
@@ -1211,14 +1332,14 @@ class ApiClient {
     });
   }
 
-  async updatePreset(presetId: string, data: { name?: string; description?: string; settings?: Record<string, any> }) {
+  async updatePreset(presetId: string, data: { name?: string; description?: string; settings?: Record<string, unknown> }) {
     return this.request<{
       id: string;
       user_id: string | null;
       name: string;
       description: string | null;
       is_builtin: boolean;
-      settings: Record<string, any>;
+      settings: Record<string, unknown>;
       created_at: string;
       updated_at: string;
     }>(`/presets/${presetId}`, {
@@ -1380,7 +1501,7 @@ class ApiClient {
       id: string;
       media_id: string;
       token: string;
-      password: string | null;
+      has_password: boolean;
       expires_at: string | null;
       is_active: boolean;
       allow_download: boolean;
@@ -1398,7 +1519,7 @@ class ApiClient {
       id: string;
       media_id: string;
       token: string;
-      password: string | null;
+      has_password: boolean;
       expires_at: string | null;
       is_active: boolean;
       allow_download: boolean;
@@ -1413,7 +1534,7 @@ class ApiClient {
       id: string;
       media_id: string;
       token: string;
-      password: string | null;
+      has_password: boolean;
       expires_at: string | null;
       is_active: boolean;
       allow_download: boolean;
@@ -1440,7 +1561,7 @@ class ApiClient {
       id: string;
       media_id: string;
       token: string;
-      password: string | null;
+      has_password: boolean;
       expires_at: string | null;
       is_active: boolean;
       allow_download: boolean;
