@@ -55,9 +55,39 @@ function OperationBuilder({ operations, onChange }: { operations: WorkflowOperat
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="ghost" size="icon" onClick={() => onChange(operations.filter((_, i) => i !== idx))}>
-                <X className="h-4 w-4 text-red-600" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (idx === 0) return;
+                    const next = [...operations];
+                    [next[idx - 1], next[idx]] = [next[idx], next[idx - 1]];
+                    onChange(next);
+                  }}
+                  disabled={idx === 0}
+                  aria-label={`Move operation ${idx + 1} up`}
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => {
+                    if (idx === operations.length - 1) return;
+                    const next = [...operations];
+                    [next[idx + 1], next[idx]] = [next[idx], next[idx + 1]];
+                    onChange(next);
+                  }}
+                  disabled={idx === operations.length - 1}
+                  aria-label={`Move operation ${idx + 1} down`}
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => onChange(operations.filter((_, i) => i !== idx))} aria-label={`Remove operation ${idx + 1}`}>
+                  <X className="h-4 w-4 text-red-600" />
+                </Button>
+              </div>
             </div>
             {OPERATION_TYPES.find(ot => ot.value === op.type)?.params.map((param) => (
               <div key={param} className="space-y-1">
