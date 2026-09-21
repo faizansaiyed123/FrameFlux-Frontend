@@ -321,16 +321,16 @@ function WorkflowCard({ workflow, onEdit, onDelete, onRun, running, readonly }: 
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => onRun(workflow.id)} disabled={running || readonly}>
+          <Button variant="ghost" size="icon" onClick={() => onRun(workflow.id)} disabled={running || readonly} aria-label={running ? 'Workflow running' : 'Run workflow'}>
             {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
           </Button>
           {!readonly && (
             <>
-              <Button variant="ghost" size="icon" onClick={() => onEdit(workflow)}>
+              <Button variant="ghost" size="icon" onClick={() => onEdit(workflow)} aria-label="Edit workflow">
                 <Pencil className="h-4 w-4" />
               </Button>
               {!workflow.is_builtin && (
-                <Button variant="ghost" size="icon" onClick={() => onDelete(workflow.id)}>
+                <Button variant="ghost" size="icon" onClick={() => onDelete(workflow.id)} aria-label="Delete workflow">
                   <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                 </Button>
               )}
