@@ -105,6 +105,7 @@ jobs:
           from app.features.presets.models import Preset
           from app.features.workflows.models import Workflow
           from app.features.projects.models import Project
+          from app.features.projects.folder_models import ProjectFolder
           from app.features.favorites.models import Favorite
           from app.features.notifications.models import Notification
           from app.features.sharing.models import ShareLink
@@ -134,6 +135,14 @@ jobs:
           exit 1
       - name: Install frontend dependencies
         run: npm ci
+      - name: TypeScript
+        run: npx tsc --noEmit
+      - name: ESLint
+        run: npm run lint
+      - name: Production build
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+        run: npm run build
       - name: Generate media fixtures
         run: |
           mkdir -p e2e/fixtures
