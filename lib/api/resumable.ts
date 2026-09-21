@@ -17,7 +17,8 @@ export class ResumableUploader {
   private totalChunks: number = 0;
   private paused: boolean = false;
   private cancelled: boolean = false;
-  private abortController: AbortController | null = null;
+  private failedChunk: number | null = null;
+  private uploadError: string | null = null;
   private file: File | null = null;
 
   get state(): ResumableUploadState {
@@ -26,9 +27,13 @@ export class ResumableUploader {
       totalSize: this.totalSize,
       uploadedChunks: new Set(this.uploadedChunks),
       totalChunks: this.totalChunks,
-      status: this.cancelled ? 'error' : this.paused ? 'paused' : this.uploadedChunks.size === this.totalChunks && this.totalChunks > 0 ? 'complete' : 'idle',
-      error: null,
+      status: this.cancelled ? 'error' : this.uploadError ? 'error' : this.paused ? 'paused' : this.uploadedChunks.size === this.totalChunks && this.totalChunks > 0 ? 'complete' : 'idle',
+      error: this.uploadError,
     };
+  }
+
+  get failedChunkIndex(): number | null {
+    return this.failedChunk;
   }
 
   get progress(): number {
@@ -44,6 +49,8 @@ export class ResumableUploader {
     this.uploadedChunks = new Set();
     this.paused = false;
     this.cancelled = false;
+    this.failedChunk = null;
+    this.uploadError = null;
 
     const { upload_id } = await api.initResumableUpload({
       original_filename: file.name,
@@ -67,7 +74,11 @@ export class ResumableUploader {
     try {
       await api.uploadChunk(this.uploadId, index, chunk);
       this.uploadedChunks.add(index);
+      this.failedChunk = null;
+      this.uploadError = null;
     } catch (err) {
+      this.failedChunk = index;
+      this.uploadError = err instanceof Error ? err.message : 'Chunk upload failed';
       throw err;
     }
   }
@@ -75,6 +86,7 @@ export class ResumableUploader {
   async uploadAll(onProgress?: (progress: number, uploaded: number, total: number) => void): Promise<void> {
     this.paused = false;
     this.cancelled = false;
+    this.uploadError = null;
 
     for (let i = 0; i < this.totalChunks; i++) {
       if (this.cancelled) {
@@ -108,6 +120,8 @@ export class ResumableUploader {
   async cancel(): Promise<void> {
     this.cancelled = true;
     this.paused = false;
+    this.failedChunk = null;
+    this.uploadError = null;
     if (this.uploadId) {
       await api.cancelResumableUpload(this.uploadId).catch(() => {});
     }
@@ -117,6 +131,7 @@ export class ResumableUploader {
 
   async retryChunk(index: number): Promise<void> {
     this.uploadedChunks.delete(index);
+    this.failedChunk = index;
     await this.uploadChunk(index);
   }
 
