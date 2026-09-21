@@ -17,8 +17,9 @@ test.describe('12 Remaining checklist coverage', () => {
       headers: { Authorization: 'Bearer ' + auth.token },
       body: form,
     });
-    expect(multipleRaw.ok, await multipleRaw.text()).toBeTruthy();
-    expect((await multipleRaw.json()).length).toBe(3);
+    const multipleText = await multipleRaw.text();
+    expect(multipleRaw.ok, multipleText).toBeTruthy();
+    expect(JSON.parse(multipleText).length).toBe(3);
 
     const subtitle = await request.post(API + '/subtitles/upload', {
       headers: { Authorization: 'Bearer ' + auth.token },
