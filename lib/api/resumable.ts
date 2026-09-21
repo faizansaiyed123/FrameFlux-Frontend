@@ -27,7 +27,7 @@ export class ResumableUploader {
       totalSize: this.totalSize,
       uploadedChunks: new Set(this.uploadedChunks),
       totalChunks: this.totalChunks,
-      status: this.cancelled ? 'error' : this.uploadError ? 'error' : this.paused ? 'paused' : this.uploadedChunks.size === this.totalChunks && this.totalChunks > 0 ? 'complete' : 'idle',
+      status: this.cancelled ? 'error' : this.uploadError ? 'error' : this.paused ? 'paused' : this.uploadedChunks.size === this.totalChunks && this.totalChunks > 0 ? 'complete' : this.uploadId ? 'uploading' : 'idle',
       error: this.uploadError,
     };
   }
