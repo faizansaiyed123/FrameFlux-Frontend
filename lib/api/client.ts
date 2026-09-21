@@ -939,14 +939,19 @@ class ApiClient {
     mix_volume?: number;
     output_format?: 'mp4' | 'webm';
   }) {
-    return this.request<{
-      output_filename: string;
-      operation: string;
-      media_id: string;
-    }>(`/audio/${mediaId}/sync-audio`, {
+    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/sync-audio`, {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+      },
       body: JSON.stringify(data),
     });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'Audio sync failed' }));
+      throw new Error(error.detail || `HTTP error ${response.status}`);
+    }
+    return response.blob();
   }
 
   async convertAudio(mediaId: string, data: {
