@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -22,12 +22,6 @@ interface SubtitleTrack {
   title: string | null;
   is_default: boolean;
   is_forced: boolean;
-}
-
-interface SyncPreviewResponse {
-  preview_url: string;
-  offset: number;
-  scale: number;
 }
 
 function downloadBlob(blob: Blob, filename: string) {
@@ -65,6 +59,12 @@ export function SubtitleForm({ mediaId }: Props) {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    return () => {
+      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
+    };
+  }, [syncPreviewUrl]);
+
   const handleFileSelect = useCallback(async (file: File | undefined) => {
     if (!file) return;
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
@@ -100,6 +100,7 @@ export function SubtitleForm({ mediaId }: Props) {
   const handleAction = async () => {
     setLoading(true);
     setError(null);
+    if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
     setSyncPreviewUrl(null);
     try {
       if (action === 'burn') {
@@ -115,9 +116,18 @@ export function SubtitleForm({ mediaId }: Props) {
         const data = await api.listSubtitleTracks(mediaId);
         setTracks(data as SubtitleTrack[]);
       } else if (action === 'sync') {
-        const result = await api.syncSubtitles(mediaId, { offset_seconds: Number(syncOffset), scale: Number(syncScale), preview: true });
-        const syncResult = result as SyncPreviewResponse | undefined;
-        if (syncResult?.preview_url) setSyncPreviewUrl(syncResult.preview_url);
+        if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
+        const result = await api.syncSubtitles(mediaId, {
+          subtitle_path: subtitlePath,
+          offset_seconds: Number(syncOffset),
+          scale: Number(syncScale),
+          preview: true,
+        });
+        if (result instanceof Blob) {
+          setSyncPreviewUrl(URL.createObjectURL(result));
+        } else if (result.preview_url) {
+          setSyncPreviewUrl(result.preview_url);
+        }
       } else if (action === 'edit_text') {
         if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
         const entryIndex = Number(editEntryIndex) - 1;
