@@ -292,7 +292,7 @@ class ApiClient {
   }
 
   async getDashboardRecentProcessing(limit?: number) {
-    return this.request<any[]>(`/dashboard/recent-processing${limit ? `?limit=${limit}` : ''}`);
+    return this.request<unknown[]>(`/dashboard/recent-processing${limit ? `?limit=${limit}` : ''}`);
   }
 
   // Media
@@ -493,6 +493,7 @@ class ApiClient {
     compression_preset?: string;
     quality?: number;
     resolution?: string;
+    target_size_mb?: number;
   }) {
     return this.request<{
       media_id: string;
@@ -757,7 +758,7 @@ class ApiClient {
   async retryChunk(uploadId: string, index: number, chunk: Blob) {
     const formData = new FormData();
     formData.append('file', chunk);
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/retry/${index}`, {
+    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/retry?index=${index}`, {
       method: 'POST',
       headers: {},
       body: formData,
@@ -1150,7 +1151,7 @@ class ApiClient {
     offset_seconds?: number;
     scale?: number;
     preview?: boolean;
-  }) {
+  }): Promise<Blob | { preview_url: string; offset: number; scale: number }> {
     const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/sync`, {
       method: 'POST',
       headers: {
@@ -1162,6 +1163,10 @@ class ApiClient {
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: 'Failed to sync subtitles' }));
       throw new Error(error.detail || 'Failed to sync subtitles');
+    }
+    const contentType = response.headers.get('content-type') || '';
+    if (data.preview && contentType.includes('application/json')) {
+      return response.json();
     }
     return response.blob();
   }
@@ -1267,9 +1272,9 @@ class ApiClient {
       container_format: string | null;
       audio_tracks: number | null;
       subtitle_tracks: number | null;
-      available_streams: any[] | null;
-      metadata: Record<string, any> | null;
-      creation_metadata: Record<string, any> | null;
+      available_streams: unknown[] | null;
+      metadata: Record<string, unknown> | null;
+      creation_metadata: Record<string, unknown> | null;
     }>(`/media-info/${mediaId}`);
   }
 
@@ -1281,8 +1286,8 @@ class ApiClient {
     });
   }
 
-  async batchProcess(mediaIds: string[], operation: string, options?: Record<string, any>) {
-    return this.request<{ job_id: string; total_items: number; operation: string; status: string; results: any[] }>('/batch/process', {
+  async batchProcess(mediaIds: string[], operation: string, options?: Record<string, unknown>) {
+    return this.request<{ job_id: string; total_items: number; operation: string; status: string; results: unknown[] }>('/batch/process', {
       method: 'POST',
       body: JSON.stringify({ media_ids: mediaIds, operation, options }),
     });
