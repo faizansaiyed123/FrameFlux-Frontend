@@ -1299,7 +1299,7 @@ class ApiClient {
   }
 
   async getBatchStatus(jobId: string) {
-    return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: any[] }>(`/batch/${jobId}/status`);
+    return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: unknown[] }>(`/batch/${jobId}/status`);
   }
 
   // Presets
@@ -1310,20 +1310,20 @@ class ApiClient {
       name: string;
       description: string | null;
       is_builtin: boolean;
-      settings: Record<string, any>;
+      settings: Record<string, unknown>;
       created_at: string;
       updated_at: string;
     }[]>('/presets');
   }
 
-  async createPreset(data: { name: string; description?: string; settings: Record<string, any> }) {
+  async createPreset(data: { name: string; description?: string; settings: Record<string, unknown> }) {
     return this.request<{
       id: string;
       user_id: string | null;
       name: string;
       description: string | null;
       is_builtin: boolean;
-      settings: Record<string, any>;
+      settings: Record<string, unknown>;
       created_at: string;
       updated_at: string;
     }>('/presets', {
@@ -1332,14 +1332,14 @@ class ApiClient {
     });
   }
 
-  async updatePreset(presetId: string, data: { name?: string; description?: string; settings?: Record<string, any> }) {
+  async updatePreset(presetId: string, data: { name?: string; description?: string; settings?: Record<string, unknown> }) {
     return this.request<{
       id: string;
       user_id: string | null;
       name: string;
       description: string | null;
       is_builtin: boolean;
-      settings: Record<string, any>;
+      settings: Record<string, unknown>;
       created_at: string;
       updated_at: string;
     }>(`/presets/${presetId}`, {
