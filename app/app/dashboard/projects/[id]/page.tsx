@@ -93,9 +93,11 @@ export default function ProjectDetailPage() {
     fetchProject();
   }, [fetchProject]);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    fetchExtras();
+    const timer = window.setTimeout(() => {
+      void fetchExtras();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchExtras]);
 
   const handleProcess = async () => {
