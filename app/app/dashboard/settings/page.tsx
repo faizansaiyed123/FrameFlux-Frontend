@@ -34,6 +34,7 @@ export default function SettingsPage() {
   const [theme, setTheme] = useState('system');
   const [language, setLanguage] = useState('en');
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     if (user?.full_name) setFullName(user.full_name);
   }, [user?.full_name]);
@@ -67,6 +68,7 @@ export default function SettingsPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchPreferences();
   }, [fetchPreferences]);
