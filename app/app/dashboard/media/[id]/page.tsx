@@ -78,12 +78,6 @@ export default function MediaDetailPage() {
   const searchParams = useSearchParams();
   const mediaId = params.id as string;
 
-  useEffect(() => {
-    if (searchParams.get('from_upload') === '1') {
-      setUploadSuccess(true);
-    }
-  }, [searchParams]);
-
   const [media, setMedia] = useState<Media | null>(null);
   const [status, setStatus] = useState<MediaProcessingStatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +93,13 @@ export default function MediaDetailPage() {
   const [shareExpiresIn, setShareExpiresIn] = useState('');
   const [shareAllowedDomains, setShareAllowedDomains] = useState('');
   const [shareAllowDownload, setShareAllowDownload] = useState(true);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    if (searchParams.get('from_upload') === '1') {
+      setUploadSuccess(true);
+    }
+  }, [searchParams]);
   const [shares, setShares] = useState<ShareResponse[]>([]);
   const [shareLoading, setShareLoading] = useState(false);
   const [selectedShareEmbed, setSelectedShareEmbed] = useState<{ embed_url: string; embed_code: string; media_title: string } | null>(null);
@@ -170,10 +171,12 @@ export default function MediaDetailPage() {
     }
   }, [mediaId]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchVersions();
   }, [fetchVersions]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchShares();
   }, [fetchShares]);
