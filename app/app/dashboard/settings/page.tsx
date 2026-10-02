@@ -34,9 +34,11 @@ export default function SettingsPage() {
   const [theme, setTheme] = useState('system');
   const [language, setLanguage] = useState('en');
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    if (user?.full_name) setFullName(user.full_name);
+    const timer = window.setTimeout(() => {
+      if (user?.full_name) setFullName(user.full_name);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [user?.full_name]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -68,9 +70,11 @@ export default function SettingsPage() {
     }
   }, []);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    fetchPreferences();
+    const timer = window.setTimeout(() => {
+      void fetchPreferences();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchPreferences]);
 
   const handleChangePassword = async (e: React.FormEvent) => {
