@@ -383,7 +383,7 @@ export interface PresetResponse {
   name: string;
   description: string | null;
   is_builtin: boolean;
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
