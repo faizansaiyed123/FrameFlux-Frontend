@@ -24,6 +24,7 @@ export default function FavoritesPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchFavorites();
   }, [fetchFavorites]);
