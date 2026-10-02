@@ -39,7 +39,7 @@ export default function PresetsPage() {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [settings, setSettings] = useState<Record<string, any>>({});
+  const [settings, setSettings] = useState<Record<string, unknown>>({});
 
   const fetchPresets = useCallback(async () => {
     setLoading(true);
@@ -53,6 +53,7 @@ export default function PresetsPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchPresets();
   }, [fetchPresets]);
@@ -73,7 +74,7 @@ export default function PresetsPage() {
     setDialogOpen(true);
   };
 
-  const handleSettingsChange = (key: string, value: any) => {
+  const handleSettingsChange = (key: string, value: unknown) => {
     setSettings(prev => {
       const next = { ...prev };
       if (value === '' || value === undefined || value === null) {
