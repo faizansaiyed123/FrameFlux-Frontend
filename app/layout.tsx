@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://frameflux.io"),
   title: {
     default: "FrameFlux — Video Processing API for Developers",
     template: "%s | FrameFlux",
