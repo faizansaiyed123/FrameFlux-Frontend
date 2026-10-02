@@ -91,6 +91,8 @@ class ApiClient {
       is_active: boolean;
       created_at: string;
       updated_at: string;
+      avatar_url?: string | null;
+      preferences?: string | null;
     }>('/auth/me');
   }
 
