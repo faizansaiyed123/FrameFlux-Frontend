@@ -309,7 +309,7 @@ export interface ShareResponse {
   id: string;
   media_id: string;
   token: string;
-  password: string | null;
+  has_password: boolean;
   expires_at: string | null;
   is_active: boolean;
   allow_download: boolean;
