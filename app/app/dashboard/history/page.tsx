@@ -33,9 +33,11 @@ export default function HistoryPage() {
     }
   }, []);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    fetchHistory();
+    const timer = window.setTimeout(() => {
+      void fetchHistory();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchHistory]);
 
   if (loading) {
