@@ -85,10 +85,12 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [transformSpeed, setTransformSpeed] = useState(1);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('from_upload') === '1') setFromUpload(true);
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('from_upload') === '1') setFromUpload(true);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
