@@ -104,7 +104,7 @@ export function ToolPanel({ activeTool, onSelectTool, selectedClip, clips, curre
               <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                 Playhead: {formatTime(currentTime)}
               </div>
-              <Button onClick={onSplit} size="sm" className="w-full">
+              <Button onClick={() => { onSplit(); onApply(); }} size="sm" className="w-full">
                 <Split className="mr-1.5 h-3.5 w-3.5" />
                 Split
               </Button>
