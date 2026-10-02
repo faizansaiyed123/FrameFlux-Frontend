@@ -37,6 +37,7 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
         height,
         compression_preset: quality,
         video_bitrate: bitrate || undefined,
+        target_size_mb: targetSize ? Number(targetSize) : undefined,
         resolution: resolution !== 'original' ? resolution : undefined,
       });
       onProcessed();
@@ -103,8 +104,8 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
         <Input value={bitrate} onChange={(e) => setBitrate(e.target.value)} placeholder="e.g. 2M" />
       </div>
       <div className="space-y-2">
-        <Label>Target Size (MB, optional)</Label>
-        <Input type="number" value={targetSize} onChange={(e) => setTargetSize(e.target.value)} min="1" placeholder="e.g. 50" />
+        <Label htmlFor="compress-target-size">Target Size (MB, optional)</Label>
+        <Input id="compress-target-size" aria-label="Target Size (MB, optional)" type="number" value={targetSize} onChange={(e) => setTargetSize(e.target.value)} min="1" placeholder="e.g. 50" />
       </div>
       <Button onClick={handleCompress} disabled={loading} className="w-full">
         {loading ? (
