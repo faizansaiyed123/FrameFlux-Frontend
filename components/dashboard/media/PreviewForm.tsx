@@ -87,7 +87,7 @@ export function PreviewForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Preview Type</Label>
-        <Select value={type} onValueChange={(v) => setType(v as any)}>
+        <Select value={type} onValueChange={(v) => { if (v === 'video' || v === 'gif' || v === 'thumbnail') setType(v); }}>
           <SelectTrigger>
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
