@@ -63,9 +63,11 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
     }
   }, [mediaId]);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    fetchVersions();
+    const timer = window.setTimeout(() => {
+      void fetchVersions();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchVersions]);
 
   const handleDownload = async (version: MediaVersion) => {
