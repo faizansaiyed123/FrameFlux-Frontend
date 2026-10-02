@@ -251,10 +251,19 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
     setError('');
     setSuccess('');
     try {
-      await api.reorderAudioClips(
+      const result = await api.reorderAudioClips(
         media.id,
         clips.map((clip) => clip.storedFilename || clip.mediaId),
       );
+      const blob = await api.getProcessedMedia(media.id, result.output_filename);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = media.original_filename.replace(/\.[^/.]+$/, '') + '_reordered.mp3';
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      URL.revokeObjectURL(url);
       setSuccess('Audio clips reordered and exported successfully.');
       onProcessed();
     } catch (err) {
