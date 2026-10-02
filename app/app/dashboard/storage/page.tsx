@@ -39,6 +39,7 @@ export default function StoragePage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchData();
   }, [fetchData]);
