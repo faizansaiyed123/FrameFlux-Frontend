@@ -1,4 +1,5 @@
 import { api } from '@/lib/api/client';
+import type { Media } from '@/types/api';
 
 export interface ResumableUploadState {
   uploadId: string | null;
@@ -135,7 +136,7 @@ export class ResumableUploader {
     await this.uploadChunk(index);
   }
 
-  async finalize(): Promise<any> {
+  async finalize(): Promise<Media> {
     if (!this.uploadId) {
       throw new Error('Upload not initialized');
     }
