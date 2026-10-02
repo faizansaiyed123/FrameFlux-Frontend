@@ -5,6 +5,8 @@ export interface User {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  avatar_url?: string | null;
+  preferences?: string | null;
 }
 
 export interface SignupRequest {
@@ -291,6 +293,15 @@ export interface MediaVersion {
   label: string;
   stored_filename: string;
   processing_status: string;
+  original_filename?: string;
+  file_size?: number;
+  mime_type?: string;
+  duration?: number | null;
+  width?: number | null;
+  height?: number | null;
+  video_codec?: string | null;
+  audio_codec?: string | null;
+  fps?: string | null;
   created_at: string;
 }
 
@@ -309,7 +320,7 @@ export interface ShareResponse {
   id: string;
   media_id: string;
   token: string;
-  password: string | null;
+  has_password: boolean;
   expires_at: string | null;
   is_active: boolean;
   allow_download: boolean;
@@ -381,7 +392,7 @@ export interface PresetResponse {
   name: string;
   description: string | null;
   is_builtin: boolean;
-  settings: Record<string, any>;
+  settings: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 }
@@ -396,6 +407,7 @@ export interface FavoriteResponse {
 export interface QuickActionsResponse {
   video: { id: string; label: string; icon: string }[];
   audio: { id: string; label: string; icon: string }[];
+  image: { id: string; label: string; icon: string }[];
 }
 
 export interface ExecuteQuickActionResponse {

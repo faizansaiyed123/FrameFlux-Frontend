@@ -78,12 +78,6 @@ export default function MediaDetailPage() {
   const searchParams = useSearchParams();
   const mediaId = params.id as string;
 
-  useEffect(() => {
-    if (searchParams.get('from_upload') === '1') {
-      setUploadSuccess(true);
-    }
-  }, [searchParams]);
-
   const [media, setMedia] = useState<Media | null>(null);
   const [status, setStatus] = useState<MediaProcessingStatusResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,6 +93,15 @@ export default function MediaDetailPage() {
   const [shareExpiresIn, setShareExpiresIn] = useState('');
   const [shareAllowedDomains, setShareAllowedDomains] = useState('');
   const [shareAllowDownload, setShareAllowDownload] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (searchParams.get('from_upload') === '1') {
+        setUploadSuccess(true);
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [searchParams]);
   const [shares, setShares] = useState<ShareResponse[]>([]);
   const [shareLoading, setShareLoading] = useState(false);
   const [selectedShareEmbed, setSelectedShareEmbed] = useState<{ embed_url: string; embed_code: string; media_title: string } | null>(null);
@@ -171,11 +174,17 @@ export default function MediaDetailPage() {
   }, [mediaId]);
 
   useEffect(() => {
-    fetchVersions();
+    const timer = window.setTimeout(() => {
+      void fetchVersions();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchVersions]);
 
   useEffect(() => {
-    fetchShares();
+    const timer = window.setTimeout(() => {
+      void fetchShares();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchShares]);
 
   const handleProcess = async () => {

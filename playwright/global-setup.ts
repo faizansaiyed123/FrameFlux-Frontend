@@ -1,4 +1,4 @@
-import { chromium } from '@playwright/test';
+import { chromium, type Page } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -10,7 +10,7 @@ function uniqueEmail() {
   return `test_${Date.now()}_${Math.random().toString(36).slice(2,8)}@example.com`;
 }
 
-async function signupAndLogin(page: any, email: string) {
+async function signupAndLogin(page: Page, email: string) {
   await page.goto('http://localhost:3000/auth/signup');
   await page.waitForLoadState('networkidle');
   await page.fill('input[placeholder="John Doe"]', TEST_NAME);

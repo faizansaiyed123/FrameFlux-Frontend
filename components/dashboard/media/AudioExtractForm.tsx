@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { api } from '@/lib/api/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 
 interface Props {
@@ -17,13 +18,23 @@ export function AudioExtractForm({ mediaId }: Props) {
   const [format, setFormat] = useState('mp3');
   const [bitrate, setBitrate] = useState('192k');
   const [sampleRate, setSampleRate] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [channels, setChannels] = useState('2');
+  const [quality, setQuality] = useState('medium');
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
 
   const handleExtract = async () => {
     setLoading(true);
+    setError(null);
     try {
       const blob = await api.extractAudio(mediaId, {
         format, bitrate,
         sample_rate: sampleRate ? parseInt(sampleRate) : undefined,
+        channels: channels ? parseInt(channels) : undefined,
+        quality_preset: quality,
+        start: start ? parseFloat(start) : undefined,
+        end: end ? parseFloat(end) : undefined,
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -41,7 +52,8 @@ export function AudioExtractForm({ mediaId }: Props) {
   };
 
   return (
-    <div className="space-y-4">
+        <div className="space-y-4">
+      {error && <Alert className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300"><AlertDescription className="text-xs">{error}</AlertDescription></Alert>}
       <div className="space-y-2">
         <Label>Format</Label>
         <Select value={format} onValueChange={setFormat}>
@@ -85,6 +97,37 @@ export function AudioExtractForm({ mediaId }: Props) {
           max="384000"
           className="text-xs h-7"
         />
+      </div>
+      <div className="space-y-2">
+        <Label>Channels</Label>
+        <Select value={channels} onValueChange={setChannels}>
+          <SelectTrigger><SelectValue placeholder="Select channels" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="1">Mono</SelectItem>
+            <SelectItem value="2">Stereo</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label>Quality</Label>
+        <Select value={quality} onValueChange={setQuality}>
+          <SelectTrigger><SelectValue placeholder="Select quality" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="low">Low</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="high">High</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-2">
+          <Label>Start (optional)</Label>
+          <Input type="number" min="0" step="0.01" value={start} onChange={(e) => setStart(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label>End (optional)</Label>
+          <Input type="number" min="0" step="0.01" value={end} onChange={(e) => setEnd(e.target.value)} />
+        </div>
       </div>
       <Button onClick={handleExtract} disabled={loading} className="w-full">
         {loading ? (

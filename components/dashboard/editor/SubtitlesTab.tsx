@@ -11,8 +11,17 @@ import { Loader2, AlertCircle, Type, CheckCircle2, Download, SlidersHorizontal, 
 
 const ACCEPTED_EXTENSIONS = ['.srt', '.ass', '.vtt', '.sub', '.txt'];
 
+interface SubtitleTrack {
+  id: number | string;
+  codec: string | null;
+  language: string | null;
+  title: string | null;
+  is_default: boolean;
+  is_forced: boolean;
+}
+
 export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: string) => void }) {
-  const [tracks, setTracks] = useState<any[]>([]);
+  const [tracks, setTracks] = useState<SubtitleTrack[]>([]);
   const [loading, setLoading] = useState(false);
   const [subtitlePath, setSubtitlePath] = useState('');
   const [syncOffset, setSyncOffset] = useState('0');
@@ -74,26 +83,30 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
   const handleSync = async (preview?: boolean) => {
     setSyncing(true); setError(''); setSyncPreviewUrl(null);
     try {
-      const blob = await api.syncSubtitles(media.id, {
+      const result = await api.syncSubtitles(media.id, {
+        subtitle_path: subtitlePath,
         offset_seconds: parseFloat(syncOffset) || 0,
         scale: parseFloat(syncScale) || 1,
         preview: !!preview,
       });
       if (preview) {
-        const data = blob as any;
-        if (data.preview_url) {
-          const res = await fetch(`${(window as any).__apiBaseUrl || 'http://localhost:8000'}${data.preview_url}`, {
-            headers: { Authorization: `Bearer ${(window as any).__token__ || ''}` },
-          });
-          const b = await res.blob();
-          setSyncPreviewUrl(URL.createObjectURL(b));
+        if (result instanceof Blob) {
+          setSyncPreviewUrl(URL.createObjectURL(result));
+        } else if (result.preview_url) {
+          setSyncPreviewUrl(result.preview_url);
         }
       } else {
-        const b = blob as Blob;
-        const url = URL.createObjectURL(b);
+        if (!(result instanceof Blob)) {
+          throw new Error('Subtitle sync did not return a media file');
+        }
+        const url = URL.createObjectURL(result);
         const a = document.createElement('a');
-        a.href = url; a.download = `${media.original_filename.replace(/\.[^/.]+$/, '')}_synced.mp4`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+        a.href = url;
+        a.download = `${media.original_filename.replace(/\.[^/.]+$/, '')}_synced.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
       }
     } catch (err) { setError(err instanceof Error ? err.message : 'Sync failed'); }
     finally { setSyncing(false); }

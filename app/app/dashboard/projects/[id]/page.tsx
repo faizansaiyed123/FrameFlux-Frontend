@@ -94,7 +94,10 @@ export default function ProjectDetailPage() {
   }, [fetchProject]);
 
   useEffect(() => {
-    fetchExtras();
+    const timer = window.setTimeout(() => {
+      void fetchExtras();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchExtras]);
 
   const handleProcess = async () => {

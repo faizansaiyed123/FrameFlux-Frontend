@@ -34,7 +34,10 @@ export default function HistoryPage() {
   }, []);
 
   useEffect(() => {
-    fetchHistory();
+    const timer = window.setTimeout(() => {
+      void fetchHistory();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchHistory]);
 
   if (loading) {

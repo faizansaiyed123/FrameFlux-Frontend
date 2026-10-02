@@ -140,7 +140,7 @@ export default function SearchPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">{item.original_filename}</p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        {item.media_type} • {item.file_size ? `${(item.file_size / 1024 / 1024).toFixed(1)} MB` : ''} • {formatDistanceToNow(new Date(item.created_at || Date.now()), { addSuffix: true })}
+                        {item.media_type} • {item.file_size ? `${(item.file_size / 1024 / 1024).toFixed(1)} MB` : ''} • {item.created_at ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true }) : 'Unknown date'}
                       </p>
                     </div>
                     <Badge variant="secondary" className="capitalize">{item.processing_status}</Badge>

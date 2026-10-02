@@ -114,7 +114,10 @@ export default function WorkflowsPage() {
   }, []);
 
   useEffect(() => {
-    fetchWorkflows();
+    const timer = window.setTimeout(() => {
+      void fetchWorkflows();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchWorkflows]);
 
   const openCreate = () => {

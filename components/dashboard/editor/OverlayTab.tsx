@@ -75,9 +75,9 @@ export function OverlayTab({ media, onOverlay, setError }: { media: Media; onOve
       <div className="flex items-center justify-between">
         <Label className="text-[10px] text-zinc-500">Overlays ({overlays.length})</Label>
         <div className="flex gap-1">
-          <Button variant="outline" size="icon" className="h-6 w-6 text-xs" onClick={() => addOverlay('text')} title="Add Text"><ImageIcon className="h-3 w-3" /></Button>
-          <Button variant="outline" size="icon" className="h-6 w-6 text-xs" onClick={() => addOverlay('image')} title="Add Image"><ImageIcon className="h-3 w-3" /></Button>
-          <Button variant="outline" size="icon" className="h-6 w-6 text-xs" onClick={() => addOverlay('watermark')} title="Add Watermark"><Layers className="h-3 w-3" /></Button>
+          <Button variant="outline" size="icon" className="h-6 w-6 text-xs" onClick={() => addOverlay('text')} title="Add Text" aria-label="Add Text"><ImageIcon className="h-3 w-3" /></Button>
+          <Button variant="outline" size="icon" className="h-6 w-6 text-xs" onClick={() => addOverlay('image')} title="Add Image" aria-label="Add Image"><ImageIcon className="h-3 w-3" /></Button>
+          <Button variant="outline" size="icon" className="h-6 w-6 text-xs" onClick={() => addOverlay('watermark')} title="Add Watermark" aria-label="Add Watermark"><Layers className="h-3 w-3" /></Button>
         </div>
       </div>
 

@@ -47,7 +47,8 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [compareVersion, setCompareVersion] = useState<MediaVersion | null>(null);
-  const [comparison, setComparison] = useState<any>(null);
+  interface MediaComparison { size_diff: number; storage_saved: number; duration_diff?: number | null; resolution_match: boolean; video_codec_match: boolean; audio_codec_match: boolean; }
+  const [comparison, setComparison] = useState<MediaComparison | null>(null);
   const [comparisonLoading, setComparisonLoading] = useState(false);
 
   const fetchVersions = useCallback(async () => {
@@ -63,7 +64,10 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
   }, [mediaId]);
 
   useEffect(() => {
-    fetchVersions();
+    const timer = window.setTimeout(() => {
+      void fetchVersions();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchVersions]);
 
   const handleDownload = async (version: MediaVersion) => {

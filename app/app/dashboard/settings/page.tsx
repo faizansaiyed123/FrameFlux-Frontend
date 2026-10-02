@@ -35,7 +35,10 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState('en');
 
   useEffect(() => {
-    if (user?.full_name) setFullName(user.full_name);
+    const timer = window.setTimeout(() => {
+      if (user?.full_name) setFullName(user.full_name);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [user?.full_name]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -68,7 +71,10 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    fetchPreferences();
+    const timer = window.setTimeout(() => {
+      void fetchPreferences();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchPreferences]);
 
   const handleChangePassword = async (e: React.FormEvent) => {

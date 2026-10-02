@@ -39,7 +39,7 @@ export default function PresetsPage() {
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [settings, setSettings] = useState<Record<string, any>>({});
+  const [settings, setSettings] = useState<Record<string, unknown>>({});
 
   const fetchPresets = useCallback(async () => {
     setLoading(true);
@@ -54,7 +54,10 @@ export default function PresetsPage() {
   }, []);
 
   useEffect(() => {
-    fetchPresets();
+    const timer = window.setTimeout(() => {
+      void fetchPresets();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchPresets]);
 
   const openCreate = () => {
@@ -73,7 +76,7 @@ export default function PresetsPage() {
     setDialogOpen(true);
   };
 
-  const handleSettingsChange = (key: string, value: any) => {
+  const handleSettingsChange = (key: string, value: unknown) => {
     setSettings(prev => {
       const next = { ...prev };
       if (value === '' || value === undefined || value === null) {
@@ -201,9 +204,9 @@ export default function PresetsPage() {
                         </SelectContent>
                       </Select>
                     ) : field.type === 'number' ? (
-                      <Input id={field.key} type="number" step={field.key === 'fps' ? '0.01' : '1'} min="1" value={settings[field.key] || ''} onChange={(e) => handleSettingsChange(field.key, e.target.value ? Number(e.target.value) : undefined)} />
+                      <Input id={field.key} type="number" step={field.key === 'fps' ? '0.01' : '1'} min="1" value={settings[field.key] == null ? '' : String(settings[field.key])} onChange={(e) => handleSettingsChange(field.key, e.target.value ? Number(e.target.value) : undefined)} />
                     ) : (
-                      <Input id={field.key} value={settings[field.key] || ''} onChange={(e) => handleSettingsChange(field.key, e.target.value || undefined)} placeholder="Auto" />
+                      <Input id={field.key} value={settings[field.key] == null ? '' : String(settings[field.key])} onChange={(e) => handleSettingsChange(field.key, e.target.value || undefined)} placeholder="Auto" />
                     )}
                   </div>
                 ))}

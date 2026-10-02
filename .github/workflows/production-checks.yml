@@ -1,0 +1,20 @@
+name: Production Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, prod-reconcile-20261002]
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: NEXT_PUBLIC_API_URL=https://api.example.com npm run build
