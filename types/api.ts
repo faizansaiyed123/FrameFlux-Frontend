@@ -293,6 +293,15 @@ export interface MediaVersion {
   label: string;
   stored_filename: string;
   processing_status: string;
+  original_filename?: string;
+  file_size?: number;
+  mime_type?: string;
+  duration?: number | null;
+  width?: number | null;
+  height?: number | null;
+  video_codec?: string | null;
+  audio_codec?: string | null;
+  fps?: string | null;
   created_at: string;
 }
 
@@ -398,6 +407,7 @@ export interface FavoriteResponse {
 export interface QuickActionsResponse {
   video: { id: string; label: string; icon: string }[];
   audio: { id: string; label: string; icon: string }[];
+  image: { id: string; label: string; icon: string }[];
 }
 
 export interface ExecuteQuickActionResponse {
