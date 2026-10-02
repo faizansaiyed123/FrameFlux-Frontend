@@ -17,7 +17,11 @@ const statusConfig: Record<string, { icon: typeof Clock; color: string; label: s
 };
 
 export default function QuickActionsPage() {
-  const [quickActions, setQuickActions] = useState<{ video: { id: string; label: string; icon: string }[]; audio: { id: string; label: string; icon: string }[] } | null>(null);
+  const [quickActions, setQuickActions] = useState<{
+    video: { id: string; label: string; icon: string }[];
+    audio: { id: string; label: string; icon: string }[];
+    image: { id: string; label: string; icon: string }[];
+  } | null>(null);
   const [mediaId, setMediaId] = useState('');
   const [loading, setLoading] = useState(true);
   const [executing, setExecuting] = useState<string | null>(null);
@@ -35,7 +39,10 @@ export default function QuickActionsPage() {
   }, []);
 
   useEffect(() => {
-    fetchQuickActions();
+    const timer = window.setTimeout(() => {
+      void fetchQuickActions();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchQuickActions]);
 
   const handleExecute = async (actionId: string) => {
