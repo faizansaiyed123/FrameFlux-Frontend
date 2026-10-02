@@ -113,6 +113,7 @@ export default function WorkflowsPage() {
     }
   }, []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchWorkflows();
   }, [fetchWorkflows]);
