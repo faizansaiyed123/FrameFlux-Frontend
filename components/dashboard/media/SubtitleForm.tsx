@@ -35,7 +35,7 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export function SubtitleForm({ mediaId }: Props) {
+export function SubtitleForm({ mediaId, onProcessed }: Props & { onProcessed?: () => void }) {
   const [loading, setLoading] = useState(false);
   const [subtitleUploading, setSubtitleUploading] = useState(false);
   const [action, setAction] = useState<'burn' | 'mux' | 'tracks' | 'sync' | 'edit_text' | 'edit_timing' | 'add_entry' | 'delete_entry' | 'split_entry' | 'merge_entries'>('burn');
