@@ -10,7 +10,8 @@ interface Props {
 }
 
 export function MediaInfoSection({ mediaId }: Props) {
-  const [info, setInfo] = useState<any>(null);
+  interface MediaInfo { file_name: string; file_size: number; duration: number | null; resolution: string | null; fps: string | null; video_codec: string | null; audio_codec: string | null; audio_channels: number | null; }
+  const [info, setInfo] = useState<MediaInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchInfo = useCallback(async () => {
@@ -25,6 +26,7 @@ export function MediaInfoSection({ mediaId }: Props) {
     }
   }, [mediaId]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
     fetchInfo();
   }, [fetchInfo]);
