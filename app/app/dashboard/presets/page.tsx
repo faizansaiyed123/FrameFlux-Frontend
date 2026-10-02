@@ -53,9 +53,11 @@ export default function PresetsPage() {
     }
   }, []);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    fetchPresets();
+    const timer = window.setTimeout(() => {
+      void fetchPresets();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchPresets]);
 
   const openCreate = () => {
