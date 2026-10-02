@@ -1,35 +1,126 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FrameFlux Frontend
 
-## Getting Started
+Next.js App Router frontend for FrameFlux.
 
-First, run the development server:
+## Stack
+
+- Next.js 16.3.4
+- React 19.2.8
+- TypeScript
+- npm
+- Playwright
+
+## Prerequisites
+
+For local development:
+
+- Node.js 22+
+- npm
+
+For Docker:
+
+- Docker
+- Docker Compose
+
+The backend is maintained in a separate repository and must be running separately when the frontend makes API requests.
+
+## Local development
+
+Install dependencies and start the existing Next.js development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+The frontend runs at:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/api-reference/components/font) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Backend API URL
 
-## Learn More
+The existing API client reads:
 
-To learn more about Next.js, take a look at the following resources:
+```text
+NEXT_PUBLIC_API_URL
+```
 
-- [Next.js Documentation](https://nextjs.org/docs/app/building-your-application)
-- [Learn Next.js](https://nextjs.org/learn)
-- [Next.js GitHub repository](https://github.com/vercel/next.js) - feedback and contributions are welcome!
+The application uses this value for browser-to-backend API requests.
 
-## Deploy on Vercel
+For the default local backend:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=vercel&utm_campaign=vercel-startup&utm_medium=default-template) from the creators of Next.js.
+```text
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Do not hardcode the backend URL into Docker configuration outside the environment/build-argument mechanism.
+
+Because this is a `NEXT_PUBLIC_` variable, the value is embedded into the Next.js client bundle during the build.
+
+## Docker startup
+
+The frontend repository is completely independent from the backend repository.
+
+Run:
+
+```bash
+docker compose up --build
+```
+
+The container:
+
+1. Installs dependencies with the existing `package-lock.json` using `npm ci`.
+2. Runs the existing `npm run build` command.
+3. Runs the existing `npm run start` command.
+4. Exposes port `3000`.
+
+The frontend is available at:
+
+```text
+http://localhost:3000
+```
+
+No backend, PostgreSQL, Redis, worker, or other service is started by this repository.
+
+## Configure the backend for Docker
+
+Set the API URL at build time when the backend is exposed on a different host/port:
+
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000 docker compose up --build
+```
+
+The default is already `http://localhost:8000`.
+
+## Stop
+
+```bash
+docker compose down
+```
+
+## Rebuild
+
+```bash
+docker compose up --build
+```
+
+## Environment variables
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_URL` | No | Base URL of the separately running FrameFlux backend. |
+
+No secrets are required by the frontend container itself.
+
+## Manual setup
+
+Start the backend separately from `FrameFlux-Backend` before using API-backed features:
+
+```bash
+cd FrameFlux-Backend
+python run.py
+```
+
+Then start the frontend from this repository with either `npm run dev` or Docker Compose.
