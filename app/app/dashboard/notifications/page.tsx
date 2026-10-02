@@ -45,7 +45,10 @@ export default function NotificationsPage() {
   }, [page, unreadOnly]);
 
   useEffect(() => {
-    void fetchNotifications();
+    const timer = window.setTimeout(() => {
+      void fetchNotifications();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchNotifications]);
 
   const handleCreate = async (e: React.FormEvent) => {
