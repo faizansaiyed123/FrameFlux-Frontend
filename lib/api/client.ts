@@ -1,4 +1,11 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+const API_BASE_URL =
+  configuredApiUrl ||
+  (process.env.NODE_ENV !== 'production'
+    ? 'http://localhost:8000'
+    : (() => {
+        throw new Error('NEXT_PUBLIC_API_URL must be set in production');
+      })());
 
 class ApiClient {
   private baseUrl: string;
@@ -1638,14 +1645,38 @@ class ApiClient {
   }
 
   // Notifications
-  async listNotifications() {
+  async listNotifications(params?: {
+    page?: number;
+    page_size?: number;
+    unread_only?: boolean;
+  }) {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.page_size) query.set('page_size', String(params.page_size));
+    if (params?.unread_only) query.set('unread_only', 'true');
+    const qs = query.toString();
+
     return this.request<{
-      id: string;
-      event: string;
-      message: string;
-      is_read: boolean;
-      created_at: string;
-    }[]>('/notifications');
+      items: {
+        id: string;
+        event: string;
+        message: string;
+        is_read: boolean;
+        created_at: string;
+      }[];
+      page: number;
+      page_size: number;
+      total: number;
+      total_pages: number;
+    }>(`/notifications${qs ? `?${qs}` : ''}`);
+  }
+
+  async getUnreadNotificationCount() {
+    return this.request<{ unread_count: number }>('/notifications/unread-count');
+  }
+
+  async markAllNotificationsRead() {
+    return this.request<void>('/notifications/read-all', { method: 'POST' });
   }
 
   async createNotification(data: { event: string; message: string }) {
