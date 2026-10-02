@@ -1757,6 +1757,7 @@ class ApiClient {
     return this.request<{
       video: { id: string; label: string; icon: string }[];
       audio: { id: string; label: string; icon: string }[];
+      image: { id: string; label: string; icon: string }[];
     }>('/quick-actions');
   }
 
