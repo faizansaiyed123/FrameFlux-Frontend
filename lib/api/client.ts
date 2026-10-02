@@ -1285,14 +1285,14 @@ class ApiClient {
   }
 
   async batchProcess(mediaIds: string[], operation: string, options?: Record<string, unknown>) {
-    return this.request<{ job_id: string; total_items: number; operation: string; status: string; results: unknown[] }>('/batch/process', {
+    return this.request<{ job_id: string; total_items: number; operation: string; status: string; results: { media_id: string; filename: string }[] }>('/batch/process', {
       method: 'POST',
       body: JSON.stringify({ media_ids: mediaIds, operation, options }),
     });
   }
 
   async getBatchStatus(jobId: string) {
-    return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: unknown[] }>(`/batch/${jobId}/status`);
+    return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: { media_id: string; filename: string; status: string; progress: number; error?: string; output_filename?: string }[] }>(`/batch/${jobId}/status`);
   }
 
   // Presets
