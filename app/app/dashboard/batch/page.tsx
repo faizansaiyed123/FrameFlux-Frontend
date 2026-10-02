@@ -82,7 +82,7 @@ export default function BatchPage() {
         total: result.total_items,
         completed: 0,
         failed: 0,
-        results: result.results.map(r => ({ ...r, status: 'queued', progress: 0 })),
+        results: result.results.map((r) => ({ ...r, status: 'queued', progress: 0 })),
       });
       setMediaIds([]);
     } catch {
