@@ -457,8 +457,8 @@ export default function MediaPage() {
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  <Button type="button" variant="outline" size="sm" onClick={handlePauseUpload} disabled={uploadPaused || !uploaderRef.current} aria-label="Pause Upload"><Pause className="mr-1 h-3.5 w-3.5" />Pause</Button>
-                  <Button type="button" variant="outline" size="sm" onClick={handleResumeUpload} disabled={!uploadPaused || !uploaderRef.current} aria-label="Resume Upload"><Play className="mr-1 h-3.5 w-3.5" />Resume</Button>
+                  <Button type="button" variant="outline" size="sm" onClick={handlePauseUpload} disabled={uploadPaused || !uploading} aria-label="Pause Upload"><Pause className="mr-1 h-3.5 w-3.5" />Pause</Button>
+                  <Button type="button" variant="outline" size="sm" onClick={handleResumeUpload} disabled={!uploadPaused || !uploading} aria-label="Resume Upload"><Play className="mr-1 h-3.5 w-3.5" />Resume</Button>
                   <Button type="button" variant="outline" size="sm" onClick={handleRetryUpload} disabled={failedChunk === null} aria-label="Retry Upload"><RotateCcw className="mr-1 h-3.5 w-3.5" />Retry</Button>
                   <Button type="button" variant="destructive" size="sm" onClick={handleCancelUpload} aria-label="Cancel Upload">Cancel</Button>
                 </div>
