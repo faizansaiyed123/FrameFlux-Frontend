@@ -24,9 +24,11 @@ export default function FavoritesPage() {
     }
   }, []);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    fetchFavorites();
+    const timer = window.setTimeout(() => {
+      void fetchFavorites();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchFavorites]);
 
   const handleRemove = async (mediaId: string) => {
