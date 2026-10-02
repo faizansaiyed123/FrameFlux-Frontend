@@ -19,18 +19,30 @@ export default function NotificationsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [event, setEvent] = useState('');
   const [message, setMessage] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(25);
+  const [totalPages, setTotalPages] = useState(0);
+  const [unreadOnly, setUnreadOnly] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await api.listNotifications();
-      setNotifications(data);
-    } catch {
-      // silent
+      setError(null);
+      const [data, unread] = await Promise.all([
+        api.listNotifications({ page, page_size: pageSize, unread_only: unreadOnly }),
+        api.getUnreadNotificationCount(),
+      ]);
+      setNotifications(data.items);
+      setTotalPages(data.total_pages);
+      setUnreadCount(unread.unread_count);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load notifications');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [page, pageSize, unreadOnly]);
 
   useEffect(() => {
     fetchNotifications();
@@ -39,13 +51,14 @@ export default function NotificationsPage() {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setError(null);
       await api.createNotification({ event, message });
       setDialogOpen(false);
       setEvent('');
       setMessage('');
       fetchNotifications();
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create notification');
     }
   };
 
@@ -53,8 +66,8 @@ export default function NotificationsPage() {
     try {
       await api.markNotificationRead(id);
       fetchNotifications();
-    } catch {
-      // silent
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to mark notification as read');
     }
   };
 
@@ -69,6 +82,8 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-8">
+      {error && <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300">{error}</div>}
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Notifications</h1>
@@ -77,7 +92,8 @@ export default function NotificationsPage() {
         <Button onClick={() => setDialogOpen(true)} className="gap-2">
           <Plus className="h-4 w-4" />
           New Notification
-        </Button>
+            </Button>
+          </div>
       </div>
 
       {notifications.length === 0 ? (
@@ -114,6 +130,16 @@ export default function NotificationsPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-zinc-500">Page {page} of {totalPages}</p>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</Button>
+            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>Next</Button>
+          </div>
         </div>
       )}
 
