@@ -204,7 +204,7 @@ export default function PresetsPage() {
                         </SelectContent>
                       </Select>
                     ) : field.type === 'number' ? (
-                      <Input id={field.key} type="number" step={field.key === 'fps' ? '0.01' : '1'} min="1" value={settings[field.key] || ''} onChange={(e) => handleSettingsChange(field.key, e.target.value ? Number(e.target.value) : undefined)} />
+                      <Input id={field.key} type="number" step={field.key === 'fps' ? '0.01' : '1'} min="1" value={settings[field.key] == null ? '' : String(settings[field.key])} onChange={(e) => handleSettingsChange(field.key, e.target.value ? Number(e.target.value) : undefined)} />
                     ) : (
                       <Input id={field.key} value={settings[field.key] || ''} onChange={(e) => handleSettingsChange(field.key, e.target.value || undefined)} placeholder="Auto" />
                     )}
