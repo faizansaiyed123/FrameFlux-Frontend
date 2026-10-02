@@ -26,9 +26,11 @@ export function MediaInfoSection({ mediaId }: Props) {
     }
   }, [mediaId]);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
-    fetchInfo();
+    const timer = window.setTimeout(() => {
+      void fetchInfo();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchInfo]);
 
   if (loading) {
