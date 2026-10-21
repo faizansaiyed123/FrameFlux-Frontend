@@ -42,7 +42,6 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
       });
       onProcessed();
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }

@@ -69,7 +69,6 @@ export class ResumableUploader {
     const start = index * this.chunkSize;
     const end = Math.min(start + this.chunkSize, this.totalSize);
     const slice = this.file!.slice(start, end);
-    // Ensure the chunk has the correct MIME type (WebKit fix)
     const chunk = new Blob([slice], { type: this.file!.type });
 
     try {

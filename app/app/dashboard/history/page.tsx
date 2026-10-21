@@ -27,7 +27,6 @@ export default function HistoryPage() {
       const data = await api.listHistory();
       setHistory(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }

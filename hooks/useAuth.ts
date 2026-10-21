@@ -52,7 +52,6 @@ export const useAuthStore = create<AuthState>()(
         try {
           await api.logout();
         } catch {
-          // Token may be expired or revoked; clear local state regardless
         } finally {
           api.setToken(null);
           set({ user: null });

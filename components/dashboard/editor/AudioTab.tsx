@@ -226,7 +226,6 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
     if (!syncAudioFile.trim()) { setError('Select an audio file'); return; }
     setError('');
     try {
-      // Create a short preview (5 seconds) for quick feedback
       const data: Parameters<typeof api.syncAudioVideo>[1] = {
         audio_path: syncAudioFile,
         audio_offset: parseFloat(syncOffset) || 0,
@@ -454,7 +453,6 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           </div>
         )}
 
-        {/* Volume Control */}
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <Button onClick={() => setAtoVideoOpen(!atoVideoOpen)} variant="outline" className="w-full justify-start text-xs">
             <Volume2 className="mr-2 h-3.5 w-3.5" />
@@ -496,7 +494,6 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           </div>
         </div>
 
-        {/* Add Audio */}
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <div className="space-y-2">
             <Label htmlFor="addAudioFile" className="text-[10px] text-zinc-500">Add Audio</Label>
@@ -514,7 +511,6 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           </div>
         </div>
 
-        {/* Replace Audio */}
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <Button onClick={() => setAtoVideoOpen(!atoVideoOpen)} variant="outline" className="w-full justify-start text-xs">
             <RotateCcw className="mr-2 h-3.5 w-3.5" />
@@ -541,7 +537,6 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           </div>
         </div>
 
-        {/* Sync Audio Video */}
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <Button onClick={() => setSyncAudioOpen(!syncAudioOpen)} variant="outline" className="w-full justify-start text-xs">
             <Link className="mr-2 h-3.5 w-3.5" />

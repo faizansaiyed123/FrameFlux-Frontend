@@ -35,7 +35,6 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
   useEffect(() => {
     let objectUrl: string | null = null;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setError('');
 
     api.getMediaFile(media.id)
@@ -132,7 +131,6 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
       <div className="flex flex-1 overflow-hidden">
         <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-8">
           {imageUrl ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={imageUrl}
               alt={media.original_filename}

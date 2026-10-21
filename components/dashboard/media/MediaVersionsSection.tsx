@@ -57,7 +57,6 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       const data = await api.listMediaVersions(mediaId);
       setVersions(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }
@@ -76,7 +75,6 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       const filename = version.original_filename || version.stored_filename;
       downloadBlob(blob, filename);
     } catch {
-      // silent
     }
   };
 
@@ -86,7 +84,6 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       await api.restoreMediaVersion(mediaId, version.id);
       fetchVersions();
     } catch {
-      // silent
     }
   };
 
@@ -96,7 +93,6 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       await api.deleteMediaVersion(mediaId, version.id);
       fetchVersions();
     } catch {
-      // silent
     }
   };
 
@@ -107,15 +103,12 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       setComparison(result);
       setCompareMode(true);
     } catch {
-      // silent
     } finally {
       setComparisonLoading(false);
     }
   };
 
   const handleCompareWithCurrent = async (version: MediaVersion) => {
-    // Compare with current media (would need current media ID)
-    // This is a placeholder - would need the current media's version ID
   };
 
   const openDetails = (version: MediaVersion) => {

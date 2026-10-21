@@ -64,7 +64,6 @@ class ApiClient {
     return response.json();
   }
 
-  // Auth
   async signup(data: { email: string; password: string; full_name?: string }) {
     return this.request<{ access_token: string; token_type: string; expires_in: number }>('/auth/signup', {
       method: 'POST',
@@ -133,7 +132,6 @@ class ApiClient {
     });
   }
 
-  // Projects
   async listProjects() {
     return this.request<{
       id: string;
@@ -259,7 +257,6 @@ class ApiClient {
     }[]>(`/projects/${projectId}/history`);
   }
 
-  // Dashboard
   async getDashboardOverview() {
     return this.request<{
       total_projects: number;
@@ -304,7 +301,6 @@ class ApiClient {
     return this.request<unknown[]>(`/dashboard/recent-processing${limit ? `?limit=${limit}` : ''}`);
   }
 
-  // Media
   async uploadMedia(file: File) {
     const formData = new FormData();
     formData.append('file', file);
@@ -739,7 +735,6 @@ class ApiClient {
     );
   }
 
-  // Resumable upload
   async initResumableUpload(data: { original_filename: string; total_size: number; chunk_size?: number }) {
     return this.request<{ upload_id: string }>('/media/resumable/init', {
       method: 'POST',
@@ -801,7 +796,6 @@ class ApiClient {
     }>(`/media/resumable/${uploadId}/finalize`, { method: 'POST' });
   }
 
-  // Video Control
   async adjustVideo(id: string, data: {
     brightness?: number;
     contrast?: number;
@@ -852,7 +846,6 @@ class ApiClient {
     });
   }
 
-  // Audio Processing
   async extractAudio(mediaId: string, data: {
     format?: string;
     bitrate?: string;
@@ -1015,7 +1008,6 @@ class ApiClient {
     return response.blob();
   }
 
-  // Thumbnails
   async getThumbnail(mediaId: string, timestamp?: number, width?: number, height?: number, fmt?: string) {
     const query = new URLSearchParams();
     if (timestamp !== undefined) query.set('timestamp', String(timestamp));
@@ -1053,7 +1045,6 @@ class ApiClient {
     });
   }
 
-  // Subtitles
   async burnSubtitles(mediaId: string, subtitlePath: string, data: {
     font_size?: number;
     font_color?: string;
@@ -1169,7 +1160,6 @@ class ApiClient {
     return response.blob();
   }
 
-  // Preview
   async generateVideoPreview(mediaId: string, data: {
     duration?: number;
     start?: number;
@@ -1229,7 +1219,6 @@ class ApiClient {
     return response.blob();
   }
 
-  // GIF Processing
   async generateGif(mediaId: string, data: {
     start?: number;
     end?: number;
@@ -1254,7 +1243,6 @@ class ApiClient {
     return response.blob();
   }
 
-  // Media Info
   async getMediaInfo(mediaId: string) {
     return this.request<{
       file_name: string;
@@ -1276,7 +1264,6 @@ class ApiClient {
     }>(`/media-info/${mediaId}`);
   }
 
-  // Batch Processing
   async batchUpload(files: string[]) {
     return this.request<{ job_id: string; total_files: number; status: string }>('/batch/upload', {
       method: 'POST',
@@ -1295,7 +1282,6 @@ class ApiClient {
     return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: { media_id: string; filename: string; status: string; progress: number; error?: string; output_filename?: string }[] }>(`/batch/${jobId}/status`);
   }
 
-  // Presets
   async listPresets() {
     return this.request<{
       id: string;
@@ -1345,7 +1331,6 @@ class ApiClient {
     return this.request<void>(`/presets/${presetId}`, { method: 'DELETE' });
   }
 
-  // Workflows
   async listWorkflows() {
     return this.request<{
       id: string;
@@ -1417,7 +1402,6 @@ class ApiClient {
     }>(`/workflows/${id}/run?media_id=${mediaId}`, { method: 'POST' });
   }
 
-  // Media Versions
   async listMediaVersions(mediaId: string) {
     return this.request<{
       id: string;
@@ -1474,7 +1458,6 @@ class ApiClient {
     }>(`/media/${mediaId}/versions/${versionId}/restore`, { method: 'POST' });
   }
 
-  // Comparisons
   async compareMedia(mediaAId: string, mediaBId: string) {
     return this.request<{
       media_a_id: string;
@@ -1488,7 +1471,6 @@ class ApiClient {
     }>(`/comparisons/${mediaAId}/${mediaBId}`);
   }
 
-  // Sharing
   async createShare(data: { media_id: string; password?: string; expires_in_hours?: number; allow_download?: boolean; allowed_domains?: string }) {
     return this.request<{
       id: string;
@@ -1562,7 +1544,6 @@ class ApiClient {
     }>(`/sharing/${shareId}/disable`, { method: 'POST' });
   }
 
-  // Processing History
   async listHistory() {
     return this.request<{
       id: string;
@@ -1593,7 +1574,6 @@ class ApiClient {
     });
   }
 
-  // Storage
   async getStorageUsage() {
     return this.request<{
       total_size: number;
@@ -1610,7 +1590,6 @@ class ApiClient {
     return this.request<{ folder: string; total_size: number; count: number }[]>('/storage/usage/by-folder');
   }
 
-  // Search
   async searchMedia(params: {
     q?: string;
     media_type?: string;
@@ -1646,7 +1625,6 @@ class ApiClient {
     }[]>(`/search/media${qs ? `?${qs}` : ''}`);
   }
 
-  // Notifications
   async listNotifications(params?: {
     page?: number;
     page_size?: number;
@@ -1704,7 +1682,6 @@ class ApiClient {
     }>(`/notifications/${notificationId}/read`, { method: 'POST' });
   }
 
-  // UI Preferences
   async listPreferences() {
     return this.request<{
       id: string;
@@ -1726,7 +1703,6 @@ class ApiClient {
     });
   }
 
-  // Favorites
   async listFavorites() {
     return this.request<{
       id: string;
@@ -1752,7 +1728,6 @@ class ApiClient {
     return this.request<void>(`/favorites/${mediaId}`, { method: 'DELETE' });
   }
 
-  // Quick Actions
   async getQuickActions() {
     return this.request<{
       video: { id: string; label: string; icon: string }[];
@@ -1769,7 +1744,6 @@ class ApiClient {
     }>(`/quick-actions/${mediaId}/execute?action_id=${encodeURIComponent(actionId)}`, { method: 'POST' });
   }
 
-  // Jobs
   async listJobs() {
     return this.request<{
       job_id: string;

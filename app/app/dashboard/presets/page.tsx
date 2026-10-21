@@ -47,7 +47,6 @@ export default function PresetsPage() {
       const data = await api.listPresets();
       setPresets(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }
@@ -104,7 +103,6 @@ export default function PresetsPage() {
       setDialogOpen(false);
       fetchPresets();
     } catch {
-      // silent
     }
   };
 
@@ -114,7 +112,6 @@ export default function PresetsPage() {
       await api.deletePreset(id);
       fetchPresets();
     } catch {
-      // silent
     }
   };
 

@@ -54,7 +54,6 @@ export default function BatchPage() {
       const data = await api.listMedia({ search: mediaSearch });
       setAvailableMedia(data);
     } catch {
-      // silent
     } finally {
       setMediaLoading(false);
     }
@@ -86,7 +85,6 @@ export default function BatchPage() {
       });
       setMediaIds([]);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }
@@ -99,7 +97,6 @@ export default function BatchPage() {
       const status = await api.getBatchStatus(job.job_id);
       setJob({ ...job, ...status });
     } catch {
-      // silent
     } finally {
       setJobLoading(false);
     }

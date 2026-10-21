@@ -54,7 +54,6 @@ export default function ComparisonsPage() {
       const data = await api.listMedia();
       setMediaList(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }
@@ -74,7 +73,6 @@ export default function ComparisonsPage() {
       const result = await api.compareMedia(mediaA, mediaB);
       setComparison(result);
     } catch {
-      // silent
     } finally {
       setComparing(false);
     }

@@ -64,7 +64,6 @@ export default function SettingsPage() {
       if (themePref) setTheme(themePref.value);
       if (langPref) setLanguage(langPref.value);
     } catch {
-      // silent
     } finally {
       setPrefsLoading(false);
     }

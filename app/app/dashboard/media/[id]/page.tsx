@@ -128,7 +128,6 @@ export default function MediaDetailPage() {
       const data = await api.listMediaVersions(mediaId);
       setVersions(data);
     } catch {
-      // silent
     } finally {
       setVersionsLoading(false);
     }
@@ -140,7 +139,6 @@ export default function MediaDetailPage() {
   }, [fetchMedia, fetchVersions]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMedia();
   }, [fetchMedia]);
 
@@ -154,7 +152,6 @@ export default function MediaDetailPage() {
         const progressData = await api.getMediaProgress(mediaId);
         setStatus(progressData);
       } catch {
-        // silent poll failure
       }
     }, 2000);
 
@@ -167,7 +164,6 @@ export default function MediaDetailPage() {
       const data = await api.listShares();
       setShares(data.filter(s => s.media_id === mediaId));
     } catch {
-      // silent
     } finally {
       setShareLoading(false);
     }
@@ -241,7 +237,6 @@ export default function MediaDetailPage() {
       setShareAllowDownload(true);
       fetchShares();
     } catch {
-      // silent
     }
   };
 
@@ -256,7 +251,6 @@ export default function MediaDetailPage() {
       await navigator.clipboard.writeText(embed.embed_code);
       setSelectedShareEmbed(embed);
     } catch {
-      // silent
     }
   };
 
@@ -265,7 +259,6 @@ export default function MediaDetailPage() {
       await api.disableShare(shareId);
       fetchShares();
     } catch {
-      // silent
     }
   };
 
@@ -274,7 +267,6 @@ export default function MediaDetailPage() {
       await api.deleteShare(shareId);
       fetchShares();
     } catch {
-      // silent
     }
   };
 
@@ -508,7 +500,6 @@ export default function MediaDetailPage() {
         </TabsContent>
         <TabsContent value="tools" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Compression */}
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-base">Compress Media</CardTitle>
@@ -518,7 +509,6 @@ export default function MediaDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Audio Extraction */}
             {media.mime_type.startsWith('video/') && (
               <Card className="border-zinc-200 dark:border-zinc-800">
                 <CardHeader>
@@ -530,7 +520,6 @@ export default function MediaDetailPage() {
               </Card>
             )}
 
-            {/* Thumbnail */}
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-base">Generate Thumbnail</CardTitle>
@@ -540,7 +529,6 @@ export default function MediaDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Preview */}
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-base">Generate Preview</CardTitle>
@@ -550,7 +538,6 @@ export default function MediaDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Subtitles */}
             {media.mime_type.startsWith('video/') && (
               <Card className="border-zinc-200 dark:border-zinc-800">
                 <CardHeader>
@@ -562,7 +549,6 @@ export default function MediaDetailPage() {
               </Card>
             )}
 
-            {/* GIF Generation */}
             {media.mime_type.startsWith('video/') && (
               <Card className="border-zinc-200 dark:border-zinc-800">
                 <CardHeader>
@@ -574,7 +560,6 @@ export default function MediaDetailPage() {
               </Card>
             )}
 
-            {/* Media Info */}
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardHeader>
                 <CardTitle className="text-base">Media Information</CardTitle>

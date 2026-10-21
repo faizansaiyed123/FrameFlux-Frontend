@@ -45,7 +45,6 @@ export function AudioExtractForm({ mediaId }: Props) {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }

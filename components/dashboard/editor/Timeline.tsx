@@ -133,12 +133,10 @@ export function Timeline({ clips, selectedClipId, currentTime, duration, onSelec
         onClick={handleTimelineClick}
       >
         <div className="relative h-full min-w-full" style={{ width: timelineWidth }}>
-          {/* Time ruler background */}
           <div className="absolute top-0 left-0 right-0 h-6 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
             {generateTimeMarkers()}
           </div>
 
-          {/* Track area */}
           <div className="absolute top-6 left-0 right-0 bottom-0">
             {clips.map((clip) => {
               const left = (clip.start / duration) * timelineWidth;
@@ -178,7 +176,6 @@ export function Timeline({ clips, selectedClipId, currentTime, duration, onSelec
               );
             })}
 
-            {/* Playhead */}
             <div
               className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20 pointer-events-none"
               style={{ left: playheadPosition }}

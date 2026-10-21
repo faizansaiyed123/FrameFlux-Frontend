@@ -94,7 +94,6 @@ export default function WorkflowsPage() {
   const [description, setDescription] = useState('');
   const [operations, setOperations] = useState<WorkflowOperation[]>([]);
 
-  // For run workflow dialog
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [runWorkflowId, setRunWorkflowId] = useState<string | null>(null);
   const [runMediaId, setRunMediaId] = useState('');
@@ -107,7 +106,6 @@ export default function WorkflowsPage() {
       const data = await api.listWorkflows();
       setWorkflows(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }
@@ -152,7 +150,6 @@ export default function WorkflowsPage() {
       setDialogOpen(false);
       fetchWorkflows();
     } catch {
-      // silent
     }
   };
 
@@ -162,7 +159,6 @@ export default function WorkflowsPage() {
       await api.deleteWorkflow(id);
       fetchWorkflows();
     } catch {
-      // silent
     }
   };
 
@@ -173,7 +169,6 @@ export default function WorkflowsPage() {
       const data = await api.listMedia();
       setRunMediaList(data.map(m => ({ id: m.id, original_filename: m.original_filename })));
     } catch {
-      // silent
     } finally {
       setRunMediaLoading(false);
     }
@@ -188,7 +183,6 @@ export default function WorkflowsPage() {
       alert('Workflow queued successfully');
       setRunDialogOpen(false);
     } catch {
-      // silent
     } finally {
       setRunning(null);
     }

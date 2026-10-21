@@ -33,7 +33,6 @@ export default function StoragePage() {
       setByType(typeData);
       setByFolder(folderData);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }

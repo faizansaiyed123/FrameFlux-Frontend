@@ -32,7 +32,6 @@ export default function QuickActionsPage() {
       const data = await api.getQuickActions();
       setQuickActions(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }

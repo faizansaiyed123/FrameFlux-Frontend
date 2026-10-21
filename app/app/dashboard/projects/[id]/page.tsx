@@ -84,12 +84,10 @@ export default function ProjectDetailPage() {
       setWorkflows(workflowsData);
       setHistory(historyData);
     } catch {
-      // silent
     }
   }, [projectId]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProject();
   }, [fetchProject]);
 
@@ -121,7 +119,6 @@ export default function ProjectDetailPage() {
       setFolderName('');
       fetchExtras();
     } catch {
-      // silent
     }
   };
 

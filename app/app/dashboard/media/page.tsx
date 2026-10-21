@@ -161,7 +161,6 @@ export default function MediaPage() {
   }, [search, mediaType, folder, tag]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchMedia();
   }, [fetchMedia]);
 

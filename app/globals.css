@@ -98,8 +98,8 @@ html { scroll-behavior: smooth; }
 body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
 ::selection { background: rgba(99, 102, 241, 0.18); }
 
-/* Native buttons get a visible soft-primary treatment so custom controls are
-   recognizable as actions even when they do not use the shared Button API. */
+
+
 button:not([data-slot]) {
   cursor: pointer;
   transition: border-color .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;

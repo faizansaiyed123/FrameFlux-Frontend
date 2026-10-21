@@ -27,7 +27,6 @@ export default async function globalSetup() {
   const email = uniqueEmail();
   await signupAndLogin(page, email);
   
-  // Save storage state
   await page.context().storageState({ path: AUTH_FILE });
   
   await browser.close();

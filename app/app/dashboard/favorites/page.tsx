@@ -18,7 +18,6 @@ export default function FavoritesPage() {
       const data = await api.listFavorites();
       setFavorites(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }
@@ -36,7 +35,6 @@ export default function FavoritesPage() {
       await api.removeFavorite(mediaId);
       fetchFavorites();
     } catch {
-      // silent
     }
   };
 

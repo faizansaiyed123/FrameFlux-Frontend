@@ -20,7 +20,6 @@ export function MediaInfoSection({ mediaId }: Props) {
       const data = await api.getMediaInfo(mediaId);
       setInfo(data);
     } catch {
-      // silent
     } finally {
       setLoading(false);
     }

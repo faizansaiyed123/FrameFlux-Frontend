@@ -57,7 +57,6 @@ export default function ProjectsPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchProjects();
   }, [fetchProjects]);
 
@@ -228,7 +227,6 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      {/* Create Project Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
           <DialogHeader>
@@ -275,7 +273,6 @@ export default function ProjectsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Project Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
@@ -320,7 +317,6 @@ export default function ProjectsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Project Dialog */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>

@@ -77,7 +77,6 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
     setSubtitlePath(file.name);
     setSubtitleUploading(true);
     
-    // Upload subtitle file to backend
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -106,7 +105,6 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
       if (action === 'burn') {
         if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
         const version = await api.burnSubtitles(mediaId, subtitlePath, { font_size: parseInt(fontSize), font_color: fontColor, position });
-        // Version created successfully, refresh versions
         if (onProcessed) onProcessed();
       } else if (action === 'mux') {
         if (!subtitlePath.trim()) { setError('Subtitle path required'); return; }
