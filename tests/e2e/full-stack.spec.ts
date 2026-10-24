@@ -398,7 +398,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   const favoriteAdd = await apiJson(request, 'POST', `${API}/favorites`, headers, { media_id: mediaId });
   expect(favoriteAdd.ok()).toBeTruthy();
   await page.reload();
-  await expect(page.getByText('sample.mp4')).toBeVisible();
+  await expect(page.getByText(`Media ID: ${mediaId}`, { exact: true })).toBeVisible();
   await screenshot(page, '44-favorite-readback.png');
   const favoriteDelete = await apiJson(request, 'DELETE', `${API}/favorites/${mediaId}`, headers);
   expect(favoriteDelete.ok()).toBeTruthy();
