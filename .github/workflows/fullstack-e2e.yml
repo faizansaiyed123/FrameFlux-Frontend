@@ -46,8 +46,9 @@ jobs:
           API_BASE_URL: http://127.0.0.1:8000
           STORAGE_BASE_URL: http://127.0.0.1:8000
           ENVIRONMENT: test
-          DEBUG: "false"
+          DEBUG: "true"
         run: |
+          mkdir -p "$GITHUB_WORKSPACE/test-results"
           cat > .env <<'EOF'
           POSTGRES_PASSWORD=test
           DATABASE_URL=postgresql+asyncpg://frameflux:test@postgres:5432/frameflux
@@ -57,14 +58,26 @@ jobs:
           API_BASE_URL=http://127.0.0.1:8000
           STORAGE_BASE_URL=http://127.0.0.1:8000
           ENVIRONMENT=test
-          DEBUG=false
+          DEBUG=true
           EOF
           docker compose up -d --build
+          docker compose ps
+          ok=0
           for i in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:8000/health >/tmp/health.json; then cat /tmp/health.json; break; fi
+            if curl -fsS http://127.0.0.1:8000/health >/tmp/health.json; then
+              cat /tmp/health.json
+              ok=1
+              break
+            fi
             sleep 2
           done
-          curl -fsS http://127.0.0.1:8000/health
+          if [ "$ok" -ne 1 ]; then
+            echo "Backend failed readiness; dumping service state and logs"
+            docker compose ps
+            docker compose logs --no-color --tail=200 backend worker postgres redis | tee "$GITHUB_WORKSPACE/test-results/backend-startup.log"
+            exit 1
+          fi
+          curl -fsS http://127.0.0.1:8000/health | tee "$GITHUB_WORKSPACE/test-results/health.json"
 
       - name: Run backend database-backed test suite
         working-directory: backend
