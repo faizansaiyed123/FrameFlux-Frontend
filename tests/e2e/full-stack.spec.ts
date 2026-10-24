@@ -587,7 +587,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
 test('real login/logout and final database cleanup evidence', async ({ page, request }) => {
   const creds = readCreds();
   const accessToken = readState().accessToken;
-  expect(accessToken).toBeTruthy();
+  if (!accessToken) throw new Error('Missing persisted access token from the authenticated browser flow');
   await page.goto('/auth/login');
   await page.evaluate((token) => localStorage.setItem('access_token', token), accessToken);
   await page.goto('/app/dashboard');
