@@ -107,6 +107,8 @@ test('public, authentication, workspace inventory and account settings', async (
   await screenshot(page, '02-public-home.png');
 
   await login(page);
+  const authenticatedToken = await page.evaluate(() => localStorage.getItem('access_token'));
+  expect(authenticatedToken).toBeTruthy();
   await screenshot(page, '03-dashboard-live.png');
 
   const pages: Array<[string, string]> = [
@@ -205,6 +207,7 @@ test('public, authentication, workspace inventory and account settings', async (
     await page.getByRole('button', { name: 'Cancel' }).click();
   }
 
+  writeState({ accessToken: authenticatedToken as string });
   fs.writeFileSync(path.join(EVIDENCE, 'api-trace-workspace.json'), JSON.stringify(apiEvents, null, 2));
 });
 
@@ -583,7 +586,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
 test('real login/logout and final database cleanup evidence', async ({ page, request }) => {
   const creds = readCreds();
   await page.goto('/app/dashboard');
-  const accessToken = await page.evaluate(() => localStorage.getItem('access_token'));
+  const accessToken = readState().accessToken;
   expect(accessToken).toBeTruthy();
   const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
   const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
