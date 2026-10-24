@@ -281,11 +281,11 @@ test('project CRUD, folders and real resumable media upload', async ({ page, req
   expect(projectDetailMedia.ok()).toBeTruthy();
 
   await page.goto('/app/dashboard/projects');
-  const projectCard = page.getByText(projectName).first().locator('..').locator('..');
-  await projectCard.getByRole('button', { name: /More options/i }).click().catch(() => {});
-  await page.getByRole('menuitem', { name: 'Edit' }).click().catch(() => {});
+  await page.getByRole('button', { name: 'More options' }).first().click();
+  await page.getByRole('menuitem', { name: 'Edit' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByLabel('Name').fill(`${projectName} Updated`);
-  await page.getByRole('button', { name: 'Save Changes' }).click().catch(() => {});
+  await page.getByRole('button', { name: 'Save Changes', exact: true }).click();
   const projectAfter = await apiJson(request, 'GET', `${API}/projects/${project.id}`, headers);
   expect(projectAfter.ok()).toBeTruthy();
   expect((await projectAfter.json()).name).toBe(`${projectName} Updated`);
