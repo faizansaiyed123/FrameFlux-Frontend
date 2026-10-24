@@ -181,7 +181,10 @@ test('public, authentication, workspace inventory and account settings', async (
 
   if (preset?.id) {
     const row = page.getByText('E2E Preset').first().locator('..');
-    await row.getByRole('button').last().click().catch(() => {});
+    await row.getByRole('button').nth(1).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Edit Preset')).toBeVisible();
+    await page.getByRole('button', { name: 'Cancel' }).click();
   }
 
   fs.writeFileSync(path.join(EVIDENCE, 'api-trace-workspace.json'), JSON.stringify(apiEvents, null, 2));
