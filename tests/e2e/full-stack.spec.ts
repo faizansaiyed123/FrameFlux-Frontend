@@ -601,7 +601,14 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
   const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
   const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
   expect(authenticatedMe.ok()).toBeTruthy();
-  expect((await authenticatedMe.json()).email).toBe(creds.email);
+  const userData = await authenticatedMe.json();
+  expect(userData.email).toBe(creds.email);
+  await page.evaluate(({ token, user }) => {
+    localStorage.setItem('access_token', token);
+    localStorage.setItem('frameflux-auth', JSON.stringify({ state: { user }, version: 0 }));
+  }, { token: accessToken as string, user: userData });
+  await page.reload();
+  await expect(page.locator('aside button').first()).toBeVisible({ timeout: 20_000 });
   await screenshot(page, '49-authenticated-final-state.png');
   const state = readState();
 
