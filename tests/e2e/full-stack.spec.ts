@@ -198,7 +198,7 @@ test('public, authentication, workspace inventory and account settings', async (
   await screenshot(page, '20-preset-created.png');
 
   if (preset?.id) {
-    const row = page.getByText('E2E Preset').first().locator('..');
+    const row = page.getByText('E2E Preset').first().locator('..').locator('..');
     await row.getByRole('button').nth(1).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await expect(page.getByRole('dialog').getByText('Edit Preset')).toBeVisible();
