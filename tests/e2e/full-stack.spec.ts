@@ -586,8 +586,11 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
 
 test('real login/logout and final database cleanup evidence', async ({ page, request }) => {
   const creds = readCreds();
-  await page.goto('/app/dashboard');
   const accessToken = readState().accessToken;
+  expect(accessToken).toBeTruthy();
+  await page.goto('/auth/login');
+  await page.evaluate((token) => localStorage.setItem('access_token', token), accessToken);
+  await page.goto('/app/dashboard');
   expect(accessToken).toBeTruthy();
   const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
   const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
