@@ -483,7 +483,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   expect(audioConvert.ok()).toBeTruthy();
   const audioExtract = await request.get(`${API}/audio/${audioId}/extract?format=wav&quality=medium`, { headers });
   expect(audioExtract.ok()).toBeTruthy();
-  const audioVolume = await request.post(`${API}/audio/${audioId}/volume?volume=0.8&fade_in=0.1&fade_out=0.1`, { headers });
+  const audioVolume = await request.post(`${API}/audio/${mediaId}/volume?volume=0.8&fade_in=0.1&fade_out=0.1`, { headers });
   expect(audioVolume.ok()).toBeTruthy();
   const audioEdit = await request.post(`${API}/audio/${audioId}/edit`, { headers, data: { operation: 'trim', start: 0, end: 1 } });
   expect(audioEdit.ok()).toBeTruthy();
