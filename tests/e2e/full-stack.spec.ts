@@ -166,7 +166,11 @@ test('public, authentication, workspace inventory and account settings', async (
   const restoredHeaders = { Authorization: `Bearer ${temporaryToken}`, 'Content-Type': 'application/json' };
   const restorePassword = await request.post(`${API}/auth/change-password`, { headers: restoredHeaders, data: { current_password: temporaryPassword, new_password: readCreds().password } });
   expect(restorePassword.ok()).toBeTruthy();
+  const freshSession = await request.post(`${API}/auth/login`, { data: { email: readCreds().email, password: readCreds().password } });
+  expect(freshSession.ok()).toBeTruthy();
+  const freshAccessToken = (await freshSession.json()).access_token as string;
   await screenshot(page, '18-password-reset-readback.png');
+  writeState({ accessToken: freshAccessToken });
 
   const preferenceSelects = page.locator('button[role="combobox"]');
   if (await preferenceSelects.count() >= 2) {
