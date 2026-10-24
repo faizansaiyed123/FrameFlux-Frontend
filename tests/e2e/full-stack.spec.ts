@@ -153,7 +153,7 @@ test('public, authentication, workspace inventory and account settings', async (
   }
 
   await page.goto('/app/dashboard/notifications');
-  await page.getByRole('button', { name: /Create Notification/i }).click();
+  await page.getByRole('button', { name: /New Notification/i }).click();
   await page.getByLabel('Event').fill('e2e.fullstack');
   await page.getByLabel('Message').fill('Real notification created through the UI.');
   await page.getByRole('button', { name: 'Create' }).click();
@@ -167,7 +167,7 @@ test('public, authentication, workspace inventory and account settings', async (
   await screenshot(page, '19-notification-created.png');
 
   await page.goto('/app/dashboard/presets');
-  await page.getByRole('button', { name: /Create Preset/i }).click();
+  await page.getByRole('button', { name: /New Preset/i }).click();
   await page.getByLabel('Name').fill('E2E Preset');
   await page.getByLabel('Description').fill('Created from the live UI against PostgreSQL.');
   await page.getByRole('button', { name: 'Create' }).click();
