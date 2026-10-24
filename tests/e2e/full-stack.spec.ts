@@ -623,14 +623,14 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
   await expect(page.evaluate(() => localStorage.getItem('access_token'))).resolves.toBeNull();
   await screenshot(page, '50-logged-out.png');
 
-  // Database-backed verification that the project and media records can be retrieved while they still exist.
+  // After logout the old bearer token must no longer authorize protected API access.
   if (state.projectId) {
-    const project = await request.get(`${API}/projects/${state.projectId}`, { headers });
-    expect(project.ok()).toBeTruthy();
+    const projectAfterLogout = await request.get(`${API}/projects/${state.projectId}`, { headers });
+    expect(projectAfterLogout.status()).toBe(401);
   }
   if (state.mediaId) {
-    const media = await request.get(`${API}/media/${state.mediaId}`, { headers });
-    expect(media.ok()).toBeTruthy();
+    const mediaAfterLogout = await request.get(`${API}/media/${state.mediaId}`, { headers });
+    expect(mediaAfterLogout.status()).toBe(401);
   }
 
   fs.writeFileSync(path.join(EVIDENCE, 'final-state.json'), JSON.stringify({
