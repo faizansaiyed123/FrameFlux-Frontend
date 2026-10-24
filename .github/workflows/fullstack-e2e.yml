@@ -68,7 +68,9 @@ jobs:
 
       - name: Run backend database-backed test suite
         working-directory: backend
-        run: docker compose exec -T backend uv run pytest -q
+        run: |
+          docker cp tests frameflux-backend:/app/tests
+          docker compose exec -T backend uv run pytest -q
 
       - name: Generate real media fixtures
         run: |
