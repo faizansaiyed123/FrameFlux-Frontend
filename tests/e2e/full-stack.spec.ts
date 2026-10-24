@@ -376,7 +376,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   const media2Id = state.media2Id as string;
   const audioId = state.audioId as string;
   const imageId = state.imageId as string;
-  expect(mediaId && media2Id && audioId && imageId).toBeTruthy();
+  expect.soft(mediaId && media2Id && audioId && imageId).toBeTruthy();
 
   // Search, storage, history, jobs and dashboard are all backed by authenticated API reads.
   await page.goto('/app/dashboard/search');
@@ -396,15 +396,15 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
 
   await page.goto('/app/dashboard/favorites');
   const favoriteAdd = await apiJson(request, 'POST', `${API}/favorites`, headers, { media_id: mediaId });
-  expect(favoriteAdd.ok()).toBeTruthy();
+  expect.soft(favoriteAdd.ok()).toBeTruthy();
   await page.reload();
   await expect(page.getByText(`Media ID: ${mediaId}`, { exact: true })).toBeVisible();
   await screenshot(page, '44-favorite-readback.png');
   const favoriteDelete = await apiJson(request, 'DELETE', `${API}/favorites/${mediaId}`, headers);
-  expect(favoriteDelete.ok()).toBeTruthy();
+  expect.soft(favoriteDelete.ok()).toBeTruthy();
 
   const compare = await apiJson(request, 'GET', `${API}/comparisons/${mediaId}/${media2Id}`, headers);
-  expect(compare.ok()).toBeTruthy();
+  expect.soft(compare.ok()).toBeTruthy();
   await page.goto('/app/dashboard/comparisons');
   await screenshot(page, '45-comparison-page.png');
 
@@ -417,32 +417,32 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
     operation: 'generate_thumbnail',
     options: {},
   });
-  expect(batch.ok()).toBeTruthy();
+  expect.soft(batch.ok()).toBeTruthy();
   const batchBody = await batch.json();
   const batchStatus = await apiJson(request, 'GET', `${API}/batch/${batchBody.job_id}/status`, headers);
-  expect(batchStatus.ok()).toBeTruthy();
+  expect.soft(batchStatus.ok()).toBeTruthy();
 
   // Quick actions are read dynamically, then executed with a real media record.
   const quick = await apiJson(request, 'GET', `${API}/quick-actions`, headers);
-  expect(quick.ok()).toBeTruthy();
+  expect.soft(quick.ok()).toBeTruthy();
   const quickBody = await quick.json();
   const firstQuick = quickBody.video?.[0] ?? quickBody.audio?.[0] ?? quickBody.image?.[0];
   if (firstQuick) {
     const quickRun = await apiJson(request, 'POST', `${API}/quick-actions/${mediaId}/execute`, headers, undefined, { action_id: firstQuick.id });
-    expect(quickRun.ok()).toBeTruthy();
+    expect.soft(quickRun.ok()).toBeTruthy();
   }
   await page.goto('/app/dashboard/quick-actions');
   await screenshot(page, '47-quick-action-live.png');
 
   // Notification state transitions.
   const unreadBefore = await apiJson(request, 'GET', `${API}/notifications/unread-count`, headers);
-  expect(unreadBefore.ok()).toBeTruthy();
+  expect.soft(unreadBefore.ok()).toBeTruthy();
   if (state.notificationId) {
     const markRead = await apiJson(request, 'POST', `${API}/notifications/${state.notificationId}/read`, headers);
-    expect(markRead.ok()).toBeTruthy();
+    expect.soft(markRead.ok()).toBeTruthy();
   }
   const readAll = await apiJson(request, 'POST', `${API}/notifications/read-all`, headers);
-  expect(readAll.ok()).toBeTruthy();
+  expect.soft(readAll.ok()).toBeTruthy();
 
   // Metadata, media info and binary preview/file endpoints.
   for (const url of [
@@ -450,7 +450,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
     `${API}/media-info/${mediaId}`,
   ]) {
     const response = await request.get(url, { headers });
-    expect(response.ok()).toBeTruthy();
+    expect.soft(response.ok()).toBeTruthy();
   }
 
   for (const url of [
@@ -461,11 +461,11 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
     `${API}/thumbnails/${mediaId}/set?interval=1&width=160&fmt=jpg`,
   ]) {
     const response = await request.get(url, { headers });
-    expect(response.ok()).toBeTruthy();
+    expect.soft(response.ok()).toBeTruthy();
   }
 
   const gif = await request.post(`${API}/gif/${mediaId}/generate?start=0&duration=1&width=160&fps=6&quality=20`, { headers });
-  expect(gif.ok()).toBeTruthy();
+  expect.soft(gif.ok()).toBeTruthy();
 
   // Video operations.
   for (const [url, body] of [
@@ -475,42 +475,42 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
     [`${API}/video/${mediaId}/reverse`, { output_format: 'mp4' }],
   ] as const) {
     const response = await request.post(url, { headers, data: body });
-    expect(response.ok()).toBeTruthy();
+    expect.soft(response.ok()).toBeTruthy();
   }
 
   // Audio operations against the actual uploaded WAV.
   const audioConvert = await request.post(`${API}/audio/${audioId}/convert`, { headers, data: { format: 'mp3', quality: 'medium' } });
-  expect(audioConvert.ok()).toBeTruthy();
+  expect.soft(audioConvert.ok()).toBeTruthy();
   const audioExtract = await request.get(`${API}/audio/${audioId}/extract?format=wav&quality=medium`, { headers });
-  expect(audioExtract.ok()).toBeTruthy();
+  expect.soft(audioExtract.ok()).toBeTruthy();
   const audioVolume = await request.post(`${API}/audio/${mediaId}/volume?volume=0.8&fade_in=0.1&fade_out=0.1`, { headers });
-  expect(audioVolume.ok()).toBeTruthy();
+  expect.soft(audioVolume.ok()).toBeTruthy();
   const audioEdit = await request.post(`${API}/audio/${audioId}/edit`, { headers, data: { operation: 'trim', start: 0, end: 1 } });
-  expect(audioEdit.ok()).toBeTruthy();
+  expect.soft(audioEdit.ok()).toBeTruthy();
 
   // Image operations against the actual uploaded JPG.
   const imageConvert = await request.post(`${API}/images/${imageId}/convert`, { headers, data: { format: 'png', width: 160, height: 90 } });
-  expect(imageConvert.ok()).toBeTruthy();
+  expect.soft(imageConvert.ok()).toBeTruthy();
   const imageCompress = await request.post(`${API}/images/${imageId}/compress?quality=70&max_width=160&max_height=90`, { headers });
-  expect(imageCompress.ok()).toBeTruthy();
+  expect.soft(imageCompress.ok()).toBeTruthy();
 
   // Thumbnails, effects and transcoding.
   const thumbSelect = await request.post(`${API}/thumbnails/${mediaId}/select?timestamp=0&width=160`, { headers });
-  expect(thumbSelect.ok()).toBeTruthy();
+  expect.soft(thumbSelect.ok()).toBeTruthy();
   const thumbCrop = await request.post(`${API}/thumbnails/${mediaId}/crop?timestamp=0&x=0&y=0&width=80&height=45`, { headers });
-  expect(thumbCrop.ok()).toBeTruthy();
+  expect.soft(thumbCrop.ok()).toBeTruthy();
 
   const effectsList = await request.get(`${API}/effects/${mediaId}/list`, { headers });
-  expect(effectsList.ok(), `effects list status=${effectsList.status()}`).toBeTruthy();
+  expect.soft(effectsList.ok(), `effects list status=${effectsList.status()}`).toBeTruthy();
   const effectsBody = await effectsList.json();
-  expect(effectsBody.effects).toEqual([]);
+  expect.soft(effectsBody.effects).toEqual([]);
   expect(effectsBody.message).toMatch(/configured/i);
   const effectApply = await request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: 'test', parameters: {} } });
-  expect(effectApply.ok()).toBeTruthy();
+  expect.soft(effectApply.ok()).toBeTruthy();
   expect((await effectApply.json()).status).toBe('queued');
 
   const transcode = await request.post(`${API}/transcoding/${mediaId}/transcode`, { headers, data: { format: 'mp4', preserve_aspect_ratio: true, options: {} } });
-  expect(transcode.ok()).toBeTruthy();
+  expect.soft(transcode.ok()).toBeTruthy();
 
   // Subtitle upload + tracks + edit + sync/mux/burn capability.
   const subtitleUpload = await request.post(`${API}/subtitles/upload`, {
@@ -523,52 +523,52 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
       },
     },
   });
-  expect(subtitleUpload.ok()).toBeTruthy();
+  expect.soft(subtitleUpload.ok()).toBeTruthy();
   const subtitleBody = await subtitleUpload.json();
   const subtitlePath = subtitleBody.filename;
   const tracks = await request.get(`${API}/subtitles/${mediaId}/tracks`, { headers });
-  expect(tracks.ok()).toBeTruthy();
+  expect.soft(tracks.ok()).toBeTruthy();
   const subtitleEdit = await request.post(`${API}/subtitles/${mediaId}/edit`, { headers, data: { operation: 'update_text', subtitle_path: subtitlePath, entry_index: 1, text: 'Updated by full-stack E2E' } });
-  expect(subtitleEdit.ok()).toBeTruthy();
+  expect.soft(subtitleEdit.ok()).toBeTruthy();
   const subtitleBurn = await request.post(`${API}/subtitles/${mediaId}/burn?subtitle_path=${encodeURIComponent(subtitlePath)}&font_size=20&position=bottom`, { headers });
-  expect(subtitleBurn.ok()).toBeTruthy();
+  expect.soft(subtitleBurn.ok()).toBeTruthy();
   const subtitleMux = await request.post(`${API}/subtitles/${mediaId}/mux?subtitle_path=${encodeURIComponent(subtitlePath)}&language=en`, { headers });
-  expect(subtitleMux.ok()).toBeTruthy();
+  expect.soft(subtitleMux.ok()).toBeTruthy();
   const subtitleSync = await request.post(`${API}/subtitles/${mediaId}/sync`, { headers, data: { subtitle_path: subtitlePath, offset_seconds: 0, scale: 1 } });
-  expect(subtitleSync.ok()).toBeTruthy();
+  expect.soft(subtitleSync.ok()).toBeTruthy();
 
   // Resumable upload control endpoints were exercised through the UI; direct state calls are checked through a second session.
   const resumableInit = await request.post(`${API}/media/resumable/init`, { headers, data: { original_filename: 'control-test.mp4', total_size: fs.statSync(path.join(FIXTURES, 'sample.mp4')).size, chunk_size: Math.min(1024 * 1024, fs.statSync(path.join(FIXTURES, 'sample.mp4')).size) } });
-  expect(resumableInit.ok()).toBeTruthy();
+  expect.soft(resumableInit.ok()).toBeTruthy();
   const resumable = await resumableInit.json();
-  expect((await request.post(`${API}/media/resumable/${resumable.upload_id}/pause`, { headers })).ok()).toBeTruthy();
-  expect((await request.post(`${API}/media/resumable/${resumable.upload_id}/resume`, { headers })).ok()).toBeTruthy();
-  expect((await request.delete(`${API}/media/resumable/${resumable.upload_id}`, { headers })).ok()).toBeTruthy();
+  expect.soft((await request.post(`${API}/media/resumable/${resumable.upload_id}/pause`, { headers })).ok()).toBeTruthy();
+  expect.soft((await request.post(`${API}/media/resumable/${resumable.upload_id}/resume`, { headers })).ok()).toBeTruthy();
+  expect.soft((await request.delete(`${API}/media/resumable/${resumable.upload_id}`, { headers })).ok()).toBeTruthy();
 
   // Direct export/history/UI preference/storage calls complete the remaining backend capabilities.
   const historyCreate = await request.post(`${API}/history?media_id=${mediaId}&operation=e2e&status=completed`, { headers });
-  expect(historyCreate.ok()).toBeTruthy();
+  expect.soft(historyCreate.ok()).toBeTruthy();
   const historyRead = await request.get(`${API}/history`, { headers });
-  expect(historyRead.ok()).toBeTruthy();
+  expect.soft(historyRead.ok()).toBeTruthy();
 
   const storageUsage = await request.get(`${API}/storage/usage`, { headers });
   const storageType = await request.get(`${API}/storage/usage/by-type`, { headers });
   const storageFolder = await request.get(`${API}/storage/usage/by-folder`, { headers });
-  expect(storageUsage.ok() && storageType.ok() && storageFolder.ok()).toBeTruthy();
+  expect.soft(storageUsage.ok() && storageType.ok() && storageFolder.ok()).toBeTruthy();
 
   const dashboard = await request.get(`${API}/dashboard/overview`, { headers });
-  expect(dashboard.ok()).toBeTruthy();
+  expect.soft(dashboard.ok()).toBeTruthy();
   const recent = await request.get(`${API}/dashboard/recent-processing`, { headers });
-  expect(recent.ok()).toBeTruthy();
+  expect.soft(recent.ok()).toBeTruthy();
 
   // Jobs and live status are real DB/Redis-backed reads.
   const jobs = await request.get(`${API}/jobs`, { headers });
-  expect(jobs.ok()).toBeTruthy();
+  expect.soft(jobs.ok()).toBeTruthy();
   if (state.shareToken) {
     const publicShare = await request.get(`${API}/sharing/${state.shareToken}`, { headers });
-    expect(publicShare.ok()).toBeTruthy();
+    expect.soft(publicShare.ok()).toBeTruthy();
     const embed = await request.get(`${API}/sharing/embed/${state.shareToken}`, { headers });
-    expect(embed.ok()).toBeTruthy();
+    expect.soft(embed.ok()).toBeTruthy();
   }
 
   await page.goto('/app/dashboard/media');
