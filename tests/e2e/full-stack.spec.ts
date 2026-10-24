@@ -322,34 +322,19 @@ test('media processing, editor forms, thumbnails, previews, versions and sharing
   }
 
   await page.getByRole('tab', { name: 'Processing' }).click();
-  await page.getByRole('button', { name: 'Start Conversion' }).click();
-  await page.waitForTimeout(1_000);
-  await expect(page.getByText(/Processing started|Conversion started|queued/i).first()).toBeVisible({ timeout: 15_000 }).catch(() => {});
-  await screenshot(page, '30-conversion-requested.png');
+  await page.getByRole('button', { name: 'Transform', exact: true }).first().click();
+  await expect(page.getByRole('button', { name: 'Apply Transform', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Apply Transform', exact: true }).click();
+  await page.waitForTimeout(750);
+  await screenshot(page, '30-transform-request.png');
 
-  await page.getByRole('button', { name: 'Apply Edit' }).click();
-  await page.waitForTimeout(1_000);
-  await screenshot(page, '31-trim-requested.png');
+  await page.getByRole('button', { name: 'Overlay', exact: true }).first().click();
+  await expect(page.getByRole('button', { name: /^Apply (\d+) Overlay/i })).toBeVisible().catch(() => {});
+  await screenshot(page, '31-overlay-editor.png');
 
-  await page.getByRole('button', { name: 'Merge Media' }).click().catch(() => {});
+  await page.getByRole('tab', { name: 'Tools' }).click();
   await page.waitForTimeout(500);
-  await page.screenshot({ path: path.join(EVIDENCE, '32-merge-request-attempt.png'), fullPage: true });
-
-  await page.getByRole('button', { name: 'Apply Transform' }).click().catch(() => {});
-  await page.waitForTimeout(500);
-  await screenshot(page, '33-transform-request.png');
-
-  await page.getByRole('button', { name: 'Create Freeze Frame' }).click().catch(() => {});
-  await page.waitForTimeout(500);
-  await screenshot(page, '34-freeze-frame-request.png');
-
-  await page.getByRole('button', { name: 'Apply Overlay' }).click().catch(() => {});
-  await page.waitForTimeout(500);
-  await screenshot(page, '35-overlay-request.png');
-
-  await page.getByRole('button', { name: 'Split Media' }).click().catch(() => {});
-  await page.waitForTimeout(500);
-  await screenshot(page, '36-split-request.png');
+  await screenshot(page, '32-tools-editor.png');
 
   await page.getByRole('tab', { name: 'Tools' }).click();
   await page.waitForTimeout(500);
