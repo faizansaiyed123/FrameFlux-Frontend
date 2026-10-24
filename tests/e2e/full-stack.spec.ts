@@ -360,8 +360,7 @@ test('media processing, editor forms, thumbnails, previews, versions and sharing
   if (share?.id) {
     await apiJson(request, 'POST', `${API}/sharing/${share.id}/disable`, headers);
     const shareAfterDisable = await apiJson(request, 'GET', `${API}/sharing/${share.token}`, headers);
-    expect(shareAfterDisable.ok()).toBeTruthy();
-    expect((await shareAfterDisable.json()).is_active).toBe(false);
+    expect(shareAfterDisable.status()).toBe(404);
   }
 
   const versions = await apiJson(request, 'GET', `${API}/media/${mediaId}/versions`, headers);
