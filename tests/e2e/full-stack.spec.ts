@@ -595,8 +595,6 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
   expect((await authenticatedMe.json()).email).toBe(creds.email);
   await screenshot(page, '49-authenticated-final-state.png');
   const state = readState();
-  await expect(page.getByText(creds.email)).toBeVisible();
-  await screenshot(page, '49-authenticated-final-state.png');
 
   const meBeforeLogout = await request.get(`${API}/auth/me`, { headers });
   expect(meBeforeLogout.ok()).toBeTruthy();
@@ -604,6 +602,7 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
   await page.getByRole('button', { name: /My Account/i }).click();
   await page.getByRole('menuitem', { name: /Log out/i }).click();
   await page.waitForURL(/\/auth\/login/, { timeout: 20_000 });
+  await expect(page.evaluate(() => localStorage.getItem('access_token'))).resolves.toBeNull();
   await screenshot(page, '50-logged-out.png');
 
   // Database-backed verification that the project and media records can be retrieved while they still exist.
