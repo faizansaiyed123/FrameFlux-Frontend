@@ -632,3 +632,163 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
     notificationId: state.notificationId,
   }, null, 2));
 });
+
+
+test('comprehensive authenticated capability matrix and lifecycle read-back', async ({ page, request }) => {
+  const state = readState();
+  const headers = await authHeaders(request);
+  const mediaId = state.mediaId as string;
+  const media2Id = state.media2Id as string;
+  const audioId = state.audioId as string;
+  const imageId = state.imageId as string;
+  const projectId = state.projectId as string;
+  expect(mediaId && media2Id && audioId && imageId && projectId).toBeTruthy();
+
+  const failures: string[] = [];
+  async function check(name: string, fn: () => Promise<APIResponse>, allowed = [200, 201, 202, 204]) {
+    try {
+      const response = await fn();
+      if (!allowed.includes(response.status())) {
+        const body = await response.text();
+        failures.push(`${name}: ${response.status()} ${body.slice(0, 300)}`);
+        return null;
+      }
+      return response;
+    } catch (error) {
+      failures.push(`${name}: ${error instanceof Error ? error.message : String(error)}`);
+      return null;
+    }
+  }
+
+  // Project lifecycle/status/read-only capability endpoints.
+  await check('project-status', () => request.get(`${API}/projects/${projectId}/status`, { headers }));
+  await check('project-workflows', () => request.get(`${API}/projects/${projectId}/workflows`, { headers }));
+  await check('project-history', () => request.get(`${API}/projects/${projectId}/history`, { headers }));
+  const tempProjectResponse = await check('project-create-temp', () => request.post(`${API}/projects`, { headers, data: { name: `E2E Temp Project ${Date.now()}`, description: 'Capability matrix' } }));
+  let tempProjectId: string | undefined;
+  if (tempProjectResponse) tempProjectId = (await tempProjectResponse.json()).id;
+  if (tempProjectId) await check('project-delete-temp', () => request.delete(`${API}/projects/${tempProjectId}`, { headers }), [204]);
+
+  // Preset CRUD beyond the UI create/read flow.
+  const presetResponse = await check('preset-create-api', () => request.post(`${API}/presets`, { headers, data: { name: `E2E API Preset ${Date.now()}`, description: 'API lifecycle', settings: { format: 'mp4', quality: 28 } } }));
+  let tempPresetId: string | undefined;
+  if (presetResponse) tempPresetId = (await presetResponse.json()).id;
+  if (tempPresetId) {
+    await check('preset-update-api', () => request.patch(`${API}/presets/${tempPresetId}`, { headers, data: { description: 'Updated API lifecycle', settings: { format: 'webm', quality: 30 } } }));
+    await check('preset-delete-api', () => request.delete(`${API}/presets/${tempPresetId}`, { headers }), [204]);
+  }
+
+  // Workflow CRUD + run through Redis/ARQ.
+  const workflowResponse = await check('workflow-create-api', () => request.post(`${API}/workflows`, { headers, data: { name: `E2E Workflow ${Date.now()}`, description: 'Capability matrix workflow', operations: [{ type: 'trim', params: { start: 0, end: 1 } }] } }));
+  let workflowId: string | undefined;
+  if (workflowResponse) workflowId = (await workflowResponse.json()).id;
+  if (workflowId) {
+    await check('workflow-list-api', () => request.get(`${API}/workflows`, { headers }));
+    await check('workflow-get-api', () => request.get(`${API}/workflows/${workflowId}`, { headers }));
+    await check('workflow-update-api', () => request.patch(`${API}/workflows/${workflowId}`, { headers, data: { description: 'Updated workflow' } }));
+    await check('workflow-run-api', () => request.post(`${API}/workflows/${workflowId}/run?media_id=${mediaId}`, { headers }));
+    await check('workflow-delete-api', () => request.delete(`${API}/workflows/${workflowId}`, { headers }), [204]);
+  }
+
+  // Media lifecycle: progress, project attach, binary downloads and batch download.
+  await check('media-progress', () => request.get(`${API}/media/${mediaId}/progress`, { headers }));
+  await check('media-file', () => request.get(`${API}/media/${mediaId}/file`, { headers }));
+  await check('media-download-original', () => request.get(`${API}/media/${mediaId}/download?download_type=original`, { headers }));
+  await check('media-download-processed', () => request.get(`${API}/media/${mediaId}/download?download_type=processed`, { headers }));
+  await check('media-attach-project', () => request.patch(`${API}/media/${media2Id}/project/${projectId}`, { headers }));
+  await check('media-batch-download', () => request.post(`${API}/media/batch-download`, { headers, data: { media_ids: [mediaId, media2Id] } }));
+
+  // Remaining media operations that queue against the actual worker.
+  await check('media-compress', () => request.post(`${API}/media/${mediaId}/compress`, { headers, data: { format: 'mp4', quality: 30 } }));
+  await check('media-keep-clips', () => request.post(`${API}/media/${mediaId}/clips/keep`, { headers, data: { clips: [{ start: 0, end: 1 }] } }));
+  await check('media-delete-clips', () => request.post(`${API}/media/${mediaId}/clips/delete`, { headers, data: { clips: [{ start: 1, end: 2 }] } }));
+  await check('media-reorder-clips', () => request.post(`${API}/media/${mediaId}/clips/reorder`, { headers, data: { media_ids: [mediaId, media2Id] } }));
+  await check('media-append-clips', () => request.post(`${API}/media/${mediaId}/clips/append`, { headers, data: { media_ids: [media2Id] } }));
+  await check('media-process-unified', () => request.post(`${API}/media/${mediaId}/process-unified`, { headers, data: { media_id: mediaId, operations: [{ type: 'trim', start: 0, end: 1 }] } }));
+
+  // Export and transcoding endpoints (current backend exposes these as configured queue/capability responses).
+  await check('export-queue', () => request.post(`${API}/export/${mediaId}/export`, { headers, data: { format: 'mp4', quality: 28 } }));
+  await check('export-status', () => request.get(`${API}/export/${mediaId}/status`, { headers }));
+  await check('transcode', () => request.post(`${API}/transcoding/${mediaId}/transcode`, { headers, data: { format: 'mp4', preserve_aspect_ratio: true, options: {} } }));
+  await check('transcode-convert', () => request.post(`${API}/transcoding/${mediaId}/convert`, { headers, data: { format: 'mp4' } }));
+  await check('transcode-compress', () => request.post(`${API}/transcoding/${mediaId}/compress`, { headers, data: { format: 'mp4' } }));
+
+  // Batch upload/process lifecycle.
+  const batchUpload = await check('batch-upload', () => request.post(`${API}/batch/upload`, { headers, data: { files: [`sample.mp4`, `sample-second.mp4`] } }));
+  if (batchUpload) {
+    const body = await batchUpload.json();
+    if (body.job_id) await check('batch-upload-status', () => request.get(`${API}/batch/${body.job_id}/status`, { headers }));
+  }
+
+  // Audio capability matrix using the real uploaded WAV/video assets.
+  await check('audio-batch-extract', () => request.post(`${API}/audio/batch/extract`, { headers, data: { media_ids: [mediaId, media2Id], format: 'mp3', bitrate: '128k' } }));
+  await check('audio-replace', () => request.post(`${API}/audio/${mediaId}/replace-audio?audio_path=${encodeURIComponent((await (await request.get(`${API}/media/${audioId}`, { headers })).json()).stored_filename)}`, { headers }));
+  await check('audio-to-video', () => request.post(`${API}/audio/${audioId}/to-video`, { headers, data: { background_color: '#000000', text: 'FrameFlux E2E', resolution: '320x180', fps: 10, duration: 1, output_format: 'mp4' } }));
+  await check('audio-sync-video', () => request.post(`${API}/audio/${mediaId}/sync-audio`, { headers, data: { audio_path: (await (await request.get(`${API}/media/${audioId}`, { headers })).json()).stored_filename, audio_offset: 0, output_format: 'mp4' } }));
+
+  // Version lifecycle.
+  const versionsResponse = await request.get(`${API}/media/${mediaId}/versions`, { headers });
+  if (versionsResponse.ok()) {
+    const versions = await versionsResponse.json();
+    const version = versions[versions.length - 1];
+    if (version) {
+      await check('media-version-get', () => request.get(`${API}/media/${mediaId}/versions/${version.id}`, { headers }));
+      await check('media-version-download', () => request.get(`${API}/media/${mediaId}/versions/${version.id}/download`, { headers }));
+      await check('media-version-restore', () => request.post(`${API}/media/${mediaId}/versions/${version.id}/restore`, { headers }));
+    }
+  }
+
+  // Sharing public player/stream lifecycle.
+  const publicShareResponse = await check('public-share-create', () => request.post(`${API}/sharing`, { headers, data: { media_id: mediaId, allow_download: true } }));
+  let publicToken: string | undefined, publicShareId: string | undefined;
+  if (publicShareResponse) {
+    const share = await publicShareResponse.json();
+    publicToken = share.token;
+    publicShareId = share.id;
+    await check('share-player', () => request.get(`${API}/sharing/player/${publicToken}`, { headers: { Referer: 'http://127.0.0.1:3000/' } }));
+    await check('share-stream', () => request.get(`${API}/sharing/stream/${publicToken}`, { headers: { Referer: 'http://127.0.0.1:3000/' } }));
+    await check('share-delete', () => request.delete(`${API}/sharing/${publicShareId}`, { headers }), [204]);
+  }
+
+  // Effects are currently capability stubs; verify their real HTTP contract rather than claiming they render an effect.
+  const effects = await check('effects-list', () => request.get(`${API}/effects/${mediaId}/list`, { headers }));
+  if (effects) await check('effects-apply', () => request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: 'test', parameters: {} } }));
+  await check('effects-remove', () => request.delete(`${API}/effects/${mediaId}/remove`, { headers }));
+
+  // Invalid-input coverage on real endpoints.
+  const invalidEdit = await request.post(`${API}/media/${mediaId}/edit`, { headers, data: { operation: 'invalid', start: 1, end: 0 } });
+  if (invalidEdit.status() !== 400 && invalidEdit.status() !== 422) failures.push(`invalid-edit expected 400/422 got ${invalidEdit.status()}`);
+  const missingProject = await request.get(`${API}/projects/00000000-0000-0000-0000-000000000000`, { headers });
+  if (missingProject.status() !== 404) failures.push(`missing-project expected 404 got ${missingProject.status()}`);
+
+  // Real resumable chunk lifecycle with an actual local media file.
+  const fileBytes = fs.readFileSync(path.join(FIXTURES, 'sample.mp4'));
+  const chunkSize = fileBytes.length + 1;
+  const resumableInit = await request.post(`${API}/media/resumable/init`, { headers, data: { original_filename: 'matrix-sample.mp4', total_size: fileBytes.length, chunk_size: chunkSize } });
+  if (!resumableInit.ok()) failures.push(`resumable-init: ${resumableInit.status()}`);
+  else {
+    const uploadId = (await resumableInit.json()).upload_id;
+    const chunkBody = await request.post(`${API}/media/resumable/${uploadId}/chunk/0`, { headers: { Authorization: headers.Authorization }, multipart: { file: { name: 'matrix-sample.mp4', mimeType: 'video/mp4', buffer: fileBytes } } });
+    if (!chunkBody.ok()) failures.push(`resumable-chunk: ${chunkBody.status()}`);
+    const retryBody = await request.post(`${API}/media/resumable/${uploadId}/retry?index=0`, { headers: { Authorization: headers.Authorization }, multipart: { file: { name: 'matrix-sample.mp4', mimeType: 'video/mp4', buffer: fileBytes } } });
+    if (!retryBody.ok()) failures.push(`resumable-retry: ${retryBody.status()}`);
+    const progressBody = await request.get(`${API}/media/uploads/${uploadId}/progress`, { headers });
+    if (!progressBody.ok()) failures.push(`resumable-progress: ${progressBody.status()}`);
+    const pauseBody = await request.post(`${API}/media/resumable/${uploadId}/pause`, { headers });
+    if (!pauseBody.ok()) failures.push(`resumable-pause: ${pauseBody.status()}`);
+    const resumeBody = await request.post(`${API}/media/resumable/${uploadId}/resume`, { headers });
+    if (!resumeBody.ok()) failures.push(`resumable-resume: ${resumeBody.status()}`);
+    const finalizeBody = await request.post(`${API}/media/resumable/${uploadId}/finalize`, { headers });
+    if (!finalizeBody.ok()) failures.push(`resumable-finalize: ${finalizeBody.status()}`);
+    else {
+      const finalized = await finalizeBody.json();
+      await check('resumable-final-media-readback', () => request.get(`${API}/media/${finalized.id}`, { headers }));
+      await check('resumable-final-media-delete', () => request.delete(`${API}/media/${finalized.id}`, { headers }), [204]);
+    }
+  }
+
+  await page.goto('/app/dashboard/media');
+  await screenshot(page, '51-capability-matrix-final.png');
+
+  expect(failures, failures.join('\\n')).toEqual([]);
+});
