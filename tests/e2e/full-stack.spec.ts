@@ -43,7 +43,7 @@ async function login(page: Page) {
   const creds = readCreds();
   await page.goto('/auth/login');
   await page.getByLabel('Email').fill(creds.email);
-  await page.getByLabel('Password').fill(creds.password);
+  await page.getByRole('textbox', { name: 'Password' }).fill(creds.password);
   await page.getByRole('button', { name: 'Sign in' }).click();
   await page.waitForURL(/\/app\/dashboard/, { timeout: 30_000 });
 }
