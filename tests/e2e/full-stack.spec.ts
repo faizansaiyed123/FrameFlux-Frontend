@@ -663,7 +663,7 @@ test('comprehensive authenticated capability matrix and lifecycle read-back', as
   await check('media-keep-clips', () => request.post(`${API}/media/${mediaId}/clips/keep`, { headers, data: { clips: [{ start: 0, end: 1 }] } }));
   await check('media-delete-clips', () => request.post(`${API}/media/${mediaId}/clips/delete`, { headers, data: { clips: [{ start: 1, end: 2 }] } }));
   await check('media-reorder-clips', () => request.post(`${API}/media/${mediaId}/clips/reorder`, { headers, data: { media_ids: [mediaId, media2Id] } }));
-  await check('media-append-clips', () => request.post(`${API}/media/${mediaId}/clips/append`, { headers, data: { media_ids: [media2Id] } }));
+  await check('media-append-clips', () => request.post(`${API}/media/${mediaId}/clips/append`, { headers, data: { media_ids: [mediaId, media2Id] } }));
   await check('media-process-unified', () => request.post(`${API}/media/${mediaId}/process-unified`, { headers, data: { media_id: mediaId, operations: [{ type: 'trim', start: 0, end: 1 }] } }));
 
   // Export and transcoding endpoints (current backend exposes these as configured queue/capability responses).
@@ -744,7 +744,7 @@ test('comprehensive authenticated capability matrix and lifecycle read-back', as
     if (!chunkBody.ok()) failures.push(`resumable-chunk: ${chunkBody.status()}`);
     const retryBody = await request.post(`${API}/media/resumable/${uploadId}/retry?index=0`, { headers: { Authorization: headers.Authorization }, multipart: { file: { name: 'matrix-sample.mp4', mimeType: 'video/mp4', buffer: fileBytes } } });
     if (!retryBody.ok()) failures.push(`resumable-retry: ${retryBody.status()}`);
-    const progressBody = await request.get(`${API}/media/uploads/${uploadId}/progress`, { headers });
+    const progressBody = await request.get(`${API}/media/resumable/${uploadId}/progress`, { headers });
     if (!progressBody.ok()) failures.push(`resumable-progress: ${progressBody.status()}`);
     const pauseBody = await request.post(`${API}/media/resumable/${uploadId}/pause`, { headers });
     if (!pauseBody.ok()) failures.push(`resumable-pause: ${pauseBody.status()}`);
