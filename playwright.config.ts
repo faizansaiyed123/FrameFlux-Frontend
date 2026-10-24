@@ -12,7 +12,6 @@ export default defineConfig({
   globalSetup: path.resolve(__dirname, 'playwright/fullstack-global-setup.ts'),
   use: {
     baseURL: 'http://127.0.0.1:3000',
-    storageState: path.resolve(__dirname, 'playwright/.auth/user.json'),
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
