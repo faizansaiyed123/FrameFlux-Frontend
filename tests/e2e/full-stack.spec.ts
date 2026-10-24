@@ -510,7 +510,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   expect((await effectApply.json()).status).toBe('queued');
 
   const transcode = await request.post(`${API}/transcoding/${mediaId}/transcode`, { headers, data: { format: 'mp4', preserve_aspect_ratio: true, options: {} } });
-  expect.soft(transcode.ok()).toBeTruthy();
+  expect.soft(transcode.ok(), `transcode status=${transcode.status()} body=${(await transcode.text()).slice(0, 300)}`).toBeTruthy();
 
   // Subtitle upload + tracks + edit + sync/mux/burn capability.
   const subtitleUpload = await request.post(`${API}/subtitles/upload`, {
@@ -533,9 +533,9 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   const subtitleBurn = await request.post(`${API}/subtitles/${mediaId}/burn?subtitle_path=${encodeURIComponent(subtitlePath)}&font_size=20&position=bottom`, { headers });
   expect.soft(subtitleBurn.ok()).toBeTruthy();
   const subtitleMux = await request.post(`${API}/subtitles/${mediaId}/mux?subtitle_path=${encodeURIComponent(subtitlePath)}&language=en`, { headers });
-  expect.soft(subtitleMux.ok()).toBeTruthy();
+  expect.soft(subtitleMux.ok(), `subtitle mux status=${subtitleMux.status()} body=${(await subtitleMux.text()).slice(0, 300)}`).toBeTruthy();
   const subtitleSync = await request.post(`${API}/subtitles/${mediaId}/sync`, { headers, data: { subtitle_path: subtitlePath, offset_seconds: 0, scale: 1 } });
-  expect.soft(subtitleSync.ok()).toBeTruthy();
+  expect.soft(subtitleSync.ok(), `subtitle sync status=${subtitleSync.status()} body=${(await subtitleSync.text()).slice(0, 300)}`).toBeTruthy();
 
   // Resumable upload control endpoints were exercised through the UI; direct state calls are checked through a second session.
   const resumableInit = await request.post(`${API}/media/resumable/init`, { headers, data: { original_filename: 'control-test.mp4', total_size: fs.statSync(path.join(FIXTURES, 'sample.mp4')).size, chunk_size: Math.min(1024 * 1024, fs.statSync(path.join(FIXTURES, 'sample.mp4')).size) } });
@@ -565,10 +565,14 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   const jobs = await request.get(`${API}/jobs`, { headers });
   expect.soft(jobs.ok()).toBeTruthy();
   if (state.shareToken) {
-    const publicShare = await request.get(`${API}/sharing/${state.shareToken}`, { headers });
-    expect.soft(publicShare.ok()).toBeTruthy();
-    const embed = await request.get(`${API}/sharing/embed/${state.shareToken}`, { headers });
-    expect.soft(embed.ok()).toBeTruthy();
+    const publicShareCreate = await request.post(`${API}/sharing`, { headers, data: { media_id: mediaId, allow_download: true } });
+    expect(publicShareCreate.ok()).toBeTruthy();
+    const freshShare = await publicShareCreate.json();
+    const publicShare = await request.get(`${API}/sharing/${freshShare.token}`, { headers });
+    expect.soft(publicShare.ok(), `public share status=${publicShare.status()}`).toBeTruthy();
+    const embed = await request.get(`${API}/sharing/embed/${freshShare.token}`, { headers });
+    expect.soft(embed.ok(), `embed status=${embed.status()}`).toBeTruthy();
+    await request.delete(`${API}/sharing/${freshShare.id}`, { headers });
   }
 
   await page.goto('/app/dashboard/media');
