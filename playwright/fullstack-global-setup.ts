@@ -26,7 +26,7 @@ export default async function globalSetup() {
   });
 
   await page.goto('http://127.0.0.1:3000/auth/signup');
-  await page.getByPlaceholder('John Doe').fill('FrameFlux E2E User');
+  await page.getByPlaceholder('Jane Doe').fill('FrameFlux E2E User');
   await page.getByPlaceholder('you@example.com').fill(email);
   await page.getByPlaceholder('••••••••').fill(PASSWORD);
   await page.getByRole('button', { name: 'Create account' }).click();
