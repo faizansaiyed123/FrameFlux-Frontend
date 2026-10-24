@@ -594,76 +594,9 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   assertEvidenceFile('48-final-media-library.png');
 });
 
-test('real login/logout and final database cleanup evidence', async ({ page, request }) => {
-  const creds = readCreds();
-  const accessToken = readState().accessToken;
-  if (!accessToken) throw new Error('Missing persisted access token from the authenticated browser flow');
-  await page.goto('/auth/login');
-  await page.evaluate((token) => localStorage.setItem('access_token', token), accessToken);
-  await page.goto('/app/dashboard');
-  expect(accessToken).toBeTruthy();
-  const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
-  const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
-  expect(authenticatedMe.ok()).toBeTruthy();
-  const userData = await authenticatedMe.json();
-  expect(userData.email).toBe(creds.email);
-  await page.evaluate(({ token, user }) => {
-    localStorage.setItem('access_token', token);
-    localStorage.setItem('frameflux-auth', JSON.stringify({ state: { user }, version: 0 }));
-  }, { token: accessToken as string, user: userData });
-  await page.reload();
-  await expect(page.locator('aside button').first()).toBeVisible({ timeout: 20_000 });
-  await screenshot(page, '49-authenticated-final-state.png');
-  const state = readState();
-
-  const meBeforeLogout = await request.get(`${API}/auth/me`, { headers });
-  expect(meBeforeLogout.ok()).toBeTruthy();
-
-  const accountTrigger = page.locator('aside [data-slot="dropdown-menu-trigger"]').last();
-  await expect(accountTrigger).toBeVisible({ timeout: 20_000 });
-  await accountTrigger.click({ force: true });
-  await page.getByRole('menuitem', { name: /Log out/i }).click();
-  await page.waitForURL(/\/auth\/login/, { timeout: 20_000 });
-  await expect(page.evaluate(() => localStorage.getItem('access_token'))).resolves.toBeNull();
-  await screenshot(page, '50-logged-out.png');
-
-  // After logout the old bearer token must no longer authorize protected API access.
-  if (state.projectId) {
-    const projectAfterLogout = await request.get(`${API}/projects/${state.projectId}`, { headers });
-    expect(projectAfterLogout.status()).toBe(401);
-  }
-  if (state.mediaId) {
-    const mediaAfterLogout = await request.get(`${API}/media/${state.mediaId}`, { headers });
-    expect(mediaAfterLogout.status()).toBe(401);
-  }
-
-  fs.writeFileSync(path.join(EVIDENCE, 'final-state.json'), JSON.stringify({
-    completedAt: new Date().toISOString(),
-    user: creds.email,
-    projectId: state.projectId,
-    mediaId: state.mediaId,
-    media2Id: state.media2Id,
-    audioId: state.audioId,
-    imageId: state.imageId,
-    shareId: state.shareId,
-    presetId: state.presetId,
-    notificationId: state.notificationId,
-  }, null, 2));
-});
-
-
 test('comprehensive authenticated capability matrix and lifecycle read-back', async ({ page, request }) => {
   const state = readState();
-  let headers: Record<string, string> = {
-    Authorization: `Bearer ${state.accessToken as string}`,
-    'Content-Type': 'application/json',
-  };
-  const sessionProbe = await request.get(`${API}/auth/me`, { headers });
-  if (!sessionProbe.ok()) {
-    headers = await authHeaders(request);
-    const refreshedMe = await request.get(`${API}/auth/me`, { headers });
-    expect(refreshedMe.ok()).toBeTruthy();
-  }
+  const headers = await authHeaders(request);
   const mediaId = state.mediaId as string;
   const media2Id = state.media2Id as string;
   const audioId = state.audioId as string;
@@ -831,3 +764,62 @@ test('comprehensive authenticated capability matrix and lifecycle read-back', as
 
   expect(failures, failures.join('\\n')).toEqual([]);
 });
+
+test('real login/logout and final database cleanup evidence', async ({ page, request }) => {
+  const creds = readCreds();
+  const accessToken = readState().accessToken;
+  if (!accessToken) throw new Error('Missing persisted access token from the authenticated browser flow');
+  await page.goto('/auth/login');
+  await page.evaluate((token) => localStorage.setItem('access_token', token), accessToken);
+  await page.goto('/app/dashboard');
+  expect(accessToken).toBeTruthy();
+  const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
+  const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
+  expect(authenticatedMe.ok()).toBeTruthy();
+  const userData = await authenticatedMe.json();
+  expect(userData.email).toBe(creds.email);
+  await page.evaluate(({ token, user }) => {
+    localStorage.setItem('access_token', token);
+    localStorage.setItem('frameflux-auth', JSON.stringify({ state: { user }, version: 0 }));
+  }, { token: accessToken as string, user: userData });
+  await page.reload();
+  await expect(page.locator('aside button').first()).toBeVisible({ timeout: 20_000 });
+  await screenshot(page, '49-authenticated-final-state.png');
+  const state = readState();
+
+  const meBeforeLogout = await request.get(`${API}/auth/me`, { headers });
+  expect(meBeforeLogout.ok()).toBeTruthy();
+
+  const accountTrigger = page.locator('aside [data-slot="dropdown-menu-trigger"]').last();
+  await expect(accountTrigger).toBeVisible({ timeout: 20_000 });
+  await accountTrigger.click({ force: true });
+  await page.getByRole('menuitem', { name: /Log out/i }).click();
+  await page.waitForURL(/\/auth\/login/, { timeout: 20_000 });
+  await expect(page.evaluate(() => localStorage.getItem('access_token'))).resolves.toBeNull();
+  await screenshot(page, '50-logged-out.png');
+
+  // After logout the old bearer token must no longer authorize protected API access.
+  if (state.projectId) {
+    const projectAfterLogout = await request.get(`${API}/projects/${state.projectId}`, { headers });
+    expect(projectAfterLogout.status()).toBe(401);
+  }
+  if (state.mediaId) {
+    const mediaAfterLogout = await request.get(`${API}/media/${state.mediaId}`, { headers });
+    expect(mediaAfterLogout.status()).toBe(401);
+  }
+
+  fs.writeFileSync(path.join(EVIDENCE, 'final-state.json'), JSON.stringify({
+    completedAt: new Date().toISOString(),
+    user: creds.email,
+    projectId: state.projectId,
+    mediaId: state.mediaId,
+    media2Id: state.media2Id,
+    audioId: state.audioId,
+    imageId: state.imageId,
+    shareId: state.shareId,
+    presetId: state.presetId,
+    notificationId: state.notificationId,
+  }, null, 2));
+});
+
+
