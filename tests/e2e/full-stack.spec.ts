@@ -503,11 +503,11 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   const effectsList = await request.get(`${API}/effects/${mediaId}/list`, { headers });
   expect(effectsList.ok(), `effects list status=${effectsList.status()}`).toBeTruthy();
   const effectsBody = await effectsList.json();
-  if (effectsBody.effects?.length) {
-    const effect = effectsBody.effects[0];
-    const effectApply = await request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: effect.name, parameters: effect.parameters ?? {} } });
-    expect(effectApply.ok()).toBeTruthy();
-  }
+  expect(effectsBody.effects).toEqual([]);
+  expect(effectsBody.message).toMatch(/configured/i);
+  const effectApply = await request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: 'test', parameters: {} } });
+  expect(effectApply.ok()).toBeTruthy();
+  expect((await effectApply.json()).status).toBe('queued');
 
   const transcode = await request.post(`${API}/transcoding/${mediaId}/transcode`, { headers, data: { format: 'mp4', preserve_aspect_ratio: true, options: {} } });
   expect(transcode.ok()).toBeTruthy();
