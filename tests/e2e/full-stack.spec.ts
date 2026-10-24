@@ -1,6 +1,7 @@
 import { test, expect, type Page, type APIRequestContext, type APIResponse } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { execFileSync } from 'child_process';
 
 test.describe.configure({ mode: 'serial' });
 
@@ -142,6 +143,23 @@ test('public, authentication, workspace inventory and account settings', async (
   expect(me.ok()).toBeTruthy();
   expect((await me.json()).full_name).toBe(profileName);
   await screenshot(page, '18-profile-updated.png');
+
+  const resetRequest = await request.post(`${API}/auth/forgot-password`, { data: { email: readCreds().email } });
+  expect(resetRequest.ok()).toBeTruthy();
+  const resetKeysRaw = execFileSync('redis-cli', ['-h', '127.0.0.1', '-p', '6379', '--scan', '--pattern', 'pwd_reset:*'], { encoding: 'utf8' }).trim();
+  const resetKey = resetKeysRaw.split(/\s+/).filter(Boolean).pop();
+  expect(resetKey).toBeTruthy();
+  const resetToken = (resetKey as string).replace('pwd_reset:', '');
+  const temporaryPassword = 'FrameFluxReset123!';
+  const resetResponse = await request.post(`${API}/auth/reset-password`, { data: { token: resetToken, new_password: temporaryPassword } });
+  expect(resetResponse.ok()).toBeTruthy();
+  const temporaryLogin = await request.post(`${API}/auth/login`, { data: { email: readCreds().email, password: temporaryPassword } });
+  expect(temporaryLogin.ok()).toBeTruthy();
+  const temporaryToken = (await temporaryLogin.json()).access_token as string;
+  const restoredHeaders = { Authorization: `Bearer ${temporaryToken}`, 'Content-Type': 'application/json' };
+  const restorePassword = await request.post(`${API}/auth/change-password`, { headers: restoredHeaders, data: { current_password: temporaryPassword, new_password: readCreds().password } });
+  expect(restorePassword.ok()).toBeTruthy();
+  await screenshot(page, '18-password-reset-readback.png');
 
   const preferenceSelects = page.locator('button[role="combobox"]');
   if (await preferenceSelects.count() >= 2) {
