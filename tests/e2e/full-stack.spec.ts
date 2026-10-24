@@ -599,7 +599,7 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
   const meBeforeLogout = await request.get(`${API}/auth/me`, { headers });
   expect(meBeforeLogout.ok()).toBeTruthy();
 
-  await page.getByRole('button', { name: /My Account/i }).click();
+  await page.getByRole('button', { name: new RegExp(creds.full_name, 'i') }).click();
   await page.getByRole('menuitem', { name: /Log out/i }).click();
   await page.waitForURL(/\/auth\/login/, { timeout: 20_000 });
   await expect(page.evaluate(() => localStorage.getItem('access_token'))).resolves.toBeNull();
