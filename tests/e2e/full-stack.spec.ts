@@ -328,7 +328,7 @@ test('media processing, editor forms, thumbnails, previews, versions and sharing
   await page.waitForTimeout(750);
   await screenshot(page, '30-transform-request.png');
 
-  await page.getByRole('button', { name: 'Overlay', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Overlay', exact: true }).first().evaluate((button) => (button as HTMLButtonElement).click());
   await expect(page.getByRole('button', { name: /^Apply (\d+) Overlay/i })).toBeVisible().catch(() => {});
   await screenshot(page, '31-overlay-editor.png');
 
