@@ -20,6 +20,7 @@ jobs:
       - name: Checkout backend
         uses: actions/checkout@v4
         with:
+          # Pinned to the backend E2E branch so schema/media-processing fixes are tested together.
           repository: faizansaiyed123/FrameFlux-Backend
           ref: e2e/full-stack-visual-walkthrough-20261024
           path: backend
