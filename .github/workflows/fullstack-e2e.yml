@@ -110,9 +110,11 @@ jobs:
         if: always()
         working-directory: backend
         run: |
-          docker compose logs --no-color > ../test-results/backend-compose.log 2>&1 || true
-          docker compose ps > ../test-results/backend-compose-ps.txt 2>&1 || true
-          cat /tmp/frameflux-frontend.log > ../test-results/frontend.log 2>&1 || true
+          mkdir -p "$GITHUB_WORKSPACE/test-results"
+          docker compose logs --no-color > "$GITHUB_WORKSPACE/test-results/backend-compose.log" 2>&1 || true
+          docker compose ps > "$GITHUB_WORKSPACE/test-results/backend-compose-ps.txt" 2>&1 || true
+          cat /tmp/frameflux-frontend.log > "$GITHUB_WORKSPACE/test-results/frontend.log" 2>&1 || true
+          test -f "$GITHUB_WORKSPACE/test-results/backend-startup.log" || true
 
       - name: Upload visual evidence
         if: always()
