@@ -501,7 +501,7 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
   expect.soft(thumbCrop.ok()).toBeTruthy();
 
   const effectsList = await request.get(`${API}/effects/${mediaId}/list`, { headers });
-  expect.soft(effectsList.ok(), `effects list status=${effectsList.status()}`).toBeTruthy();
+  expect(effectsList.ok()).toBeTruthy();
   const effectsBody = await effectsList.json();
   expect.soft(effectsBody.effects).toEqual([]);
   expect(effectsBody.message).toMatch(/configured/i);
