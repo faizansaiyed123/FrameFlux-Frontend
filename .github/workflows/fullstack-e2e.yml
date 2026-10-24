@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: faizansaiyed123/FrameFlux-Backend
-          ref: main
+          ref: e2e/full-stack-visual-walkthrough-20261024
           path: backend
 
       - name: Setup Node
