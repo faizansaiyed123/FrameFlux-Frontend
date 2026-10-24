@@ -302,7 +302,7 @@ test('media processing, editor forms, thumbnails, previews, versions and sharing
 
   const mediaId = state.mediaId as string;
   await page.goto(`/app/dashboard/media/${mediaId}`);
-  await expect(page.getByText('sample.mp4')).toBeVisible();
+  await expect(page.getByText('sample.mp4', { exact: true }).first()).toBeVisible();
   await screenshot(page, '27-media-overview.png');
 
   const processResponsePromise = page.waitForResponse((r) => r.url().includes(`/media/${mediaId}/process`) && r.request().method() === 'POST');
