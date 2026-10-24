@@ -721,10 +721,13 @@ test('comprehensive authenticated capability matrix and lifecycle read-back', as
   }
 
   // Audio capability matrix using the real uploaded WAV/video assets.
+  const audioRecordResponse = await request.get(`${API}/media/${audioId}`, { headers });
+  expect(audioRecordResponse.ok()).toBeTruthy();
+  const audioStoredFilename = (await audioRecordResponse.json()).stored_filename as string;
   await check('audio-batch-extract', () => request.post(`${API}/audio/batch/extract`, { headers, data: { media_ids: [mediaId, media2Id], format: 'mp3', bitrate: '128k' } }));
-  await check('audio-replace', () => request.post(`${API}/audio/${mediaId}/replace-audio?audio_path=${encodeURIComponent((await (await request.get(`${API}/media/${audioId}`, { headers })).json()).stored_filename)}`, { headers }));
+  await check('audio-replace', () => request.post(`${API}/audio/${mediaId}/replace-audio?audio_path=${encodeURIComponent(audioStoredFilename)}`, { headers }));
   await check('audio-to-video', () => request.post(`${API}/audio/${audioId}/to-video`, { headers, data: { background_color: '#000000', text: 'FrameFlux E2E', resolution: '320x180', fps: 10, duration: 1, output_format: 'mp4' } }));
-  await check('audio-sync-video', () => request.post(`${API}/audio/${mediaId}/sync-audio`, { headers, data: { audio_path: (await (await request.get(`${API}/media/${audioId}`, { headers })).json()).stored_filename, audio_offset: 0, output_format: 'mp4' } }));
+  await check('audio-sync-video', () => request.post(`${API}/audio/${mediaId}/sync-audio`, { headers, data: { audio_path: audioStoredFilename, audio_offset: 0, output_format: 'mp4' } }));
 
   // Version lifecycle.
   const versionsResponse = await request.get(`${API}/media/${mediaId}/versions`, { headers });
