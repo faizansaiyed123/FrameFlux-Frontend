@@ -51,6 +51,10 @@ async function login(page: Page) {
 }
 
 async function authHeaders(request: APIRequestContext) {
+  const savedToken = readState().accessToken;
+  if (savedToken) {
+    return { Authorization: `Bearer ${savedToken}`, 'Content-Type': 'application/json' };
+  }
   const creds = readCreds();
   const response = await request.post(`${API}/auth/login`, { data: { email: creds.email, password: creds.password } });
   expect(response.ok()).toBeTruthy();
