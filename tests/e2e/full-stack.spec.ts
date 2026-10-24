@@ -213,7 +213,7 @@ test('project CRUD, folders and real resumable media upload', async ({ page, req
   const headers = await authHeaders(request);
 
   await page.goto('/app/dashboard/projects');
-  await page.getByRole('button', { name: /Create Project/i }).click();
+  await page.getByRole('button', { name: 'Create Project', exact: true }).first().click();
   const projectName = `E2E Project ${Date.now()}`;
   await page.getByLabel('Name').fill(projectName);
   await page.getByLabel('Description').fill('Real database-backed full-stack walkthrough project.');
