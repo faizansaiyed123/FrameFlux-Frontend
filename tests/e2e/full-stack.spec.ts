@@ -744,7 +744,7 @@ test('comprehensive authenticated capability matrix and lifecycle read-back', as
     if (!chunkBody.ok()) failures.push(`resumable-chunk: ${chunkBody.status()}`);
     const retryBody = await request.post(`${API}/media/resumable/${uploadId}/retry?index=0`, { headers: { Authorization: headers.Authorization }, multipart: { file: { name: 'matrix-sample.mp4', mimeType: 'video/mp4', buffer: fileBytes } } });
     if (!retryBody.ok()) failures.push(`resumable-retry: ${retryBody.status()}`);
-    const progressBody = await request.get(`${API}/media/resumable/${uploadId}/progress`, { headers });
+    const progressBody = await request.get(`${API}/media/uploads/${uploadId}/progress`, { headers });
     if (!progressBody.ok()) failures.push(`resumable-progress: ${progressBody.status()}`);
     const pauseBody = await request.post(`${API}/media/resumable/${uploadId}/pause`, { headers });
     if (!pauseBody.ok()) failures.push(`resumable-pause: ${pauseBody.status()}`);
