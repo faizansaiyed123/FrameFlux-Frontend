@@ -13,6 +13,7 @@ const CREDS_FILE = path.resolve('playwright/.auth/credentials.json');
 
 type Credentials = { email: string; password: string; full_name: string };
 type State = {
+  accessToken?: string;
   projectId?: string;
   mediaId?: string;
   media2Id?: string;
