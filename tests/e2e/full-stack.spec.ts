@@ -738,9 +738,15 @@ test('comprehensive authenticated capability matrix and lifecycle read-back', as
     await check('share-delete', () => request.delete(`${API}/sharing/${publicShareId}`, { headers }), [204]);
   }
 
-  // Effects are currently capability stubs; verify their real HTTP contract rather than claiming they render an effect.
+  // Effects are configured stubs; verify their documented HTTP contract.
   const effects = await check('effects-list', () => request.get(`${API}/effects/${mediaId}/list`, { headers }));
-  if (effects) await check('effects-apply', () => request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: 'test', parameters: {} } }));
+  if (effects) {
+    const body = await effects.json();
+    if (body.effects?.length !== 0 || !/configured/i.test(body.message ?? '')) {
+      failures.push('effects-list contract mismatch');
+    }
+  }
+  await check('effects-apply', () => request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: 'test', parameters: {} } }));
   await check('effects-remove', () => request.delete(`${API}/effects/${mediaId}/remove`, { headers }));
 
   // Invalid-input coverage on real endpoints.
