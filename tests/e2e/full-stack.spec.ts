@@ -231,7 +231,7 @@ test('project CRUD, folders and real resumable media upload', async ({ page, req
   await expect(page.getByText(projectName)).toBeVisible();
   await screenshot(page, '22-project-detail.png');
 
-  await page.getByRole('button', { name: 'Create Folder', exact: true }).first().click();
+  await page.getByRole('button', { name: 'New Folder', exact: true }).click();
   await page.getByLabel('Folder Name').fill('E2E Folder');
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await page.waitForTimeout(500);
