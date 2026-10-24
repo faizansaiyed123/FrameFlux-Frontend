@@ -654,7 +654,16 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
 
 test('comprehensive authenticated capability matrix and lifecycle read-back', async ({ page, request }) => {
   const state = readState();
-  const headers = await authHeaders(request);
+  let headers: Record<string, string> = {
+    Authorization: `Bearer ${state.accessToken as string}`,
+    'Content-Type': 'application/json',
+  };
+  const sessionProbe = await request.get(`${API}/auth/me`, { headers });
+  if (!sessionProbe.ok()) {
+    headers = await authHeaders(request);
+    const refreshedMe = await request.get(`${API}/auth/me`, { headers });
+    expect(refreshedMe.ok()).toBeTruthy();
+  }
   const mediaId = state.mediaId as string;
   const media2Id = state.media2Id as string;
   const audioId = state.audioId as string;
