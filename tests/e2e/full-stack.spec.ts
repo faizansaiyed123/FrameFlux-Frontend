@@ -322,7 +322,9 @@ test('media processing, editor forms, thumbnails, previews, versions and sharing
   }
 
   await page.getByRole('tab', { name: 'Processing' }).click();
-  await page.getByRole('button', { name: 'Transform', exact: true }).first().click();
+  const transformTab = page.getByRole('button', { name: 'Transform', exact: true }).first();
+  await transformTab.scrollIntoViewIfNeeded();
+  await transformTab.click({ force: true });
   await expect(page.getByRole('button', { name: 'Apply Transform', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Apply Transform', exact: true }).click();
   await page.waitForTimeout(750);
