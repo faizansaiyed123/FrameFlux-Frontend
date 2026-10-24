@@ -582,11 +582,14 @@ test('feature capability sweep with real API data and UI read-back', async ({ pa
 
 test('real login/logout and final database cleanup evidence', async ({ page, request }) => {
   const creds = readCreds();
-  await page.goto('/app/dashboard/settings');
-  await expect(page.getByText(creds.email)).toBeVisible({ timeout: 20_000 });
+  await page.goto('/app/dashboard');
   const accessToken = await page.evaluate(() => localStorage.getItem('access_token'));
   expect(accessToken).toBeTruthy();
   const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
+  const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
+  expect(authenticatedMe.ok()).toBeTruthy();
+  expect((await authenticatedMe.json()).email).toBe(creds.email);
+  await screenshot(page, '49-authenticated-final-state.png');
   const state = readState();
   await expect(page.getByText(creds.email)).toBeVisible();
   await screenshot(page, '49-authenticated-final-state.png');
