@@ -208,7 +208,9 @@ test('public, authentication, workspace inventory and account settings', async (
     await page.getByRole('button', { name: 'Cancel' }).click();
   }
 
-  writeState({ accessToken: authenticatedToken as string });
+  const refreshedLogin = await request.post(`${API}/auth/login`, { data: { email: readCreds().email, password: readCreds().password } });
+  expect(refreshedLogin.ok()).toBeTruthy();
+  writeState({ accessToken: (await refreshedLogin.json()).access_token as string });
   fs.writeFileSync(path.join(EVIDENCE, 'api-trace-workspace.json'), JSON.stringify(apiEvents, null, 2));
 });
 
