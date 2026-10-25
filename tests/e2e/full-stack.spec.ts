@@ -620,8 +620,15 @@ test('comprehensive authenticated capability matrix and lifecycle read-back', as
     }
   }
 
-  // Project lifecycle/status/read-only capability endpoints.
-  await check('project-status', () => request.get(`${API}/projects/${projectId}/status`, { headers }));
+  // Public service health and authenticated UI preference capabilities.
+  await check('health-live', () => request.get(API + '/health/live'));
+  await check('health-ready', () => request.get(API + '/health/ready'));
+  const preferences = await check('ui-preferences-read', () => request.get(API + '/ui/preferences', { headers }));
+  if (preferences) {
+    await check('ui-preference-write', () => request.put(API + '/ui/preferences/e2e_test_preference', { headers, data: { value: 'verified' } }));
+  }
+
+  // Project lifecycle/status/read-only capability endpoints.  await check('project-status', () => request.get(`${API}/projects/${projectId}/status`, { headers }));
   await check('project-workflows', () => request.get(`${API}/projects/${projectId}/workflows`, { headers }));
   await check('project-history', () => request.get(`${API}/projects/${projectId}/history`, { headers }));
   const tempProjectResponse = await check('project-create-temp', () => request.post(`${API}/projects`, { headers, data: { name: `E2E Temp Project ${Date.now()}`, description: 'Capability matrix' } }));
