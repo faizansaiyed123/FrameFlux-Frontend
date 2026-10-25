@@ -48,7 +48,10 @@ export default function JobsPage() {
   }, []);
 
   useEffect(() => {
-    fetchJobs();
+    const timer = window.setTimeout(() => {
+      void fetchJobs();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchJobs]);
 
   useEffect(() => {

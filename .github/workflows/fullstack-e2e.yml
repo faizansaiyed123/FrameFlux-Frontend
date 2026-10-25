@@ -1,0 +1,171 @@
+name: Full-Stack Visual E2E
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: frameflux-fullstack-e2e-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fullstack-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          # Pinned to the backend E2E branch so schema/media-processing fixes are tested together.
+          repository: faizansaiyed123/FrameFlux-Backend
+          ref: e2e/full-stack-visual-walkthrough-20261024
+          path: backend
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Install ffmpeg for test fixtures
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg redis-tools
+
+      - name: Start backend stack
+        working-directory: backend
+        env:
+          POSTGRES_PASSWORD: test
+          DATABASE_URL: postgresql+asyncpg://frameflux:test@postgres:5432/frameflux
+          JWT_SECRET_KEY: test-only-secret-for-fullstack-e2e-20261024
+          REDIS_URL: redis://redis:6379/0
+          APP_ORIGIN: http://127.0.0.1:3000
+          API_BASE_URL: http://127.0.0.1:8000
+          STORAGE_BASE_URL: http://127.0.0.1:8000
+          ENVIRONMENT: test
+          DEBUG: "true"
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/test-results"
+          cat > .env <<'EOF'
+          POSTGRES_PASSWORD=test
+          DATABASE_URL=postgresql+asyncpg://frameflux:test@postgres:5432/frameflux
+          JWT_SECRET_KEY=test-only-secret-for-fullstack-e2e-20261024
+          REDIS_URL=redis://redis:6379/0
+          APP_ORIGIN=http://127.0.0.1:3000
+          API_BASE_URL=http://127.0.0.1:8000
+          STORAGE_BASE_URL=http://127.0.0.1:8000
+          ENVIRONMENT=test
+          DEBUG=true
+          EOF
+          docker compose up -d --build
+          docker compose ps
+          ok=0
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:8000/health >/tmp/health.json; then
+              cat /tmp/health.json
+              ok=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "Backend failed readiness; dumping service state and logs"
+            docker compose ps
+            docker compose logs --no-color --tail=200 backend worker postgres redis | tee "$GITHUB_WORKSPACE/test-results/backend-startup.log"
+            exit 1
+          fi
+          curl -fsS http://127.0.0.1:8000/health | tee "$GITHUB_WORKSPACE/test-results/health.json"
+
+      - name: Run backend database-backed test suite
+        working-directory: backend
+        run: |
+          docker cp tests frameflux-backend:/app/tests
+          docker compose exec -T backend uv run pytest -q
+
+      - name: Generate real media fixtures
+        run: |
+          mkdir -p test-fixtures
+          ffmpeg -y -f lavfi -i testsrc=size=320x180:rate=10 -f lavfi -i sine=frequency=440:sample_rate=44100 -t 3 -pix_fmt yuv420p -c:v libx264 -c:a aac -shortest test-fixtures/sample.mp4
+          ffmpeg -y -f lavfi -i testsrc=size=160x90:rate=10 -t 2 -pix_fmt yuv420p -c:v libx264 test-fixtures/sample-second.mp4
+          ffmpeg -y -f lavfi -i sine=frequency=660:sample_rate=44100 -t 3 -c:a pcm_s16le test-fixtures/sample.wav
+          ffmpeg -y -f lavfi -i color=c=blue:s=160x90 -frames:v 1 test-fixtures/sample.jpg
+          cat > test-fixtures/sample.srt <<'EOF'
+          1
+          00:00:00,000 --> 00:00:01,500
+          FrameFlux real subtitle evidence
+          
+          2
+          00:00:01,500 --> 00:00:03,000
+          Full-stack browser test
+          EOF
+          ls -lh test-fixtures
+
+      - name: Start frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+        run: |
+          npm run dev -- --hostname 0.0.0.0 > /tmp/frameflux-frontend.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:3000/ >/tmp/frontend.html; then break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:3000/ >/dev/null
+
+      - name: Run full-stack browser walkthrough
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+        run: npx playwright test
+
+      - name: Capture service logs
+        if: always()
+        working-directory: backend
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/test-results"
+          docker compose logs --no-color > "$GITHUB_WORKSPACE/test-results/backend-compose.log" 2>&1 || true
+          docker compose ps > "$GITHUB_WORKSPACE/test-results/backend-compose-ps.txt" 2>&1 || true
+          cat /tmp/frameflux-frontend.log > "$GITHUB_WORKSPACE/test-results/frontend.log" 2>&1 || true
+          test -f "$GITHUB_WORKSPACE/test-results/backend-startup.log" || true
+
+      - name: Upload visual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frameflux-fullstack-visual-evidence
+          path: |
+            test-results/
+            playwright-report/
+            test-fixtures/
+          if-no-files-found: warn
+
+      - name: Commit visual walkthrough screenshots
+        if: always()
+        run: |
+          mkdir -p docs/testing/visuals
+          cp -f test-results/evidence/*.png docs/testing/visuals/ 2>/dev/null || true
+          git fetch origin e2e/full-stack-visual-walkthrough-20261024
+          git checkout e2e/full-stack-visual-walkthrough-20261024
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/testing/visuals
+          if git diff --cached --quiet; then
+            echo "No new visual screenshots to commit"
+            exit 0
+          fi
+          git commit -m "docs: commit full-stack visual evidence [skip ci]"
+          git push origin HEAD:e2e/full-stack-visual-walkthrough-20261024
+
+      - name: Shutdown stack
+        if: always()
+        working-directory: backend
+        run: docker compose down -v || true

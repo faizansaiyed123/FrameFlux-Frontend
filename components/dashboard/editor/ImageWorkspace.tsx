@@ -35,7 +35,6 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
   useEffect(() => {
     let objectUrl: string | null = null;
-    setError('');
 
     api.getMediaFile(media.id)
       .then((blob) => {
