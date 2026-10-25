@@ -448,7 +448,7 @@ The final browser flow verifies that logout redirects to the login screen and re
 
 ## 14. Complete feature coverage map
 
-The repository was inventoried before execution. The backend contains 33 feature route modules and the frontend contains the authenticated pages listed below.
+The repository was inventoried before execution. The backend contains 33 feature route modules and the frontend contains the authenticated pages listed below. Public health probes and the live UI-preferences endpoints are also included in the authenticated capability matrix.
 
 | Feature area | Browser surface | API / backend coverage |
 | --- | --- | --- |
