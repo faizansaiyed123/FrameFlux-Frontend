@@ -791,7 +791,7 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
 
   const accountTrigger = page.locator('aside [data-slot="dropdown-menu-trigger"]').last();
   await expect(accountTrigger).toBeVisible({ timeout: 20_000 });
-  await accountTrigger.click({ force: true });
+  await accountTrigger.evaluate((element) => (element as HTMLButtonElement).click());
   await page.getByRole('menuitem', { name: /Log out/i }).click();
   await page.waitForURL(/\/auth\/login/, { timeout: 20_000 });
   await expect(page.evaluate(() => localStorage.getItem('access_token'))).resolves.toBeNull();
