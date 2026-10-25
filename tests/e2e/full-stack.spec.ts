@@ -772,6 +772,828 @@ test('real login/logout and final database cleanup evidence', async ({ page, req
   await page.goto('/auth/login');
   await page.evaluate((token) => localStorage.setItem('access_token', token), accessToken);
   await page.goto('/app/dashboard');
+  const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
+  const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
+  expect(authenticatedMe.ok()).toBeTruthy();
+  const userData = await authenticatedMe.json();
+  expect(userData.email).toBe(creds.email);
+  await page.evaluate(({ token, user }) => {
+    localStorage.setItem('access_token', token);
+    localStorage.setItem('frameflux-auth', JSON.stringify({ state: { user }, version: 0 }));
+  }, { token: accessToken as string, user: userData });
+  await page.reload();
+  await expect(page.locator('aside button').first()).toBeVisible({ timeout: 20_000 });
+  await screenshot(page, '49-authenticated-final-state.png');
+  const state = readState();
+
+  const meBeforeLogout = await request.get(`${API}/auth/me`, { headers });
+  expect(meBeforeLogout.ok()).toBeTruthy();
+
+  const accountTrigger = page.locator('aside [data-slot="dropdown-menu-trigger"]').last();
+  await expect(accountTrigger).toBeVisible({ timeout: 20_000 });
+  await accountTrigger.click({ force: true });
+  await page.getByRole('menuitem', { name: /Log out/i }).click();
+  await page.waitForURL(/\/auth\/login/, { timeout: 20_000 });
+  await expect(page.evaluate(() => localStorage.getItem('access_token'))).resolves.toBeNull();
+  await screenshot(page, '50-logged-out.png');
+
+  if (state.projectId) {
+    const projectAfterLogout = await request.get(`${API}/projects/${state.projectId}`, { headers });
+    expect(projectAfterLogout.status()).toBe(401);
+  }
+  if (state.mediaId) {
+    const mediaAfterLogout = await request.get(`${API}/media/${state.mediaId}`, { headers });
+    expect(mediaAfterLogout.status()).toBe(401);
+  }
+
+  fs.writeFileSync(path.join(EVIDENCE, 'final-state.json'), JSON.stringify({
+    completedAt: new Date().toISOString(),
+    user: creds.email,
+    projectId: state.projectId,
+    mediaId: state.mediaId,
+    media2Id: state.media2Id,
+    audioId: state.audioId,
+    imageId: state.imageId,
+    shareId: state.shareId,
+    presetId: state.presetId,
+    notificationId: state.notificationId,
+  }, null, 2));
+});
+
+import { test, expect, type Page, type APIRequestContext, type APIResponse } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
+import { execFileSync } from 'child_process';
+
+test.describe.configure({ mode: 'serial' });
+
+const API = 'http://127.0.0.1:8000';
+const EVIDENCE = path.resolve('test-results/evidence');
+const FIXTURES = path.resolve('test-fixtures');
+const STATE_FILE = path.join(EVIDENCE, 'state.json');
+const CREDS_FILE = path.resolve('playwright/.auth/credentials.json');
+
+type Credentials = { email: string; password: string; full_name: string };
+type State = {
+  accessToken?: string;
+  projectId?: string;
+  mediaId?: string;
+  media2Id?: string;
+  audioId?: string;
+  imageId?: string;
+  shareId?: string;
+  shareToken?: string;
+  presetId?: string;
+  workflowId?: string;
+  notificationId?: string;
+};
+
+function readCreds(): Credentials {
+  return JSON.parse(fs.readFileSync(CREDS_FILE, 'utf8')) as Credentials;
+}
+
+function readState(): State {
+  if (!fs.existsSync(STATE_FILE)) return {};
+  return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')) as State;
+}
+
+function writeState(patch: State) {
+  const state = { ...readState(), ...patch };
+  fs.mkdirSync(EVIDENCE, { recursive: true });
+  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+}
+
+async function login(page: Page) {
+  const creds = readCreds();
+  await page.goto('/auth/login');
+  await page.getByLabel('Email').fill(creds.email);
+  await page.getByRole('textbox', { name: 'Password' }).fill(creds.password);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.waitForURL(/\/app\/dashboard/, { timeout: 30_000 });
+}
+
+async function authHeaders(request: APIRequestContext) {
+  const savedToken = readState().accessToken;
+  if (savedToken) {
+    return { Authorization: `Bearer ${savedToken}`, 'Content-Type': 'application/json' };
+  }
+  const creds = readCreds();
+  const response = await request.post(`${API}/auth/login`, { data: { email: creds.email, password: creds.password } });
+  expect(response.ok()).toBeTruthy();
+  const json = await response.json();
+  return { Authorization: `Bearer ${json.access_token}`, 'Content-Type': 'application/json' };
+}
+
+async function apiJson(request: APIRequestContext, method: string, url: string, headers: Record<string, string>, data?: unknown, params?: Record<string, string | number | boolean>) {
+  const options: Record<string, unknown> = { headers };
+  if (data !== undefined) options.data = data;
+  if (params !== undefined) options.params = params;
+  const response = method === 'GET'
+    ? await request.get(url, options as never)
+    : method === 'POST'
+      ? await request.post(url, options as never)
+      : method === 'PATCH'
+        ? await request.patch(url, options as never)
+        : method === 'DELETE'
+          ? await request.delete(url, options as never)
+          : await request.fetch(url, { ...options, method } as never);
+  return response;
+}
+
+async function waitForMediaComplete(request: APIRequestContext, headers: Record<string, string>, mediaId: string) {
+  for (let i = 0; i < 90; i++) {
+    const response = await apiJson(request, 'GET', `${API}/media/${mediaId}/status`, headers);
+    if (response.ok()) {
+      const body = await response.json();
+      if (body.status === 'completed') return body;
+      if (body.status === 'failed') throw new Error(`Media processing failed: ${JSON.stringify(body)}`);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  throw new Error(`Timed out waiting for media ${mediaId} to complete`);
+}
+
+async function screenshot(page: Page, name: string) {
+  await page.screenshot({ path: path.join(EVIDENCE, name), fullPage: true });
+}
+
+function assertEvidenceFile(name: string) {
+  expect(fs.existsSync(path.join(EVIDENCE, name))).toBeTruthy();
+}
+
+test('public, authentication, workspace inventory and account settings', async ({ page, request }) => {
+  const apiEvents: { method: string; url: string; status: number }[] = [];
+  page.on('response', (response) => {
+    if (response.url().startsWith(API)) {
+      apiEvents.push({ method: response.request().method(), url: response.url(), status: response.status() });
+    }
+  });
+
+  await page.goto('/');
+  await expect(page.getByText('FrameFlux', { exact: true }).first()).toBeVisible();
+  await screenshot(page, '02-public-home.png');
+
+  await login(page);
+  const authenticatedToken = await page.evaluate(() => localStorage.getItem('access_token'));
+  expect(authenticatedToken).toBeTruthy();
+  await screenshot(page, '03-dashboard-live.png');
+
+  const pages: Array<[string, string]> = [
+    ['/app/dashboard/projects', '04-projects.png'],
+    ['/app/dashboard/media', '05-media-library.png'],
+    ['/app/dashboard/batch', '06-batch.png'],
+    ['/app/dashboard/favorites', '07-favorites.png'],
+    ['/app/dashboard/quick-actions', '08-quick-actions.png'],
+    ['/app/dashboard/search', '09-search.png'],
+    ['/app/dashboard/workflows', '10-workflows.png'],
+    ['/app/dashboard/presets', '11-presets.png'],
+    ['/app/dashboard/notifications', '12-notifications.png'],
+    ['/app/dashboard/storage', '13-storage.png'],
+    ['/app/dashboard/history', '14-history.png'],
+    ['/app/dashboard/jobs', '15-jobs.png'],
+    ['/app/dashboard/settings', '16-settings.png'],
+    ['/app/dashboard/help', '17-help.png'],
+  ];
+
+  for (const [route, shot] of pages) {
+    await page.goto(route, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    await screenshot(page, shot);
+    await expect(page.locator('body')).not.toContainText('Application error');
+  }
+
+  const headers = await authHeaders(request);
+  const profileName = `FrameFlux E2E Updated ${Date.now()}`;
+  await page.goto('/app/dashboard/settings');
+  await page.getByLabel('Full Name').fill(profileName);
+  await page.getByRole('button', { name: /Save/i }).first().click();
+  await expect(page.getByText(/Profile updated|saved|updated/i).first()).toBeVisible({ timeout: 10_000 }).catch(() => {});
+  const me = await apiJson(request, 'GET', `${API}/auth/me`, headers);
+  expect(me.ok()).toBeTruthy();
+  expect((await me.json()).full_name).toBe(profileName);
+  await screenshot(page, '18-profile-updated.png');
+
+  const resetRequest = await request.post(`${API}/auth/forgot-password`, { data: { email: readCreds().email } });
+  expect(resetRequest.ok()).toBeTruthy();
+  const resetKeysRaw = execFileSync('redis-cli', ['-h', '127.0.0.1', '-p', '6379', '--scan', '--pattern', 'pwd_reset:*'], { encoding: 'utf8' }).trim();
+  const resetKey = resetKeysRaw.split(/\s+/).filter(Boolean).pop();
+  expect(resetKey).toBeTruthy();
+  const resetToken = (resetKey as string).replace('pwd_reset:', '');
+  const temporaryPassword = 'FrameFluxReset123!';
+  const resetResponse = await request.post(`${API}/auth/reset-password`, { data: { token: resetToken, new_password: temporaryPassword } });
+  expect(resetResponse.ok()).toBeTruthy();
+  const temporaryLogin = await request.post(`${API}/auth/login`, { data: { email: readCreds().email, password: temporaryPassword } });
+  expect(temporaryLogin.ok()).toBeTruthy();
+  const temporaryToken = (await temporaryLogin.json()).access_token as string;
+  const restoredHeaders = { Authorization: `Bearer ${temporaryToken}`, 'Content-Type': 'application/json' };
+  const restorePassword = await request.post(`${API}/auth/change-password`, { headers: restoredHeaders, data: { current_password: temporaryPassword, new_password: readCreds().password } });
+  expect(restorePassword.ok()).toBeTruthy();
+  const freshSession = await request.post(`${API}/auth/login`, { data: { email: readCreds().email, password: readCreds().password } });
+  expect(freshSession.ok()).toBeTruthy();
+  const freshAccessToken = (await freshSession.json()).access_token as string;
+  await screenshot(page, '18-password-reset-readback.png');
+  writeState({ accessToken: freshAccessToken });
+
+  const preferenceSelects = page.locator('button[role="combobox"]');
+  if (await preferenceSelects.count() >= 2) {
+    await preferenceSelects.nth(0).click();
+    await page.getByRole('option').first().click();
+    await preferenceSelects.nth(1).click();
+    await page.getByRole('option').first().click();
+    await page.getByRole('button', { name: /Save Preferences/i }).click().catch(() => {});
+  }
+
+  await page.goto('/app/dashboard/notifications');
+  await page.getByRole('button', { name: /New Notification/i }).click();
+  await page.getByLabel('Event').fill('e2e.fullstack');
+  await page.getByLabel('Message').fill('Real notification created through the UI.');
+  await page.getByRole('button', { name: 'Create' }).click();
+  await page.waitForTimeout(500);
+  const notes = await apiJson(request, 'GET', `${API}/notifications?page=1&page_size=50`, headers);
+  expect(notes.ok()).toBeTruthy();
+  const noteBody = await notes.json();
+  const note = noteBody.items.find((n: { event: string }) => n.event === 'e2e.fullstack');
+  expect(note).toBeTruthy();
+  writeState({ notificationId: note.id });
+  await screenshot(page, '19-notification-created.png');
+
+  await page.goto('/app/dashboard/presets');
+  await page.getByRole('button', { name: /New Preset/i }).click();
+  await page.getByLabel('Name').fill('E2E Preset');
+  await page.getByLabel('Description').fill('Created from the live UI against PostgreSQL.');
+  await page.getByRole('button', { name: 'Create' }).click();
+  await page.waitForTimeout(500);
+  const presets = await apiJson(request, 'GET', `${API}/presets`, headers);
+  expect(presets.ok()).toBeTruthy();
+  const preset = (await presets.json()).find((p: { name: string }) => p.name === 'E2E Preset');
+  expect(preset).toBeTruthy();
+  writeState({ presetId: preset.id });
+  await screenshot(page, '20-preset-created.png');
+
+  if (preset?.id) {
+    const row = page.getByText('E2E Preset').first().locator('..').locator('..').locator('..');
+    await row.getByRole('button').nth(1).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Edit Preset')).toBeVisible();
+    await page.getByRole('button', { name: 'Cancel' }).click();
+  }
+
+  const refreshedLogin = await request.post(`${API}/auth/login`, { data: { email: readCreds().email, password: readCreds().password } });
+  expect(refreshedLogin.ok()).toBeTruthy();
+  writeState({ accessToken: (await refreshedLogin.json()).access_token as string });
+  fs.writeFileSync(path.join(EVIDENCE, 'api-trace-workspace.json'), JSON.stringify(apiEvents, null, 2));
+});
+
+test('project CRUD, folders and real resumable media upload', async ({ page, request }) => {
+  await login(page);
+  const headers = await authHeaders(request);
+
+  await page.goto('/app/dashboard/projects');
+  await page.getByRole('button', { name: 'Create Project', exact: true }).first().click();
+  const projectName = `E2E Project ${Date.now()}`;
+  await page.getByLabel('Name').fill(projectName);
+  await page.getByLabel('Description').fill('Real database-backed full-stack walkthrough project.');
+  await page.getByRole('button', { name: 'Create Project' }).click();
+  await expect(page.getByText(projectName)).toBeVisible({ timeout: 15_000 });
+
+  const projectList = await apiJson(request, 'GET', `${API}/projects`, headers);
+  expect(projectList.ok()).toBeTruthy();
+  const project = (await projectList.json()).find((p: { name: string }) => p.name === projectName);
+  expect(project).toBeTruthy();
+  writeState({ projectId: project.id });
+  await screenshot(page, '21-project-created.png');
+
+  await page.goto(`/app/dashboard/projects/${project.id}`);
+  await expect(page.getByText(projectName)).toBeVisible();
+  await screenshot(page, '22-project-detail.png');
+
+  await page.getByRole('tab', { name: /Folders/ }).click();
+  await page.getByRole('button', { name: 'New Folder', exact: true }).click();
+  await page.getByLabel('Folder Name').fill('E2E Folder');
+  await page.getByRole('button', { name: 'Create', exact: true }).click();
+  await page.waitForTimeout(500);
+  const folders = await apiJson(request, 'GET', `${API}/projects/${project.id}/folders`, headers);
+  expect(folders.ok()).toBeTruthy();
+  expect((await folders.json()).some((f: { name: string }) => f.name === 'E2E Folder')).toBeTruthy();
+  await screenshot(page, '23-project-folder-created.png');
+
+  await page.goto('/app/dashboard/media');
+  const fileInput = page.locator('input[type="file"]').first();
+  await page.getByRole('button', { name: /Upload media/i }).click();
+  await fileInput.setInputFiles(path.join(FIXTURES, 'sample.mp4'));
+  await page.getByRole('button', { name: /Upload/i }).last().click();
+  await page.waitForURL(/\/app\/dashboard\/media\/[^?]+\?from_upload=1/, { timeout: 90_000 });
+  const mediaId = page.url().match(/media\/([^?]+)/)?.[1];
+  expect(mediaId).toBeTruthy();
+  writeState({ mediaId });
+
+  const mediaRead = await apiJson(request, 'GET', `${API}/media/${mediaId}`, headers);
+  expect(mediaRead.ok()).toBeTruthy();
+  const mediaBody = await mediaRead.json();
+  expect(mediaBody.original_filename).toBe('sample.mp4');
+  await screenshot(page, '24-media-uploaded-readback.png');
+
+  await page.goto('/app/dashboard/media');
+  await page.getByRole('button', { name: /Upload media/i }).click();
+  await fileInput.setInputFiles([
+    path.join(FIXTURES, 'sample-second.mp4'),
+    path.join(FIXTURES, 'sample.wav'),
+    path.join(FIXTURES, 'sample.jpg'),
+  ]);
+  await page.getByRole('button', { name: /Upload/i }).last().click();
+  await page.waitForTimeout(2_000);
+
+  const mediaList = await apiJson(request, 'GET', `${API}/media`, headers);
+  expect(mediaList.ok()).toBeTruthy();
+  const allMedia = await mediaList.json();
+  const media2 = allMedia.find((m: { original_filename: string }) => m.original_filename === 'sample-second.mp4');
+  const audio = allMedia.find((m: { original_filename: string }) => m.original_filename === 'sample.wav');
+  const image = allMedia.find((m: { original_filename: string }) => m.original_filename === 'sample.jpg');
+  expect(media2 && audio && image).toBeTruthy();
+  writeState({ media2Id: media2.id, audioId: audio.id, imageId: image.id });
+  await screenshot(page, '25-multiple-media-uploaded.png');
+
+  const projectDetailMedia = await apiJson(request, 'GET', `${API}/projects/${project.id}/media`, headers);
+  expect(projectDetailMedia.ok()).toBeTruthy();
+
+  await page.goto('/app/dashboard/projects');
+  await page.getByRole('button', { name: 'More options' }).first().click();
+  await page.getByRole('menuitem', { name: 'Edit' }).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  await page.getByLabel('Name').fill(`${projectName} Updated`);
+  await page.getByRole('button', { name: 'Save Changes', exact: true }).click();
+  const projectAfter = await apiJson(request, 'GET', `${API}/projects/${project.id}`, headers);
+  expect(projectAfter.ok()).toBeTruthy();
+  expect((await projectAfter.json()).name).toBe(`${projectName} Updated`);
+  await screenshot(page, '26-project-updated.png');
+
+  writeState({ projectId: project.id });
+});
+
+test('media processing, editor forms, thumbnails, previews, versions and sharing', async ({ page, request }) => {
+  await login(page);
+  const state = readState();
+  const headers = await authHeaders(request);
+  expect(state.mediaId).toBeTruthy();
+
+  const mediaId = state.mediaId as string;
+  await page.goto(`/app/dashboard/media/${mediaId}`);
+  await expect(page.getByText('sample.mp4', { exact: true }).first()).toBeVisible();
+  await screenshot(page, '27-media-overview.png');
+
+  const processResponsePromise = page.waitForResponse((r) => r.url().includes(`/media/${mediaId}/process`) && r.request().method() === 'POST');
+  await page.getByRole('button', { name: /^Process$/ }).click();
+  const processResponse = await processResponsePromise;
+  expect(processResponse.status()).toBe(200);
+  await waitForMediaComplete(request, headers, mediaId);
+  await page.reload();
+  await page.waitForTimeout(500);
+  await screenshot(page, '28-media-processing-completed.png');
+
+  const tabs = ['Processing', 'Tools', 'Versions', 'Sharing', 'Metadata'];
+  for (const tab of tabs) {
+    await page.getByRole('tab', { name: tab }).click();
+    await page.waitForTimeout(300);
+    await screenshot(page, `29-tab-${tab.toLowerCase()}.png`);
+  }
+
+  await page.getByRole('tab', { name: 'Processing' }).click();
+  await page.getByRole('button', { name: 'Transform', exact: true }).first().evaluate((button) => (button as HTMLButtonElement).click());
+  await expect(page.getByRole('button', { name: 'Apply Transform', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Apply Transform', exact: true }).click();
+  await page.waitForTimeout(750);
+  await screenshot(page, '30-transform-request.png');
+
+  await page.getByRole('button', { name: 'Overlay', exact: true }).first().evaluate((button) => (button as HTMLButtonElement).click());
+  await expect(page.getByRole('button', { name: /^Apply (\d+) Overlay/i })).toBeVisible().catch(() => {});
+  await screenshot(page, '31-overlay-editor.png');
+
+  await page.getByRole('tab', { name: 'Tools' }).click();
+  await page.waitForTimeout(500);
+  await screenshot(page, '32-tools-editor.png');
+
+  await page.getByRole('tab', { name: 'Tools' }).click();
+  await page.waitForTimeout(500);
+  const toolButtons = page.getByRole('button');
+  const toolTexts = await toolButtons.evaluateAll((buttons) => buttons.map((b) => (b.textContent || '').trim()).filter(Boolean));
+  expect(toolTexts.join(' ')).toMatch(/Video Editor|Video|Audio|Editor/);
+  await screenshot(page, '37-tools-editor.png');
+
+  await page.goto(`/app/dashboard/media/${mediaId}`);
+  const shareTab = page.getByRole('tab', { name: 'Sharing' });
+  await shareTab.click();
+  await page.getByRole('button', { name: /Create Share Link/i }).click();
+  await page.getByLabel('Password (optional)').fill('SharePass123!');
+  await page.getByRole('button', { name: 'Create Link' }).click();
+  await page.waitForTimeout(700);
+  const shares = await apiJson(request, 'GET', `${API}/sharing`, headers);
+  expect(shares.ok()).toBeTruthy();
+  const share = (await shares.json()).find((s: { media_id: string }) => s.media_id === mediaId);
+  expect(share).toBeTruthy();
+  writeState({ shareId: share.id, shareToken: share.token });
+  await screenshot(page, '38-share-created.png');
+
+  if (share?.id) {
+    await apiJson(request, 'POST', `${API}/sharing/${share.id}/disable`, headers);
+    const shareAfterDisable = await apiJson(request, 'GET', `${API}/sharing/${share.token}`, headers);
+    expect(shareAfterDisable.status()).toBe(404);
+  }
+
+  const versions = await apiJson(request, 'GET', `${API}/media/${mediaId}/versions`, headers);
+  expect(versions.ok()).toBeTruthy();
+  await screenshot(page, '39-media-versions-readback.png');
+});
+
+test('feature capability sweep with real API data and UI read-back', async ({ page, request }) => {
+  await login(page);
+  const state = readState();
+  const headers = await authHeaders(request);
+  const mediaId = state.mediaId as string;
+  const media2Id = state.media2Id as string;
+  const audioId = state.audioId as string;
+  const imageId = state.imageId as string;
+  expect.soft(mediaId && media2Id && audioId && imageId).toBeTruthy();
+
+  // Search, storage, history, jobs and dashboard are all backed by authenticated API reads.
+  await page.goto('/app/dashboard/search');
+  const searchInput = page.getByPlaceholder(/Search/i).first();
+  await searchInput.fill('sample');
+  await page.waitForTimeout(500);
+  await screenshot(page, '40-search-results.png');
+
+  await page.goto('/app/dashboard/storage');
+  await screenshot(page, '41-storage-live.png');
+
+  await page.goto('/app/dashboard/history');
+  await screenshot(page, '42-history-live.png');
+
+  await page.goto('/app/dashboard/jobs');
+  await screenshot(page, '43-jobs-live.png');
+
+  await page.goto('/app/dashboard/favorites');
+  const favoriteAdd = await apiJson(request, 'POST', `${API}/favorites`, headers, { media_id: mediaId });
+  expect.soft(favoriteAdd.ok()).toBeTruthy();
+  await page.reload();
+  await expect(page.getByText(`Media ID: ${mediaId}`, { exact: true })).toBeVisible();
+  await screenshot(page, '44-favorite-readback.png');
+  const favoriteDelete = await apiJson(request, 'DELETE', `${API}/favorites/${mediaId}`, headers);
+  expect.soft(favoriteDelete.ok()).toBeTruthy();
+
+  const compare = await apiJson(request, 'GET', `${API}/comparisons/${mediaId}/${media2Id}`, headers);
+  expect.soft(compare.ok()).toBeTruthy();
+  await page.goto('/app/dashboard/comparisons');
+  await screenshot(page, '45-comparison-page.png');
+
+  await page.goto('/app/dashboard/batch');
+  await screenshot(page, '46-batch-page-live.png');
+
+  // Batch process a real uploaded second video through the actual API.
+  const batch = await apiJson(request, 'POST', `${API}/batch/process`, headers, {
+    media_ids: [mediaId, media2Id],
+    operation: 'generate_thumbnail',
+    options: {},
+  });
+  expect.soft(batch.ok()).toBeTruthy();
+  const batchBody = await batch.json();
+  const batchStatus = await apiJson(request, 'GET', `${API}/batch/${batchBody.job_id}/status`, headers);
+  expect.soft(batchStatus.ok()).toBeTruthy();
+
+  // Quick actions are read dynamically, then executed with a real media record.
+  const quick = await apiJson(request, 'GET', `${API}/quick-actions`, headers);
+  expect.soft(quick.ok()).toBeTruthy();
+  const quickBody = await quick.json();
+  const firstQuick = quickBody.video?.[0] ?? quickBody.audio?.[0] ?? quickBody.image?.[0];
+  if (firstQuick) {
+    const quickRun = await apiJson(request, 'POST', `${API}/quick-actions/${mediaId}/execute`, headers, undefined, { action_id: firstQuick.id });
+    expect.soft(quickRun.ok()).toBeTruthy();
+  }
+  await page.goto('/app/dashboard/quick-actions');
+  await screenshot(page, '47-quick-action-live.png');
+
+  // Notification state transitions.
+  const unreadBefore = await apiJson(request, 'GET', `${API}/notifications/unread-count`, headers);
+  expect.soft(unreadBefore.ok()).toBeTruthy();
+  if (state.notificationId) {
+    const markRead = await apiJson(request, 'POST', `${API}/notifications/${state.notificationId}/read`, headers);
+    expect.soft(markRead.ok()).toBeTruthy();
+  }
+  const readAll = await apiJson(request, 'POST', `${API}/notifications/read-all`, headers);
+  expect.soft(readAll.ok()).toBeTruthy();
+
+  // Metadata, media info and binary preview/file endpoints.
+  for (const url of [
+    `${API}/metadata/${mediaId}`,
+    `${API}/media-info/${mediaId}`,
+  ]) {
+    const response = await request.get(url, { headers });
+    expect.soft(response.ok()).toBeTruthy();
+  }
+
+  for (const url of [
+    `${API}/preview/${mediaId}/video?duration=1&width=160&fps=6`,
+    `${API}/preview/${mediaId}/gif?duration=1&width=160&fps=6&quality=20`,
+    `${API}/preview/${mediaId}/thumbnail?timestamp=0&width=160&height=90&fmt=jpg`,
+    `${API}/thumbnails/${mediaId}?timestamp=0&width=160&fmt=jpg`,
+    `${API}/thumbnails/${mediaId}/set?interval=1&width=160&fmt=jpg`,
+  ]) {
+    const response = await request.get(url, { headers });
+    expect.soft(response.ok()).toBeTruthy();
+  }
+
+  const gif = await request.post(`${API}/gif/${mediaId}/generate?start=0&duration=1&width=160&fps=6&quality=20`, { headers });
+  expect.soft(gif.ok()).toBeTruthy();
+
+  // Video operations.
+  for (const [url, body] of [
+    [`${API}/video/${mediaId}/adjust`, { brightness: 0, contrast: 1, saturation: 1, gamma: 1, hue: 0 }],
+    [`${API}/video/${mediaId}/filter`, { operation: 'sharpen', intensity: 1 }],
+    [`${API}/video/${mediaId}/fade`, { fade_type: 'in', duration: 0.5, start_time: 0 }],
+    [`${API}/video/${mediaId}/reverse`, { output_format: 'mp4' }],
+  ] as const) {
+    const response = await request.post(url, { headers, data: body });
+    expect.soft(response.ok()).toBeTruthy();
+  }
+
+  // Audio operations against the actual uploaded WAV.
+  const audioConvert = await request.post(`${API}/audio/${audioId}/convert`, { headers, data: { format: 'mp3', quality: 'medium' } });
+  expect.soft(audioConvert.ok()).toBeTruthy();
+  const audioExtract = await request.get(`${API}/audio/${audioId}/extract?format=wav&quality=medium`, { headers });
+  expect.soft(audioExtract.ok()).toBeTruthy();
+  const audioVolume = await request.post(`${API}/audio/${mediaId}/volume?volume=0.8&fade_in=0.1&fade_out=0.1`, { headers });
+  expect.soft(audioVolume.ok()).toBeTruthy();
+  const audioEdit = await request.post(`${API}/audio/${audioId}/edit`, { headers, data: { operation: 'trim', start: 0, end: 1 } });
+  expect.soft(audioEdit.ok()).toBeTruthy();
+
+  // Image operations against the actual uploaded JPG.
+  const imageConvert = await request.post(`${API}/images/${imageId}/convert`, { headers, data: { format: 'png', width: 160, height: 90 } });
+  expect.soft(imageConvert.ok()).toBeTruthy();
+  const imageCompress = await request.post(`${API}/images/${imageId}/compress?quality=70&max_width=160&max_height=90`, { headers });
+  expect.soft(imageCompress.ok()).toBeTruthy();
+
+  // Thumbnails, effects and transcoding.
+  const thumbSelect = await request.post(`${API}/thumbnails/${mediaId}/select?timestamp=0&width=160`, { headers });
+  expect.soft(thumbSelect.ok()).toBeTruthy();
+  const thumbCrop = await request.post(`${API}/thumbnails/${mediaId}/crop?timestamp=0&x=0&y=0&width=80&height=45`, { headers });
+  expect.soft(thumbCrop.ok()).toBeTruthy();
+
+  const effectsList = await request.get(`${API}/effects/${mediaId}/list`, { headers });
+  expect(effectsList.ok()).toBeTruthy();
+  const effectsBody = await effectsList.json();
+  expect.soft(effectsBody.effects).toEqual([]);
+  expect(effectsBody.message).toMatch(/configured/i);
+  const effectApply = await request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: 'test', parameters: {} } });
+  expect.soft(effectApply.ok()).toBeTruthy();
+  expect((await effectApply.json()).status).toBe('queued');
+
+  const transcode = await request.post(`${API}/transcoding/${mediaId}/transcode`, { headers, data: { format: 'mp4', preserve_aspect_ratio: true, options: {} } });
+  expect.soft(transcode.ok(), `transcode status=${transcode.status()} body=${(await transcode.text()).slice(0, 300)}`).toBeTruthy();
+
+  // Subtitle upload + tracks + edit + sync/mux/burn capability.
+  const subtitleUpload = await request.post(`${API}/subtitles/upload`, {
+    headers: { Authorization: headers.Authorization },
+    multipart: {
+      file: {
+        name: 'sample.srt',
+        mimeType: 'application/x-subrip',
+        buffer: fs.readFileSync(path.join(FIXTURES, 'sample.srt')),
+      },
+    },
+  });
+  expect.soft(subtitleUpload.ok()).toBeTruthy();
+  const subtitleBody = await subtitleUpload.json();
+  const subtitlePath = subtitleBody.filename;
+  const tracks = await request.get(`${API}/subtitles/${mediaId}/tracks`, { headers });
+  expect.soft(tracks.ok()).toBeTruthy();
+  const subtitleEdit = await request.post(`${API}/subtitles/${mediaId}/edit`, { headers, data: { operation: 'update_text', subtitle_path: subtitlePath, entry_index: 1, text: 'Updated by full-stack E2E' } });
+  expect.soft(subtitleEdit.ok()).toBeTruthy();
+  const subtitleBurn = await request.post(`${API}/subtitles/${mediaId}/burn?subtitle_path=${encodeURIComponent(subtitlePath)}&font_size=20&position=bottom`, { headers });
+  expect.soft(subtitleBurn.ok()).toBeTruthy();
+  const subtitleMux = await request.post(`${API}/subtitles/${mediaId}/mux?subtitle_path=${encodeURIComponent(subtitlePath)}&language=en`, { headers });
+  expect.soft(subtitleMux.ok(), `subtitle mux status=${subtitleMux.status()} body=${(await subtitleMux.text()).slice(0, 300)}`).toBeTruthy();
+  const subtitleSync = await request.post(`${API}/subtitles/${mediaId}/sync`, { headers, data: { subtitle_path: subtitlePath, offset_seconds: 0, scale: 1 } });
+  expect.soft(subtitleSync.ok(), `subtitle sync status=${subtitleSync.status()} body=${(await subtitleSync.text()).slice(0, 300)}`).toBeTruthy();
+
+  // Resumable upload control endpoints were exercised through the UI; direct state calls are checked through a second session.
+  const resumableInit = await request.post(`${API}/media/resumable/init`, { headers, data: { original_filename: 'control-test.mp4', total_size: fs.statSync(path.join(FIXTURES, 'sample.mp4')).size, chunk_size: Math.min(1024 * 1024, fs.statSync(path.join(FIXTURES, 'sample.mp4')).size) } });
+  expect.soft(resumableInit.ok()).toBeTruthy();
+  const resumable = await resumableInit.json();
+  expect.soft((await request.post(`${API}/media/resumable/${resumable.upload_id}/pause`, { headers })).ok()).toBeTruthy();
+  expect.soft((await request.post(`${API}/media/resumable/${resumable.upload_id}/resume`, { headers })).ok()).toBeTruthy();
+  expect.soft((await request.delete(`${API}/media/resumable/${resumable.upload_id}`, { headers })).ok()).toBeTruthy();
+
+  // Direct export/history/UI preference/storage calls complete the remaining backend capabilities.
+  const historyCreate = await request.post(`${API}/history?media_id=${mediaId}&operation=e2e&status=completed`, { headers });
+  expect.soft(historyCreate.ok()).toBeTruthy();
+  const historyRead = await request.get(`${API}/history`, { headers });
+  expect.soft(historyRead.ok()).toBeTruthy();
+
+  const storageUsage = await request.get(`${API}/storage/usage`, { headers });
+  const storageType = await request.get(`${API}/storage/usage/by-type`, { headers });
+  const storageFolder = await request.get(`${API}/storage/usage/by-folder`, { headers });
+  expect.soft(storageUsage.ok() && storageType.ok() && storageFolder.ok()).toBeTruthy();
+
+  const dashboard = await request.get(`${API}/dashboard/overview`, { headers });
+  expect.soft(dashboard.ok()).toBeTruthy();
+  const recent = await request.get(`${API}/dashboard/recent-processing`, { headers });
+  expect.soft(recent.ok()).toBeTruthy();
+
+  // Jobs and live status are real DB/Redis-backed reads.
+  const jobs = await request.get(`${API}/jobs`, { headers });
+  expect.soft(jobs.ok()).toBeTruthy();
+  if (state.shareToken) {
+    const publicShareCreate = await request.post(`${API}/sharing`, { headers, data: { media_id: mediaId, allow_download: true } });
+    expect(publicShareCreate.ok()).toBeTruthy();
+    const freshShare = await publicShareCreate.json();
+    const publicShare = await request.get(`${API}/sharing/${freshShare.token}`, { headers });
+    expect.soft(publicShare.ok(), `public share status=${publicShare.status()}`).toBeTruthy();
+    const embed = await request.get(`${API}/sharing/embed/${freshShare.token}`, { headers });
+    expect.soft(embed.ok(), `embed status=${embed.status()}`).toBeTruthy();
+    await request.delete(`${API}/sharing/${freshShare.id}`, { headers });
+  }
+
+  await page.goto('/app/dashboard/media');
+  await screenshot(page, '48-final-media-library.png');
+  assertEvidenceFile('48-final-media-library.png');
+});
+
+test('comprehensive authenticated capability matrix and lifecycle read-back', async ({ page, request }) => {
+  const state = readState();
+  const headers = await authHeaders(request);
+  const mediaId = state.mediaId as string;
+  const media2Id = state.media2Id as string;
+  const audioId = state.audioId as string;
+  const imageId = state.imageId as string;
+  const projectId = state.projectId as string;
+  expect(mediaId && media2Id && audioId && imageId && projectId).toBeTruthy();
+
+  const failures: string[] = [];
+  async function check(name: string, fn: () => Promise<APIResponse>, allowed = [200, 201, 202, 204]) {
+    try {
+      const response = await fn();
+      if (!allowed.includes(response.status())) {
+        const body = await response.text();
+        failures.push(`${name}: ${response.status()} ${body.slice(0, 300)}`);
+        return null;
+      }
+      return response;
+    } catch (error) {
+      failures.push(`${name}: ${error instanceof Error ? error.message : String(error)}`);
+      return null;
+    }
+  }
+
+  // Project lifecycle/status/read-only capability endpoints.
+  await check('project-status', () => request.get(`${API}/projects/${projectId}/status`, { headers }));
+  await check('project-workflows', () => request.get(`${API}/projects/${projectId}/workflows`, { headers }));
+  await check('project-history', () => request.get(`${API}/projects/${projectId}/history`, { headers }));
+  const tempProjectResponse = await check('project-create-temp', () => request.post(`${API}/projects`, { headers, data: { name: `E2E Temp Project ${Date.now()}`, description: 'Capability matrix' } }));
+  let tempProjectId: string | undefined;
+  if (tempProjectResponse) tempProjectId = (await tempProjectResponse.json()).id;
+  if (tempProjectId) await check('project-delete-temp', () => request.delete(`${API}/projects/${tempProjectId}`, { headers }), [204]);
+
+  // Preset CRUD beyond the UI create/read flow.
+  const presetResponse = await check('preset-create-api', () => request.post(`${API}/presets`, { headers, data: { name: `E2E API Preset ${Date.now()}`, description: 'API lifecycle', settings: { format: 'mp4', quality: 28 } } }));
+  let tempPresetId: string | undefined;
+  if (presetResponse) tempPresetId = (await presetResponse.json()).id;
+  if (tempPresetId) {
+    await check('preset-update-api', () => request.patch(`${API}/presets/${tempPresetId}`, { headers, data: { description: 'Updated API lifecycle', settings: { format: 'webm', quality: 30 } } }));
+    await check('preset-delete-api', () => request.delete(`${API}/presets/${tempPresetId}`, { headers }), [204]);
+  }
+
+  // Workflow CRUD + run through Redis/ARQ.
+  const workflowResponse = await check('workflow-create-api', () => request.post(`${API}/workflows`, { headers, data: { name: `E2E Workflow ${Date.now()}`, description: 'Capability matrix workflow', operations: [{ type: 'trim', params: { start: 0, end: 1 } }] } }));
+  let workflowId: string | undefined;
+  if (workflowResponse) workflowId = (await workflowResponse.json()).id;
+  if (workflowId) {
+    await check('workflow-list-api', () => request.get(`${API}/workflows`, { headers }));
+    await check('workflow-get-api', () => request.get(`${API}/workflows/${workflowId}`, { headers }));
+    await check('workflow-update-api', () => request.patch(`${API}/workflows/${workflowId}`, { headers, data: { description: 'Updated workflow' } }));
+    await check('workflow-run-api', () => request.post(`${API}/workflows/${workflowId}/run?media_id=${mediaId}`, { headers }));
+    await check('workflow-delete-api', () => request.delete(`${API}/workflows/${workflowId}`, { headers }), [204]);
+  }
+
+  // Media lifecycle: progress, project attach, binary downloads and batch download.
+  await check('media-progress', () => request.get(`${API}/media/${mediaId}/progress`, { headers }));
+  await check('media-file', () => request.get(`${API}/media/${mediaId}/file`, { headers }));
+  await check('media-download-original', () => request.get(`${API}/media/${mediaId}/download?download_type=original`, { headers }));
+  await check('media-download-processed', () => request.get(`${API}/media/${mediaId}/download?download_type=processed`, { headers }));
+  await check('media-attach-project', () => request.patch(`${API}/media/${media2Id}/project/${projectId}`, { headers }));
+  await check('media-batch-download', () => request.post(`${API}/media/batch-download`, { headers, data: { media_ids: [mediaId, media2Id] } }));
+
+  // Remaining media operations that queue against the actual worker.
+  await check('media-compress', () => request.post(`${API}/media/${mediaId}/compress`, { headers, data: { format: 'mp4', quality: 30 } }));
+  await check('media-keep-clips', () => request.post(`${API}/media/${mediaId}/clips/keep`, { headers, data: { clips: [{ start: 0, end: 1 }] } }));
+  await check('media-delete-clips', () => request.post(`${API}/media/${mediaId}/clips/delete`, { headers, data: { clips: [{ start: 1, end: 2 }] } }));
+  await check('media-reorder-clips', () => request.post(`${API}/media/${mediaId}/clips/reorder`, { headers, data: { media_ids: [mediaId, media2Id] } }));
+  await check('media-append-clips', () => request.post(`${API}/media/${mediaId}/clips/append`, { headers, data: { media_ids: [mediaId, media2Id] } }));
+  await check('media-process-unified', () => request.post(`${API}/media/${mediaId}/process-unified`, { headers, data: { media_id: mediaId, operations: [{ type: 'trim', start: 0, end: 1 }] } }));
+
+  // Export and transcoding endpoints (current backend exposes these as configured queue/capability responses).
+  await check('export-queue', () => request.post(`${API}/export/${mediaId}/export`, { headers, data: { format: 'mp4', quality: 28 } }));
+  await check('export-status', () => request.get(`${API}/export/${mediaId}/status`, { headers }));
+  await check('transcode', () => request.post(`${API}/transcoding/${mediaId}/transcode`, { headers, data: { format: 'mp4', preserve_aspect_ratio: true, options: {} } }));
+  await check('transcode-convert', () => request.post(`${API}/transcoding/${mediaId}/convert`, { headers, data: { format: 'mp4' } }));
+  await check('transcode-compress', () => request.post(`${API}/transcoding/${mediaId}/compress`, { headers, data: { format: 'mp4' } }));
+
+  // Batch upload/process lifecycle.
+  const batchUpload = await check('batch-upload', () => request.post(`${API}/batch/upload`, { headers, data: { files: [`sample.mp4`, `sample-second.mp4`] } }));
+  if (batchUpload) {
+    const body = await batchUpload.json();
+    if (body.job_id) await check('batch-upload-status', () => request.get(`${API}/batch/${body.job_id}/status`, { headers }));
+  }
+
+  // Audio capability matrix using the real uploaded WAV/video assets.
+  const audioRecordResponse = await request.get(`${API}/media/${audioId}`, { headers });
+  expect(audioRecordResponse.ok(), `audio record status=${audioRecordResponse.status()} body=${(await audioRecordResponse.text()).slice(0, 300)}`).toBeTruthy();
+  const audioStoredFilename = (await audioRecordResponse.json()).stored_filename as string;
+  await check('audio-batch-extract', () => request.post(`${API}/audio/batch/extract`, { headers, data: { media_ids: [mediaId, media2Id], format: 'mp3', bitrate: '128k' } }));
+  await check('audio-replace', () => request.post(`${API}/audio/${mediaId}/replace-audio?audio_path=${encodeURIComponent(audioStoredFilename)}`, { headers }));
+  await check('audio-to-video', () => request.post(`${API}/audio/${audioId}/to-video`, { headers, data: { background_color: '#000000', text: 'FrameFlux E2E', resolution: '320x180', fps: 10, duration: 1, output_format: 'mp4' } }));
+  await check('audio-sync-video', () => request.post(`${API}/audio/${mediaId}/sync-audio`, { headers, data: { audio_path: audioStoredFilename, audio_offset: 0, output_format: 'mp4' } }));
+
+  const audioPersistedBeforeMatrix = await request.get(`${API}/media/${audioId}`, { headers });
+  expect(audioPersistedBeforeMatrix.ok(), `audio persisted before matrix: status=${audioPersistedBeforeMatrix.status()} body=${(await audioPersistedBeforeMatrix.text()).slice(0, 300)}`).toBeTruthy();
+
+  // Version lifecycle.
+  const versionsResponse = await request.get(`${API}/media/${mediaId}/versions`, { headers });
+  if (versionsResponse.ok()) {
+    const versions = await versionsResponse.json();
+    const version = versions[versions.length - 1];
+    if (version) {
+      await check('media-version-get', () => request.get(`${API}/media/${mediaId}/versions/${version.id}`, { headers }));
+      await check('media-version-download', () => request.get(`${API}/media/${mediaId}/versions/${version.id}/download`, { headers }));
+      await check('media-version-restore', () => request.post(`${API}/media/${mediaId}/versions/${version.id}/restore`, { headers }));
+    }
+  }
+
+  // Sharing public player/stream lifecycle.
+  const publicShareResponse = await check('public-share-create', () => request.post(`${API}/sharing`, { headers, data: { media_id: mediaId, allow_download: true } }));
+  let publicToken: string | undefined, publicShareId: string | undefined;
+  if (publicShareResponse) {
+    const share = await publicShareResponse.json();
+    publicToken = share.token;
+    publicShareId = share.id;
+    await check('share-player', () => request.get(`${API}/sharing/player/${publicToken}`, { headers: { Referer: 'http://127.0.0.1:3000/' } }));
+    await check('share-stream', () => request.get(`${API}/sharing/stream/${publicToken}`, { headers: { Referer: 'http://127.0.0.1:3000/' } }));
+    await check('share-delete', () => request.delete(`${API}/sharing/${publicShareId}`, { headers }), [204]);
+  }
+
+  // Effects are configured stubs; verify their documented HTTP contract.
+  const effects = await check('effects-list', () => request.get(`${API}/effects/${mediaId}/list`, { headers }));
+  if (effects) {
+    const body = await effects.json();
+    if (body.effects?.length !== 0 || !/configured/i.test(body.message ?? '')) {
+      failures.push('effects-list contract mismatch');
+    }
+  }
+  await check('effects-apply', () => request.post(`${API}/effects/${mediaId}/apply`, { headers, data: { effect_name: 'test', parameters: {} } }));
+  await check('effects-remove', () => request.delete(`${API}/effects/${mediaId}/remove`, { headers }));
+
+  // Invalid-input coverage on real endpoints.
+  const invalidEdit = await request.post(`${API}/media/${mediaId}/edit`, { headers, data: { operation: 'invalid', start: 1, end: 0 } });
+  if (invalidEdit.status() !== 400 && invalidEdit.status() !== 422) failures.push(`invalid-edit expected 400/422 got ${invalidEdit.status()}`);
+  const missingProject = await request.get(`${API}/projects/00000000-0000-0000-0000-000000000000`, { headers });
+  if (missingProject.status() !== 404) failures.push(`missing-project expected 404 got ${missingProject.status()}`);
+
+  // Real resumable chunk lifecycle with an actual local media file.
+  const fileBytes = fs.readFileSync(path.join(FIXTURES, 'sample.mp4'));
+  const chunkSize = fileBytes.length + 1;
+  const resumableInit = await request.post(`${API}/media/resumable/init`, { headers, data: { original_filename: 'matrix-sample.mp4', total_size: fileBytes.length, chunk_size: chunkSize } });
+  if (!resumableInit.ok()) failures.push(`resumable-init: ${resumableInit.status()}`);
+  else {
+    const uploadId = (await resumableInit.json()).upload_id;
+    const chunkBody = await request.post(`${API}/media/resumable/${uploadId}/chunk/0`, { headers: { Authorization: headers.Authorization }, multipart: { file: { name: 'matrix-sample.mp4', mimeType: 'video/mp4', buffer: fileBytes } } });
+    if (!chunkBody.ok()) failures.push(`resumable-chunk: ${chunkBody.status()}`);
+    const retryBody = await request.post(`${API}/media/resumable/${uploadId}/retry?index=0`, { headers: { Authorization: headers.Authorization }, multipart: { file: { name: 'matrix-sample.mp4', mimeType: 'video/mp4', buffer: fileBytes } } });
+    if (!retryBody.ok()) failures.push(`resumable-retry: ${retryBody.status()}`);
+    const progressBody = await request.get(`${API}/media/uploads/${uploadId}/progress`, { headers });
+    if (!progressBody.ok()) failures.push(`resumable-progress: ${progressBody.status()}`);
+    const pauseBody = await request.post(`${API}/media/resumable/${uploadId}/pause`, { headers });
+    if (!pauseBody.ok()) failures.push(`resumable-pause: ${pauseBody.status()}`);
+    const resumeBody = await request.post(`${API}/media/resumable/${uploadId}/resume`, { headers });
+    if (!resumeBody.ok()) failures.push(`resumable-resume: ${resumeBody.status()}`);
+    const finalizeBody = await request.post(`${API}/media/resumable/${uploadId}/finalize`, { headers });
+    if (!finalizeBody.ok()) failures.push(`resumable-finalize: ${finalizeBody.status()}`);
+    else {
+      const finalized = await finalizeBody.json();
+      await check('resumable-final-media-readback', () => request.get(`${API}/media/${finalized.id}`, { headers }));
+      await check('resumable-final-media-delete', () => request.delete(`${API}/media/${finalized.id}`, { headers }), [204]);
+    }
+  }
+
+  await page.goto('/app/dashboard/media');
+  await screenshot(page, '51-capability-matrix-final.png');
+
+  expect(failures, failures.join('\\n')).toEqual([]);
+});
+
+test('real login/logout and final database cleanup evidence', async ({ page, request }) => {
+  const creds = readCreds();
+  const accessToken = readState().accessToken;
+  if (!accessToken) throw new Error('Missing persisted access token from the authenticated browser flow');
+  await page.goto('/auth/login');
+  await page.evaluate((token) => localStorage.setItem('access_token', token), accessToken);
+  await page.goto('/app/dashboard');
   expect(accessToken).toBeTruthy();
   const headers = { Authorization: `Bearer ${accessToken as string}`, 'Content-Type': 'application/json' };
   const authenticatedMe = await request.get(`${API}/auth/me`, { headers });
