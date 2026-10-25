@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 concurrency:
   group: frameflux-fullstack-e2e-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -144,6 +147,23 @@ jobs:
             playwright-report/
             test-fixtures/
           if-no-files-found: warn
+
+      - name: Commit visual walkthrough screenshots
+        if: always()
+        run: |
+          mkdir -p docs/testing/visuals
+          cp -f test-results/evidence/*.png docs/testing/visuals/ 2>/dev/null || true
+          git fetch origin e2e/full-stack-visual-walkthrough-20261024
+          git checkout e2e/full-stack-visual-walkthrough-20261024
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/testing/visuals
+          if git diff --cached --quiet; then
+            echo "No new visual screenshots to commit"
+            exit 0
+          fi
+          git commit -m "docs: commit full-stack visual evidence [skip ci]"
+          git push origin HEAD:e2e/full-stack-visual-walkthrough-20261024
 
       - name: Shutdown stack
         if: always()
