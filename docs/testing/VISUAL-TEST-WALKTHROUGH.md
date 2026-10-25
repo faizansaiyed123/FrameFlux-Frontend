@@ -4,6 +4,8 @@ FrameFlux is a browser-based media workspace for uploading, organizing, processi
 
 This walkthrough follows the same presentation style as the AutoFix visual walkthrough: it explains the product through real screens and real user flows rather than presenting a traditional developer test report.
 
+> **Verification note:** this walkthrough is generated from the real browser + FastAPI + PostgreSQL + Redis + FFmpeg test environment. Playwright screenshots are committed by CI into `docs/testing/visuals/` so GitHub renders the evidence directly in this page. The final all-green status is only claimed after the complete browser matrix passes.
+
 The evidence in this document comes from the repository's Full-Stack Visual E2E workflow. The test environment starts the real FastAPI backend, PostgreSQL, Redis, FFmpeg, and Next.js frontend, performs browser actions, verifies HTTP responses, and reads the resulting records back from the API/database-backed application.
 
 ## The product at a glance
