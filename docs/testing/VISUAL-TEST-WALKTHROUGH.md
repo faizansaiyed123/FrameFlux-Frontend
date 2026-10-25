@@ -9,7 +9,7 @@ This walkthrough follows the same presentation style as the AutoFix visual walkt
 
 ### Final verification result
 
-**Verified:** October 25, 2026 — Full-Stack Visual E2E run **#40173623779** completed successfully, with **6/6 Playwright tests passing**. The tested application commit was **dd8bf0650bc9afb2ffeebfc7dd7a4ed3f28cba50**, and the same commit passed Frontend Production Checks (lint + production build). The workflow completed successfully through backend stack startup, PostgreSQL/Redis-backed backend tests, real FFmpeg fixture generation, frontend startup, browser walkthrough, evidence upload, screenshot commit, and shutdown.
+**Verified:** October 25, 2026 — Full-Stack Visual E2E run **#40174379068** completed successfully, with **6/6 Playwright tests passing**. The tested application commit was **7cfc40987e63dde6741a9d9c7991f4470ae9cef9**, and the same commit passed Frontend Production Checks (lint + production build). The workflow completed successfully through backend stack startup, PostgreSQL/Redis-backed backend tests, real FFmpeg fixture generation, frontend startup, browser walkthrough, evidence upload, screenshot commit, and shutdown.
 
 The six browser scenarios were:
 
