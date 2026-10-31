@@ -12,7 +12,14 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api/client';
-import { Loader2, Download, Trash2, RotateCcw, Eye, GitCompare } from 'lucide-react';
+import {
+  Loader2,
+  Download,
+  Trash2,
+  RotateCcw,
+  Eye,
+  GitCompare,
+} from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 function formatFileSize(bytes: number): string {
@@ -49,10 +56,14 @@ interface Props {
 export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
   const [versions, setVersions] = useState<MediaVersion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedVersion, setSelectedVersion] = useState<MediaVersion | null>(null);
+  const [selectedVersion, setSelectedVersion] = useState<MediaVersion | null>(
+    null,
+  );
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
-  const [compareVersion, setCompareVersion] = useState<MediaVersion | null>(null);
+  const [compareVersion, setCompareVersion] = useState<MediaVersion | null>(
+    null,
+  );
   interface MediaComparison {
     size_diff: number;
     storage_saved: number;
@@ -91,7 +102,11 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
   };
 
   const handleRestore = async (version: MediaVersion) => {
-    if (!confirm(`Restore version ${version.version_number}? This will replace the current file.`))
+    if (
+      !confirm(
+        `Restore version ${version.version_number}? This will replace the current file.`,
+      )
+    )
       return;
     try {
       await api.restoreMediaVersion(mediaId, version.id);
@@ -144,7 +159,10 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       <Card className="border-zinc-200 dark:border-zinc-800">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>File Versions</CardTitle>
-          <Badge variant="outline" className="text-xs">
+          <Badge
+            variant="outline"
+            className="text-xs"
+          >
             {versions.length} versions
           </Badge>
         </CardHeader>
@@ -173,7 +191,10 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       </Card>
 
       {selectedVersion && (
-        <Dialog open={detailDialogOpen} onOpenChange={setDetailDialogOpen}>
+        <Dialog
+          open={detailDialogOpen}
+          onOpenChange={setDetailDialogOpen}
+        >
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>Version Details</DialogTitle>
@@ -181,41 +202,65 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Version</p>
-                  <p className="font-medium">#{selectedVersion.version_number}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Version
+                  </p>
+                  <p className="font-medium">
+                    #{selectedVersion.version_number}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Label</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Label
+                  </p>
                   <p className="font-medium">{selectedVersion.label || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Status</p>
-                  <p className="font-medium capitalize">{selectedVersion.processing_status}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Status
+                  </p>
+                  <p className="font-medium capitalize">
+                    {selectedVersion.processing_status}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Created</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Created
+                  </p>
                   <p className="font-medium">
-                    {formatDistanceToNow(new Date(selectedVersion.created_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(selectedVersion.created_at), {
+                      addSuffix: true,
+                    })}
                   </p>
                 </div>
                 {selectedVersion.file_size && (
                   <div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Size</p>
-                    <p className="font-medium">{formatFileSize(selectedVersion.file_size)}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Size
+                    </p>
+                    <p className="font-medium">
+                      {formatFileSize(selectedVersion.file_size)}
+                    </p>
                   </div>
                 )}
                 {selectedVersion.duration && (
                   <div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Duration</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Duration
+                    </p>
                     <p className="font-medium">
                       {Math.floor(selectedVersion.duration / 60)}:
-                      {(selectedVersion.duration % 60).toFixed(0).padStart(2, '0')}
+                      {(selectedVersion.duration % 60)
+                        .toFixed(0)
+                        .padStart(2, '0')}
                     </p>
                   </div>
                 )}
                 {selectedVersion.width && selectedVersion.height && (
                   <div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Resolution</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Resolution
+                    </p>
                     <p className="font-medium">
                       {selectedVersion.width} × {selectedVersion.height}
                     </p>
@@ -223,20 +268,27 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
                 )}
                 {selectedVersion.video_codec && (
                   <div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Video Codec</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Video Codec
+                    </p>
                     <p className="font-medium">{selectedVersion.video_codec}</p>
                   </div>
                 )}
                 {selectedVersion.audio_codec && (
                   <div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">Audio Codec</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      Audio Codec
+                    </p>
                     <p className="font-medium">{selectedVersion.audio_codec}</p>
                   </div>
                 )}
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setDetailDialogOpen(false)}
+              >
                 Close
               </Button>
             </DialogFooter>
@@ -245,7 +297,10 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       )}
 
       {compareMode && comparison && (
-        <Dialog open={compareMode} onOpenChange={setCompareMode}>
+        <Dialog
+          open={compareMode}
+          onOpenChange={setCompareMode}
+        >
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Version Comparison</DialogTitle>
@@ -262,12 +317,16 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Version #{versions[0]?.version_number}
                   </p>
-                  <p className="font-medium">{versions[0]?.label || 'Current'}</p>
+                  <p className="font-medium">
+                    {versions[0]?.label || 'Current'}
+                  </p>
                 </div>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Size Difference</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">
+                    Size Difference
+                  </span>
                   <span className="font-medium">
                     {comparison.size_diff > 0 ? '+' : ''}
                     {comparison.size_diff} bytes (
@@ -275,13 +334,17 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Duration Difference</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">
+                    Duration Difference
+                  </span>
                   <span className="font-medium">
                     {comparison.duration_diff?.toFixed(1) || 'N/A'}s
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Resolution Match</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">
+                    Resolution Match
+                  </span>
                   <span
                     className={`font-medium ${comparison.resolution_match ? 'text-green-600' : 'text-red-600'}`}
                   >
@@ -289,7 +352,9 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Video Codec Match</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">
+                    Video Codec Match
+                  </span>
                   <span
                     className={`font-medium ${comparison.video_codec_match ? 'text-green-600' : 'text-red-600'}`}
                   >
@@ -297,7 +362,9 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-zinc-500 dark:text-zinc-400">Audio Codec Match</span>
+                  <span className="text-zinc-500 dark:text-zinc-400">
+                    Audio Codec Match
+                  </span>
                   <span
                     className={`font-medium ${comparison.audio_codec_match ? 'text-green-600' : 'text-red-600'}`}
                   >
@@ -342,19 +409,56 @@ function VersionRow({
   onCompare: () => void;
 }) {
   const statusConfig: Record<string, { color: string }> = {
-    completed: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
-    processing: { color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' },
-    failed: { color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' },
-    queued: { color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
-    pending: { color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300' },
+    completed: {
+      color: `
+      bg-green-100 text-green-700 dark:bg-green-900/30
+      dark:text-green-300
+    `,
+    },
+    processing: {
+      color: `
+      bg-amber-100 text-amber-700 dark:bg-amber-900/30
+      dark:text-amber-300
+    `,
+    },
+    failed: {
+      color: `
+      bg-red-100 text-red-700 dark:bg-red-900/30
+      dark:text-red-300
+    `,
+    },
+    queued: {
+      color: `
+      bg-blue-100 text-blue-700 dark:bg-blue-900/30
+      dark:text-blue-300
+    `,
+    },
+    pending: {
+      color: `
+      bg-gray-100 text-gray-700 dark:bg-gray-800
+      dark:text-gray-300
+    `,
+    },
   };
 
-  const statusInfo = statusConfig[version.processing_status] || statusConfig.pending;
+  const statusInfo =
+    statusConfig[version.processing_status] || statusConfig.pending;
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+    <div
+      className={`
+      flex items-center justify-between p-3 rounded-lg border
+      border-zinc-200 dark:border-zinc-800
+    `}
+    >
       <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+        <div
+          className={`
+          flex h-8 w-8 items-center justify-center rounded-lg
+          bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+          dark:text-indigo-400
+        `}
+        >
           <span className="text-sm font-medium">v{version.version_number}</span>
         </div>
         <div>
@@ -362,24 +466,49 @@ function VersionRow({
             {version.label || 'Unnamed version'}
           </p>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            {formatDistanceToNow(new Date(version.created_at), { addSuffix: true })}
+            {formatDistanceToNow(new Date(version.created_at), {
+              addSuffix: true,
+            })}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Badge variant="outline" className={`${statusInfo.color} capitalize`}>
+        <Badge
+          variant="outline"
+          className={`${statusInfo.color} capitalize`}
+        >
           {version.processing_status}
         </Badge>
-        <Button variant="ghost" size="icon" onClick={() => onDownload(version)} title="Download">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDownload(version)}
+          title="Download"
+        >
           <Download className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => onDetails(version)} title="Details">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDetails(version)}
+          title="Details"
+        >
           <Eye className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => onRestore(version)} title="Restore">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onRestore(version)}
+          title="Restore"
+        >
           <RotateCcw className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={onCompare} title="Compare with latest">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onCompare}
+          title="Compare with latest"
+        >
           <GitCompare className="h-4 w-4" />
         </Button>
         <Button

@@ -76,7 +76,9 @@ export function PreviewForm({ mediaId }: Props) {
       }
       downloadBlob(blob, filename);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Preview generation failed');
+      setError(
+        err instanceof Error ? err.message : 'Preview generation failed',
+      );
     } finally {
       setLoading(false);
     }
@@ -87,7 +89,12 @@ export function PreviewForm({ mediaId }: Props) {
   return (
     <div className="space-y-4">
       {error && (
-        <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+        <Alert
+          className={`
+          border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+          text-red-700 dark:text-red-300
+        `}
+        >
           <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
@@ -166,7 +173,10 @@ export function PreviewForm({ mediaId }: Props) {
         <>
           <div className="space-y-2">
             <Label>Format</Label>
-            <Select value={fmt} onValueChange={setFmt}>
+            <Select
+              value={fmt}
+              onValueChange={setFmt}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select format" />
               </SelectTrigger>
@@ -183,7 +193,10 @@ export function PreviewForm({ mediaId }: Props) {
       {type === 'gif' && (
         <div className="space-y-2">
           <Label>Quality</Label>
-          <Select value={quality} onValueChange={setQuality}>
+          <Select
+            value={quality}
+            onValueChange={setQuality}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Select quality" />
             </SelectTrigger>
@@ -195,7 +208,11 @@ export function PreviewForm({ mediaId }: Props) {
           </Select>
         </div>
       )}
-      <Button onClick={handleGenerate} disabled={loading} className="w-full">
+      <Button
+        onClick={handleGenerate}
+        disabled={loading}
+        className="w-full"
+      >
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

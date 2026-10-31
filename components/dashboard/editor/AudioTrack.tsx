@@ -87,7 +87,10 @@ export function AudioTrack({ duration, currentTime, onSeek }: AudioTrackProps) {
   }
 
   return (
-    <div ref={containerRef} className="h-14 w-full relative">
+    <div
+      ref={containerRef}
+      className="h-14 w-full relative"
+    >
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-pointer rounded"

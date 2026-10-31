@@ -11,7 +11,8 @@ import { formatDistanceToNow } from 'date-fns';
 
 const statusConfig: Record<string, { color: string; label: string }> = {
   completed: {
-    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    color:
+      'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
     label: 'Completed',
   },
   failed: {
@@ -19,7 +20,8 @@ const statusConfig: Record<string, { color: string; label: string }> = {
     label: 'Failed',
   },
   processing: {
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    color:
+      'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
     label: 'Processing',
   },
   queued: {
@@ -69,13 +71,17 @@ export default function HistoryPage() {
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           Processing History
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">View all past processing operations</p>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          View all past processing operations
+        </p>
       </div>
 
       {history.length === 0 ? (
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="p-6 text-center">
-            <p className="text-zinc-500 dark:text-zinc-400">No processing history yet.</p>
+            <p className="text-zinc-500 dark:text-zinc-400">
+              No processing history yet.
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -83,9 +89,18 @@ export default function HistoryPage() {
           {history.map((entry) => {
             const info = statusConfig[entry.status] || statusConfig.pending;
             return (
-              <Card key={entry.id} className="border-zinc-200 dark:border-zinc-800">
+              <Card
+                key={entry.id}
+                className="border-zinc-200 dark:border-zinc-800"
+              >
                 <CardContent className="p-4 flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                  <div
+                    className={`
+                    flex h-10 w-10 items-center justify-center rounded-lg
+                    bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                    dark:text-indigo-400
+                  `}
+                  >
                     <History className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -93,16 +108,23 @@ export default function HistoryPage() {
                       <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 capitalize">
                         {entry.operation}
                       </p>
-                      <Badge variant="secondary" className={`${info.color} border-0`}>
+                      <Badge
+                        variant="secondary"
+                        className={`${info.color} border-0`}
+                      >
                         {info.label}
                       </Badge>
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       Media ID: {entry.media_id} •{' '}
-                      {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(entry.created_at), {
+                        addSuffix: true,
+                      })}
                     </p>
                     {entry.error && (
-                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">{entry.error}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                        {entry.error}
+                      </p>
                     )}
                   </div>
                 </CardContent>

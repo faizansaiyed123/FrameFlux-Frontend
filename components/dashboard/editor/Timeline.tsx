@@ -60,7 +60,10 @@ export function Timeline({
       const handleMouseMove = (moveEvent: MouseEvent) => {
         const deltaX = moveEvent.clientX - startX;
         const deltaTime = deltaX / pixelsPerSecond;
-        const newStart = Math.max(0, Math.min(originalStart + deltaTime, duration - clipDuration));
+        const newStart = Math.max(
+          0,
+          Math.min(originalStart + deltaTime, duration - clipDuration),
+        );
         const newEnd = newStart + clipDuration;
         onClipChange(clip, { start: newStart, end: newEnd });
       };
@@ -88,10 +91,16 @@ export function Timeline({
         const deltaX = moveEvent.clientX - startX;
         const deltaTime = deltaX / pixelsPerSecond;
         if (edge === 'left') {
-          const newStart = Math.max(0, Math.min(originalValue + deltaTime, clip.end - 0.1));
+          const newStart = Math.max(
+            0,
+            Math.min(originalValue + deltaTime, clip.end - 0.1),
+          );
           onClipChange(clip, { start: newStart });
         } else {
-          const newEnd = Math.min(duration, Math.max(originalValue + deltaTime, clip.start + 0.1));
+          const newEnd = Math.min(
+            duration,
+            Math.max(originalValue + deltaTime, clip.start + 0.1),
+          );
           onClipChange(clip, { end: newEnd });
         }
       };
@@ -107,7 +116,8 @@ export function Timeline({
     [pixelsPerSecond, duration, onSelectClip, onClipChange],
   );
 
-  const playheadPosition = duration > 0 ? (currentTime / duration) * timelineWidth : 0;
+  const playheadPosition =
+    duration > 0 ? (currentTime / duration) * timelineWidth : 0;
 
   const generateTimeMarkers = () => {
     const markers = [];
@@ -117,7 +127,10 @@ export function Timeline({
       markers.push(
         <div
           key={i}
-          className="absolute top-0 h-full border-l border-zinc-200 dark:border-zinc-700"
+          className={`
+            absolute top-0 h-full border-l border-zinc-200
+            dark:border-zinc-700
+          `}
           style={{ left: `${(i / safeDuration) * 100}%` }}
         >
           <span className="absolute top-1 left-1 text-[10px] text-zinc-400 font-mono">
@@ -131,7 +144,12 @@ export function Timeline({
 
   if (duration <= 0 || isNaN(duration)) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-zinc-400">
+      <div
+        className={`
+        flex h-full items-center justify-center text-xs
+        text-zinc-400
+      `}
+      >
         Loading timeline...
       </div>
     );
@@ -139,8 +157,15 @@ export function Timeline({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between px-4 py-1 border-b border-zinc-200 dark:border-zinc-800">
-        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Timeline</span>
+      <div
+        className={`
+        flex items-center justify-between px-4 py-1 border-b
+        border-zinc-200 dark:border-zinc-800
+      `}
+      >
+        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+          Timeline
+        </span>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-zinc-400">
             {clips.length} clip{clips.length !== 1 ? 's' : ''}
@@ -150,18 +175,32 @@ export function Timeline({
 
       <div
         ref={timelineRef}
-        className="flex-1 relative overflow-x-auto overflow-y-hidden cursor-crosshair"
+        className={`
+          flex-1 relative overflow-x-auto overflow-y-hidden
+          cursor-crosshair
+        `}
         onClick={handleTimelineClick}
       >
-        <div className="relative h-full min-w-full" style={{ width: timelineWidth }}>
-          <div className="absolute top-0 left-0 right-0 h-6 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
+        <div
+          className="relative h-full min-w-full"
+          style={{ width: timelineWidth }}
+        >
+          <div
+            className={`
+            absolute top-0 left-0 right-0 h-6 border-b border-zinc-200
+            dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50
+          `}
+          >
             {generateTimeMarkers()}
           </div>
 
           <div className="absolute top-6 left-0 right-0 bottom-0">
             {clips.map((clip) => {
               const left = (clip.start / duration) * timelineWidth;
-              const width = Math.max(((clip.end - clip.start) / duration) * timelineWidth, 20);
+              const width = Math.max(
+                ((clip.end - clip.start) / duration) * timelineWidth,
+                20,
+              );
               const isSelected = clip.id === selectedClipId;
 
               return (
@@ -179,8 +218,18 @@ export function Timeline({
                   }}
                   onMouseDown={(e) => handleClipMouseDown(e, clip)}
                 >
-                  <div className="px-2 py-1 h-full flex flex-col justify-between overflow-hidden">
-                    <span className="text-[10px] font-medium text-zinc-700 dark:text-zinc-200 truncate">
+                  <div
+                    className={`
+                    px-2 py-1 h-full flex flex-col justify-between
+                    overflow-hidden
+                  `}
+                  >
+                    <span
+                      className={`
+                      text-[10px] font-medium text-zinc-700 dark:text-zinc-200
+                      truncate
+                    `}
+                    >
                       {clip.name}
                     </span>
                     <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
@@ -188,11 +237,17 @@ export function Timeline({
                     </span>
                   </div>
                   <div
-                    className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black/10 rounded-l-md"
+                    className={`
+                      absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize
+                      hover:bg-black/10 rounded-l-md
+                    `}
                     onMouseDown={(e) => handleEdgeMouseDown(e, clip, 'left')}
                   />
                   <div
-                    className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black/10 rounded-r-md"
+                    className={`
+                      absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize
+                      hover:bg-black/10 rounded-r-md
+                    `}
                     onMouseDown={(e) => handleEdgeMouseDown(e, clip, 'right')}
                   />
                 </div>
@@ -200,10 +255,18 @@ export function Timeline({
             })}
 
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20 pointer-events-none"
+              className={`
+                absolute top-0 bottom-0 w-0.5 bg-red-500 z-20
+                pointer-events-none
+              `}
               style={{ left: playheadPosition }}
             >
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-500 rotate-45" />
+              <div
+                className={`
+                absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3
+                bg-red-500 rotate-45
+              `}
+              />
             </div>
           </div>
         </div>

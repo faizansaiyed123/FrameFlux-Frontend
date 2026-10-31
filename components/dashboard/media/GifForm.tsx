@@ -61,7 +61,12 @@ export function GifForm({ mediaId }: Props) {
   return (
     <div className="space-y-4">
       {error && (
-        <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+        <Alert
+          className={`
+          border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+          text-red-700 dark:text-red-300
+        `}
+        >
           <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
@@ -98,7 +103,10 @@ export function GifForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Frame Rate (fps)</Label>
-        <Select value={fps} onValueChange={setFps}>
+        <Select
+          value={fps}
+          onValueChange={setFps}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select fps" />
           </SelectTrigger>
@@ -114,7 +122,10 @@ export function GifForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Quality (1-31, lower = better)</Label>
-        <Select value={quality} onValueChange={setQuality}>
+        <Select
+          value={quality}
+          onValueChange={setQuality}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select quality" />
           </SelectTrigger>
@@ -129,7 +140,11 @@ export function GifForm({ mediaId }: Props) {
           Lower = better quality, larger file
         </p>
       </div>
-      <Button onClick={handleGenerate} disabled={loading} className="w-full">
+      <Button
+        onClick={handleGenerate}
+        disabled={loading}
+        className="w-full"
+      >
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

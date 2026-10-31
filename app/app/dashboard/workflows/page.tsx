@@ -39,7 +39,14 @@ const OPERATION_TYPES = [
   {
     value: 'convert',
     label: 'Convert',
-    params: ['format', 'resolution', 'video_codec', 'audio_codec', 'fps', 'quality'],
+    params: [
+      'format',
+      'resolution',
+      'video_codec',
+      'audio_codec',
+      'fps',
+      'quality',
+    ],
   },
   {
     value: 'compress',
@@ -75,7 +82,11 @@ const OPERATION_TYPES = [
   { value: 'resize', label: 'Resize', params: ['width', 'height'] },
   { value: 'rotate', label: 'Rotate', params: ['angle'] },
   { value: 'remove_audio', label: 'Remove Audio', params: [] },
-  { value: 'replace_audio', label: 'Replace Audio', params: ['audio_path', 'fade_in', 'fade_out'] },
+  {
+    value: 'replace_audio',
+    label: 'Replace Audio',
+    params: ['audio_path', 'fade_in', 'fade_out'],
+  },
   {
     value: 'add_subtitles',
     label: 'Add Subtitles',
@@ -87,8 +98,16 @@ const OPERATION_TYPES = [
     params: ['start', 'duration', 'width', 'fps', 'quality'],
   },
   { value: 'speed', label: 'Change Speed', params: ['speed'] },
-  { value: 'overlay', label: 'Add Overlay', params: ['text', 'x', 'y', 'font_size', 'opacity'] },
-  { value: 'fade', label: 'Fade In/Out', params: ['fade_type', 'duration', 'start_time'] },
+  {
+    value: 'overlay',
+    label: 'Add Overlay',
+    params: ['text', 'x', 'y', 'font_size', 'opacity'],
+  },
+  {
+    value: 'fade',
+    label: 'Fade In/Out',
+    params: ['fade_type', 'duration', 'start_time'],
+  },
 ];
 
 function OperationBuilder({
@@ -120,7 +139,10 @@ function OperationBuilder({
                 </SelectTrigger>
                 <SelectContent>
                   {OPERATION_TYPES.map((ot) => (
-                    <SelectItem key={ot.value} value={ot.value}>
+                    <SelectItem
+                      key={ot.value}
+                      value={ot.value}
+                    >
                       {ot.label}
                     </SelectItem>
                   ))}
@@ -134,32 +156,42 @@ function OperationBuilder({
                 <X className="h-4 w-4 text-red-600" />
               </Button>
             </div>
-            {OPERATION_TYPES.find((ot) => ot.value === op.type)?.params.map((param) => (
-              <div key={param} className="space-y-1">
-                <Label className="text-xs text-zinc-600 dark:text-zinc-400 capitalize">
-                  {param.replace(/_/g, ' ')}
-                </Label>
-                <Input
-                  value={String(op.params?.[param] ?? '')}
-                  onChange={(e) => {
-                    const newOps = [...operations];
-                    newOps[idx] = {
-                      ...newOps[idx],
-                      params: { ...(newOps[idx].params || {}), [param]: e.target.value },
-                    };
-                    onChange(newOps);
-                  }}
-                  placeholder={`Enter ${param}`}
-                />
-              </div>
-            ))}
+            {OPERATION_TYPES.find((ot) => ot.value === op.type)?.params.map(
+              (param) => (
+                <div
+                  key={param}
+                  className="space-y-1"
+                >
+                  <Label className="text-xs text-zinc-600 dark:text-zinc-400 capitalize">
+                    {param.replace(/_/g, ' ')}
+                  </Label>
+                  <Input
+                    value={String(op.params?.[param] ?? '')}
+                    onChange={(e) => {
+                      const newOps = [...operations];
+                      newOps[idx] = {
+                        ...newOps[idx],
+                        params: {
+                          ...(newOps[idx].params || {}),
+                          [param]: e.target.value,
+                        },
+                      };
+                      onChange(newOps);
+                    }}
+                    placeholder={`Enter ${param}`}
+                  />
+                </div>
+              ),
+            )}
           </CardContent>
         </Card>
       ))}
       <Button
         variant="outline"
         size="sm"
-        onClick={() => onChange([...operations, { type: 'convert', params: {} }])}
+        onClick={() =>
+          onChange([...operations, { type: 'convert', params: {} }])
+        }
         className="w-full"
       >
         <Plus className="h-4 w-4 mr-2" /> Add Operation
@@ -183,7 +215,9 @@ export default function WorkflowsPage() {
   const [runDialogOpen, setRunDialogOpen] = useState(false);
   const [runWorkflowId, setRunWorkflowId] = useState<string | null>(null);
   const [runMediaId, setRunMediaId] = useState('');
-  const [runMediaList, setRunMediaList] = useState<{ id: string; original_filename: string }[]>([]);
+  const [runMediaList, setRunMediaList] = useState<
+    { id: string; original_filename: string }[]
+  >([]);
   const [runMediaLoading, setRunMediaLoading] = useState(false);
 
   const fetchWorkflows = useCallback(async () => {
@@ -251,7 +285,9 @@ export default function WorkflowsPage() {
     setRunMediaLoading(true);
     try {
       const data = await api.listMedia();
-      setRunMediaList(data.map((m) => ({ id: m.id, original_filename: m.original_filename })));
+      setRunMediaList(
+        data.map((m) => ({ id: m.id, original_filename: m.original_filename })),
+      );
     } catch {
     } finally {
       setRunMediaLoading(false);
@@ -292,13 +328,20 @@ export default function WorkflowsPage() {
             Create and manage processing workflows
           </p>
         </div>
-        <Button onClick={openCreate} className="gap-2">
+        <Button
+          onClick={openCreate}
+          className="gap-2"
+        >
           <Plus className="h-4 w-4" />
           New Workflow
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="mb-4"
+      >
         <TabsList>
           <TabsTrigger value="custom">My Workflows</TabsTrigger>
           <TabsTrigger value="builtin">Built-in Workflows</TabsTrigger>
@@ -308,7 +351,8 @@ export default function WorkflowsPage() {
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardContent className="p-6 text-center">
                 <p className="text-zinc-500 dark:text-zinc-400">
-                  No custom workflows yet. Create your first workflow to automate processing.
+                  No custom workflows yet. Create your first workflow to
+                  automate processing.
                 </p>
               </CardContent>
             </Card>
@@ -346,15 +390,28 @@ export default function WorkflowsPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Workflow' : 'Create Workflow'}</DialogTitle>
+            <DialogTitle>
+              {editing ? 'Edit Workflow' : 'Create Workflow'}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSave} className="space-y-4">
+          <form
+            onSubmit={handleSave}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
@@ -366,10 +423,17 @@ export default function WorkflowsPage() {
             </div>
             <div className="space-y-2">
               <Label>Operations (executed in order)</Label>
-              <OperationBuilder operations={operations} onChange={setOperations} />
+              <OperationBuilder
+                operations={operations}
+                onChange={setOperations}
+              />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDialogOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">{editing ? 'Save' : 'Create'}</Button>
@@ -378,7 +442,10 @@ export default function WorkflowsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={runDialogOpen} onOpenChange={setRunDialogOpen}>
+      <Dialog
+        open={runDialogOpen}
+        onOpenChange={setRunDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Run Workflow</DialogTitle>
@@ -387,15 +454,24 @@ export default function WorkflowsPage() {
             <div className="space-y-2">
               <Label>Select Media File</Label>
               {runMediaLoading ? (
-                <Input disabled placeholder="Loading..." />
+                <Input
+                  disabled
+                  placeholder="Loading..."
+                />
               ) : (
-                <Select value={runMediaId} onValueChange={setRunMediaId}>
+                <Select
+                  value={runMediaId}
+                  onValueChange={setRunMediaId}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Choose media file" />
                   </SelectTrigger>
                   <SelectContent>
                     {runMediaList.map((media) => (
-                      <SelectItem key={media.id} value={media.id}>
+                      <SelectItem
+                        key={media.id}
+                        value={media.id}
+                      >
                         {media.original_filename}
                       </SelectItem>
                     ))}
@@ -415,7 +491,10 @@ export default function WorkflowsPage() {
             >
               Cancel
             </Button>
-            <Button onClick={handleRunConfirm} disabled={!!running || !runMediaId}>
+            <Button
+              onClick={handleRunConfirm}
+              disabled={!!running || !runMediaId}
+            >
               {running ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
@@ -448,7 +527,13 @@ function WorkflowCard({
   return (
     <Card className="border-zinc-200 dark:border-zinc-800">
       <CardContent className="p-4 flex items-center gap-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+        <div
+          className={`
+          flex h-10 w-10 items-center justify-center rounded-lg
+          bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+          dark:text-indigo-400
+        `}
+        >
           <WorkflowIcon className="h-5 w-5" />
         </div>
         <div className="flex-1 min-w-0">
@@ -457,18 +542,25 @@ function WorkflowCard({
               {workflow.name}
             </p>
             {workflow.is_builtin && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge
+                variant="secondary"
+                className="text-xs"
+              >
                 Built-in
               </Badge>
             )}
             {!workflow.is_builtin && (
-              <Badge variant="outline" className="text-xs">
+              <Badge
+                variant="outline"
+                className="text-xs"
+              >
                 Custom
               </Badge>
             )}
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-            {workflow.description || 'No description'} • {workflow.operations.length} operations
+            {workflow.description || 'No description'} •{' '}
+            {workflow.operations.length} operations
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -478,15 +570,27 @@ function WorkflowCard({
             onClick={() => onRun(workflow.id)}
             disabled={running || readonly}
           >
-            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+            {running ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
           </Button>
           {!readonly && (
             <>
-              <Button variant="ghost" size="icon" onClick={() => onEdit(workflow)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(workflow)}
+              >
                 <Pencil className="h-4 w-4" />
               </Button>
               {!workflow.is_builtin && (
-                <Button variant="ghost" size="icon" onClick={() => onDelete(workflow.id)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onDelete(workflow.id)}
+                >
                   <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                 </Button>
               )}

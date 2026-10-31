@@ -22,7 +22,8 @@ For Docker:
 - Docker
 - Docker Compose
 
-The backend is maintained in a separate repository and must be running separately when the frontend makes API requests.
+The backend is maintained in a separate repository and must be running
+separately when the frontend makes API requests.
 
 ## Local development
 
@@ -55,9 +56,11 @@ For the default local backend:
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-Do not hardcode the backend URL into Docker configuration outside the environment/build-argument mechanism.
+Do not hardcode the backend URL into Docker configuration outside the
+environment/build-argument mechanism.
 
-Because this is a `NEXT_PUBLIC_` variable, the value is embedded into the Next.js client bundle during the build.
+Because this is a `NEXT_PUBLIC_` variable, the value is embedded into the
+Next.js client bundle during the build.
 
 ## Docker startup
 
@@ -82,11 +85,13 @@ The frontend is available at:
 http://localhost:3000
 ```
 
-No backend, PostgreSQL, Redis, worker, or other service is started by this repository.
+No backend, PostgreSQL, Redis, worker, or other service is started by this
+repository.
 
 ## Configure the backend for Docker
 
-Set the API URL at build time when the backend is exposed on a different host/port:
+Set the API URL at build time when the backend is exposed on a different
+host/port:
 
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8000 docker compose up --build
@@ -116,11 +121,13 @@ No secrets are required by the frontend container itself.
 
 ## Manual setup
 
-Start the backend separately from `FrameFlux-Backend` before using API-backed features:
+Start the backend separately from `FrameFlux-Backend` before using API-backed
+features:
 
 ```bash
 cd FrameFlux-Backend
 python run.py
 ```
 
-Then start the frontend from this repository with either `npm run dev` or Docker Compose.
+Then start the frontend from this repository with either `npm run dev` or Docker
+Compose.

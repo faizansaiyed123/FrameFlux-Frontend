@@ -30,13 +30,34 @@ const SETTINGS_FIELDS = [
     key: 'format',
     label: 'Output Format',
     type: 'select',
-    options: ['mp4', 'webm', 'mov', 'avi', 'mkv', 'flv', 'mpeg', 'ts', 'm4v', '3gp'],
+    options: [
+      'mp4',
+      'webm',
+      'mov',
+      'avi',
+      'mkv',
+      'flv',
+      'mpeg',
+      'ts',
+      'm4v',
+      '3gp',
+    ],
   },
   {
     key: 'resolution',
     label: 'Resolution Preset',
     type: 'select',
-    options: ['', '144p', '240p', '360p', '480p', '720p', '1080p', '1440p', '2160p'],
+    options: [
+      '',
+      '144p',
+      '240p',
+      '360p',
+      '480p',
+      '720p',
+      '1080p',
+      '1440p',
+      '2160p',
+    ],
   },
   { key: 'width', label: 'Custom Width', type: 'number' },
   { key: 'height', label: 'Custom Height', type: 'number' },
@@ -191,15 +212,24 @@ export default function PresetsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
             Presets
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your processing presets</p>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+            Manage your processing presets
+          </p>
         </div>
-        <Button onClick={openCreate} className="gap-2">
+        <Button
+          onClick={openCreate}
+          className="gap-2"
+        >
           <Plus className="h-4 w-4" />
           New Preset
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="mb-4"
+      >
         <TabsList>
           <TabsTrigger value="custom">My Presets</TabsTrigger>
           <TabsTrigger value="builtin">Built-in Presets</TabsTrigger>
@@ -209,7 +239,8 @@ export default function PresetsPage() {
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardContent className="p-6 text-center">
                 <p className="text-zinc-500 dark:text-zinc-400">
-                  No custom presets yet. Create your first preset to save processing settings.
+                  No custom presets yet. Create your first preset to save
+                  processing settings.
                 </p>
               </CardContent>
             </Card>
@@ -245,15 +276,28 @@ export default function PresetsPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editing ? 'Edit Preset' : 'Create Preset'}</DialogTitle>
+            <DialogTitle>
+              {editing ? 'Edit Preset' : 'Create Preset'}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSave} className="space-y-4">
+          <form
+            onSubmit={handleSave}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
@@ -267,12 +311,17 @@ export default function PresetsPage() {
               <Label>Settings</Label>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {SETTINGS_FIELDS.map((field) => (
-                  <div key={field.key} className="space-y-2">
+                  <div
+                    key={field.key}
+                    className="space-y-2"
+                  >
                     <Label htmlFor={field.key}>{field.label}</Label>
                     {field.type === 'select' ? (
                       <Select
                         value={String(settings[field.key] || '')}
-                        onValueChange={(v) => handleSettingsChange(field.key, v || undefined)}
+                        onValueChange={(v) =>
+                          handleSettingsChange(field.key, v || undefined)
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Auto" />
@@ -280,7 +329,10 @@ export default function PresetsPage() {
                         <SelectContent>
                           <SelectItem value="">Auto</SelectItem>
                           {field.options?.map((opt) => (
-                            <SelectItem key={opt} value={opt}>
+                            <SelectItem
+                              key={opt}
+                              value={opt}
+                            >
                               {opt}
                             </SelectItem>
                           ))}
@@ -292,7 +344,11 @@ export default function PresetsPage() {
                         type="number"
                         step={field.key === 'fps' ? '0.01' : '1'}
                         min="1"
-                        value={settings[field.key] == null ? '' : String(settings[field.key])}
+                        value={
+                          settings[field.key] == null
+                            ? ''
+                            : String(settings[field.key])
+                        }
                         onChange={(e) =>
                           handleSettingsChange(
                             field.key,
@@ -303,9 +359,16 @@ export default function PresetsPage() {
                     ) : (
                       <Input
                         id={field.key}
-                        value={settings[field.key] == null ? '' : String(settings[field.key])}
+                        value={
+                          settings[field.key] == null
+                            ? ''
+                            : String(settings[field.key])
+                        }
                         onChange={(e) =>
-                          handleSettingsChange(field.key, e.target.value || undefined)
+                          handleSettingsChange(
+                            field.key,
+                            e.target.value || undefined,
+                          )
                         }
                         placeholder="Auto"
                       />
@@ -315,7 +378,11 @@ export default function PresetsPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDialogOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">{editing ? 'Save' : 'Create'}</Button>
@@ -349,19 +416,25 @@ function PresetCard({
               {preset.name}
             </p>
             {preset.is_builtin && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge
+                variant="secondary"
+                className="text-xs"
+              >
                 Built-in
               </Badge>
             )}
             {!preset.is_builtin && (
-              <Badge variant="outline" className="text-xs">
+              <Badge
+                variant="outline"
+                className="text-xs"
+              >
                 Custom
               </Badge>
             )}
           </div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
-            {preset.description || 'No description'} • {Object.keys(preset.settings).length}{' '}
-            settings
+            {preset.description || 'No description'} •{' '}
+            {Object.keys(preset.settings).length} settings
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -375,11 +448,19 @@ function PresetCard({
           </Button>
           {!readonly && (
             <>
-              <Button variant="ghost" size="icon" onClick={() => onEdit(preset)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(preset)}
+              >
                 <Pencil className="h-4 w-4" />
               </Button>
               {!preset.is_builtin && (
-                <Button variant="ghost" size="icon" onClick={() => onDelete(preset.id)}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onDelete(preset.id)}
+                >
                   <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                 </Button>
               )}

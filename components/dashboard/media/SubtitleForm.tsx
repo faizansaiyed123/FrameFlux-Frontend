@@ -12,7 +12,14 @@ import {
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '@/lib/api/client';
-import { Loader2, Upload, FileText, Download, List, SlidersHorizontal } from 'lucide-react';
+import {
+  Loader2,
+  Upload,
+  FileText,
+  Download,
+  List,
+  SlidersHorizontal,
+} from 'lucide-react';
 
 const ACCEPTED_EXTENSIONS = ['.srt', '.ass', '.vtt', '.sub', '.txt'];
 
@@ -78,7 +85,8 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
 
   useEffect(() => {
     return () => {
-      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
+      if (syncPreviewUrl?.startsWith('blob:'))
+        URL.revokeObjectURL(syncPreviewUrl);
     };
   }, [syncPreviewUrl]);
 
@@ -86,7 +94,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
     if (!file) return;
     const ext = '.' + file.name.split('.').pop()?.toLowerCase();
     if (!ACCEPTED_EXTENSIONS.includes(ext)) {
-      setError(`Unsupported format. Accepted: ${ACCEPTED_EXTENSIONS.join(', ')}`);
+      setError(
+        `Unsupported format. Accepted: ${ACCEPTED_EXTENSIONS.join(', ')}`,
+      );
       return;
     }
     setError(null);
@@ -100,7 +110,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
       const result = await api.uploadSubtitleFile(formData);
       setSubtitlePath(result.filename);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to upload subtitle file');
+      setError(
+        err instanceof Error ? err.message : 'Failed to upload subtitle file',
+      );
     } finally {
       setSubtitleUploading(false);
     }
@@ -119,7 +131,8 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
   const handleAction = async () => {
     setLoading(true);
     setError(null);
-    if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
+    if (syncPreviewUrl?.startsWith('blob:'))
+      URL.revokeObjectURL(syncPreviewUrl);
     setSyncPreviewUrl(null);
     try {
       if (action === 'burn') {
@@ -138,7 +151,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           setError('Subtitle path required');
           return;
         }
-        const blob = await api.muxSubtitles(mediaId, subtitlePath, { language: 'und' });
+        const blob = await api.muxSubtitles(mediaId, subtitlePath, {
+          language: 'und',
+        });
         downloadBlob(blob, `subtitles_muxed_${mediaId}.mp4`);
       } else if (action === 'tracks') {
         const data = await api.listSubtitleTracks(mediaId);
@@ -184,7 +199,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           subtitleFileName
             ? 'edited_' + subtitleFileName
             : 'edited_subtitles' +
-                (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'),
+                (subtitlePath.includes('.')
+                  ? '.' + subtitlePath.split('.').pop()
+                  : '.srt'),
         );
       } else if (action === 'edit_timing') {
         if (!subtitlePath.trim()) {
@@ -198,7 +215,12 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           setError('Subtitle entry must be a positive number');
           return;
         }
-        if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start) {
+        if (
+          !Number.isFinite(start) ||
+          !Number.isFinite(end) ||
+          start < 0 ||
+          end <= start
+        ) {
           setError('End time must be greater than start time');
           return;
         }
@@ -214,7 +236,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           subtitleFileName
             ? 'timed_' + subtitleFileName
             : 'timed_subtitles' +
-                (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'),
+                (subtitlePath.includes('.')
+                  ? '.' + subtitlePath.split('.').pop()
+                  : '.srt'),
         );
       } else if (action === 'add_entry') {
         if (!subtitlePath.trim()) {
@@ -223,7 +247,12 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
         }
         const start = Number(addStart);
         const end = Number(addEnd);
-        if (!Number.isFinite(start) || !Number.isFinite(end) || start < 0 || end <= start) {
+        if (
+          !Number.isFinite(start) ||
+          !Number.isFinite(end) ||
+          start < 0 ||
+          end <= start
+        ) {
           setError('End time must be greater than start time');
           return;
         }
@@ -231,8 +260,13 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           setError('Subtitle text required');
           return;
         }
-        const insertAfter = editEntryIndex.trim() ? Number(editEntryIndex) - 1 : undefined;
-        if (insertAfter !== undefined && (!Number.isInteger(insertAfter) || insertAfter < -1)) {
+        const insertAfter = editEntryIndex.trim()
+          ? Number(editEntryIndex) - 1
+          : undefined;
+        if (
+          insertAfter !== undefined &&
+          (!Number.isInteger(insertAfter) || insertAfter < -1)
+        ) {
           setError('Insert-after entry must be zero or greater');
           return;
         }
@@ -249,7 +283,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           subtitleFileName
             ? 'added_' + subtitleFileName
             : 'added_subtitles' +
-                (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'),
+                (subtitlePath.includes('.')
+                  ? '.' + subtitlePath.split('.').pop()
+                  : '.srt'),
         );
       } else if (action === 'delete_entry') {
         if (!subtitlePath.trim()) {
@@ -271,7 +307,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           subtitleFileName
             ? 'deleted_' + subtitleFileName
             : 'deleted_subtitles' +
-                (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'),
+                (subtitlePath.includes('.')
+                  ? '.' + subtitlePath.split('.').pop()
+                  : '.srt'),
         );
       } else if (action === 'split_entry') {
         if (!subtitlePath.trim()) {
@@ -299,7 +337,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           subtitleFileName
             ? 'split_' + subtitleFileName
             : 'split_subtitles' +
-                (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'),
+                (subtitlePath.includes('.')
+                  ? '.' + subtitlePath.split('.').pop()
+                  : '.srt'),
         );
       } else if (action === 'merge_entries') {
         if (!subtitlePath.trim()) {
@@ -321,7 +361,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           subtitleFileName
             ? 'merged_' + subtitleFileName
             : 'merged_subtitles' +
-                (subtitlePath.includes('.') ? '.' + subtitlePath.split('.').pop() : '.srt'),
+                (subtitlePath.includes('.')
+                  ? '.' + subtitlePath.split('.').pop()
+                  : '.srt'),
         );
       }
     } catch (err) {
@@ -378,7 +420,12 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
   return (
     <div className="space-y-4">
       {error && (
-        <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+        <Alert
+          className={`
+          border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+          text-red-700 dark:text-red-300
+        `}
+        >
           <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
@@ -422,7 +469,8 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
               <FileText className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Text
             </SelectItem>
             <SelectItem value="edit_timing">
-              <SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Edit Subtitle Timing
+              <SlidersHorizontal className="mr-2 h-3.5 w-3.5" /> Edit Subtitle
+              Timing
             </SelectItem>
             <SelectItem value="add_entry">
               <FileText className="mr-2 h-3.5 w-3.5" /> Add Subtitle Entry
@@ -439,14 +487,20 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           </SelectContent>
         </Select>
       </div>
-      {(action === 'burn' || action === 'mux' || action === 'sync' || action === 'edit_text') && (
+      {(action === 'burn' ||
+        action === 'mux' ||
+        action === 'sync' ||
+        action === 'edit_text') && (
         <div className="space-y-2">
           <Label>Subtitle File</Label>
           <div
             className={`relative border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-colors ${
               dragActive
                 ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
-                : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
+                : `
+                  border-zinc-300 dark:border-zinc-700 hover:border-zinc-400
+                  dark:hover:border-zinc-600
+                `
             }`}
             onDragEnter={(e) => {
               e.preventDefault();
@@ -582,7 +636,9 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
             value={editEntryIndex}
             onChange={(e) => setEditEntryIndex(e.target.value)}
           />
-          <p className="text-xs text-zinc-500">Merges this entry with the following entry.</p>
+          <p className="text-xs text-zinc-500">
+            Merges this entry with the following entry.
+          </p>
         </div>
       )}
       {action === 'split_entry' && (
@@ -713,7 +769,10 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           </div>
           <div className="space-y-2">
             <Label>Font Color</Label>
-            <Select value={fontColor} onValueChange={setFontColor}>
+            <Select
+              value={fontColor}
+              onValueChange={setFontColor}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select color" />
               </SelectTrigger>
@@ -726,7 +785,10 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           </div>
           <div className="space-y-2">
             <Label>Position</Label>
-            <Select value={position} onValueChange={setPosition}>
+            <Select
+              value={position}
+              onValueChange={setPosition}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select position" />
               </SelectTrigger>
@@ -739,7 +801,11 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           </div>
         </>
       )}
-      <Button onClick={handleAction} disabled={loading || subtitleUploading} className="w-full">
+      <Button
+        onClick={handleAction}
+        disabled={loading || subtitleUploading}
+        className="w-full"
+      >
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -760,20 +826,34 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           {tracks.map((t, i) => (
             <div
               key={i}
-              className="text-xs p-2 rounded border border-zinc-200 dark:border-zinc-800"
+              className={`
+                text-xs p-2 rounded border border-zinc-200
+                dark:border-zinc-800
+              `}
             >
               <p className="font-medium">
                 {t.language || 'Unknown'} {t.is_default ? '(Default)' : ''}{' '}
                 {t.is_forced ? '(Forced)' : ''}
               </p>
-              <p className="text-[10px] text-zinc-500">Codec: {t.codec || 'N/A'}</p>
+              <p className="text-[10px] text-zinc-500">
+                Codec: {t.codec || 'N/A'}
+              </p>
             </div>
           ))}
         </div>
       )}
       {syncPreviewUrl && (
-        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-          <video src={syncPreviewUrl} controls className="w-full max-h-48" />
+        <div
+          className={`
+          rounded-lg border border-zinc-200 dark:border-zinc-800
+          overflow-hidden
+        `}
+        >
+          <video
+            src={syncPreviewUrl}
+            controls
+            className="w-full max-h-48"
+          />
         </div>
       )}
     </div>

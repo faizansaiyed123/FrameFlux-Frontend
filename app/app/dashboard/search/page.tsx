@@ -60,7 +60,10 @@ export default function SearchPage() {
           <CardTitle>Search Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSearch} className="space-y-4">
+          <form
+            onSubmit={handleSearch}
+            className="space-y-4"
+          >
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="space-y-2">
                 <Label htmlFor="query">Filename</Label>
@@ -108,7 +111,10 @@ export default function SearchPage() {
                 />
               </div>
             </div>
-            <Button type="submit" disabled={loading}>
+            <Button
+              type="submit"
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -141,9 +147,18 @@ export default function SearchPage() {
           ) : (
             <div className="grid gap-4">
               {results.map((item) => (
-                <Card key={item.id} className="border-zinc-200 dark:border-zinc-800">
+                <Card
+                  key={item.id}
+                  className="border-zinc-200 dark:border-zinc-800"
+                >
                   <CardContent className="p-4 flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                    <div
+                      className={`
+                      flex h-10 w-10 items-center justify-center rounded-lg
+                      bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                      dark:text-indigo-400
+                    `}
+                    >
                       <Film className="h-5 w-5" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -152,13 +167,21 @@ export default function SearchPage() {
                       </p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
                         {item.media_type} •{' '}
-                        {item.file_size ? `${(item.file_size / 1024 / 1024).toFixed(1)} MB` : ''} •{' '}
+                        {item.file_size
+                          ? `${(item.file_size / 1024 / 1024).toFixed(1)} MB`
+                          : ''}{' '}
+                        •{' '}
                         {item.created_at
-                          ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true })
+                          ? formatDistanceToNow(new Date(item.created_at), {
+                              addSuffix: true,
+                            })
                           : 'Unknown date'}
                       </p>
                     </div>
-                    <Badge variant="secondary" className="capitalize">
+                    <Badge
+                      variant="secondary"
+                      className="capitalize"
+                    >
                       {item.processing_status}
                     </Badge>
                   </CardContent>

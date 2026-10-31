@@ -45,7 +45,11 @@ interface AudioWorkspaceProps {
   onProcessed: () => void;
 }
 
-export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspaceProps) {
+export function AudioWorkspace({
+  media,
+  onBack,
+  onProcessed,
+}: AudioWorkspaceProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const waveformRef = useRef<HTMLCanvasElement>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -116,7 +120,8 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
     for (let i = 0; i < bars; i++) {
       const x = i * barWidth;
       const normalizedPosition = i / bars;
-      const amplitude = Math.sin(normalizedPosition * Math.PI * 10) * 0.4 + Math.random() * 0.3;
+      const amplitude =
+        Math.sin(normalizedPosition * Math.PI * 10) * 0.4 + Math.random() * 0.3;
       const barHeight = Math.max(2, amplitude * height * 0.7);
 
       ctx.fillStyle = '#6366f1';
@@ -217,13 +222,19 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
     api
       .listMedia({ media_type: 'audio' })
       .then((items) =>
-        setReorderMedia(items.filter((item) => !clips.some((clip) => clip.mediaId === item.id))),
+        setReorderMedia(
+          items.filter(
+            (item) => !clips.some((clip) => clip.mediaId === item.id),
+          ),
+        ),
       )
       .catch(() => setReorderError('Unable to load audio clips.'));
   }, [activeTool, clips]);
 
   const addAudioClip = useCallback(() => {
-    const item = reorderMedia.find((candidate) => candidate.id === selectedAudioToAdd);
+    const item = reorderMedia.find(
+      (candidate) => candidate.id === selectedAudioToAdd,
+    );
     if (!item) return;
     setClips((prev) => [
       ...prev,
@@ -265,11 +276,15 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
         media.id,
         clips.map((clip) => clip.storedFilename || clip.mediaId),
       );
-      const blob = await api.getProcessedMedia(media.id, result.output_filename);
+      const blob = await api.getProcessedMedia(
+        media.id,
+        result.output_filename,
+      );
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = media.original_filename.replace(/\.[^/.]+$/, '') + '_reordered.mp3';
+      anchor.download =
+        media.original_filename.replace(/\.[^/.]+$/, '') + '_reordered.mp3';
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
@@ -285,23 +300,49 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
+      <div
+        className={`
+        flex items-center justify-between border-b border-zinc-200
+        dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2
+      `}
+      >
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px] sm:max-w-[400px]">
+            <h1
+              className={`
+              text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate
+              max-w-[200px] sm:max-w-[400px]
+            `}
+            >
               {media.original_filename}
             </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Audio Editor</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Audio Editor
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => {}} disabled>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {}}
+            disabled
+          >
             <Undo className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => {}} disabled>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {}}
+            disabled
+          >
             <Redo className="h-4 w-4" />
           </Button>
           <Button
@@ -326,22 +367,38 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex flex-1 flex-col">
-          <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+          <div
+            className={`
+            flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center
+            justify-center
+          `}
+          >
             <div className="w-full max-w-2xl px-4">
               <div className="flex items-center gap-4 mb-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                <div
+                  className={`
+                  flex h-16 w-16 items-center justify-center rounded-full
+                  bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                  dark:text-indigo-400
+                `}
+                >
                   <Music className="h-8 w-8" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                     {media.original_filename}
                   </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">{media.mime_type}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {media.mime_type}
+                  </p>
                 </div>
               </div>
               <canvas
                 ref={waveformRef}
-                className="w-full h-24 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer"
+                className={`
+                  w-full h-24 rounded-lg border border-zinc-200
+                  dark:border-zinc-700 cursor-pointer
+                `}
                 onClick={(e) => {
                   const canvas = waveformRef.current;
                   if (!canvas || duration <= 0) return;
@@ -354,7 +411,12 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
             </div>
           </div>
 
-          <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
+          <div
+            className={`
+            border-t border-zinc-200 dark:border-zinc-800 bg-white
+            dark:bg-zinc-900 px-4 py-2
+          `}
+          >
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -363,8 +425,16 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
               >
                 <SkipBack className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={handlePlayPause}>
-                {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlePlayPause}
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
               </Button>
               <Button
                 variant="ghost"
@@ -373,13 +443,26 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
               >
                 <SkipForward className="h-4 w-4" />
               </Button>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono min-w-[100px]">
+              <span
+                className={`
+                text-xs text-zinc-500 dark:text-zinc-400 font-mono
+                min-w-[100px]
+              `}
+              >
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
               <div className="flex-1" />
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={toggleMute}>
-                  {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleMute}
+                >
+                  {isMuted ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
                 </Button>
                 <input
                   type="range"
@@ -394,7 +477,12 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
             </div>
           </div>
 
-          <div className="h-48 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+          <div
+            className={`
+            h-48 border-t border-zinc-200 dark:border-zinc-800
+            bg-white dark:bg-zinc-900
+          `}
+          >
             <Timeline
               clips={clips}
               selectedClipId={selectedClipId}
@@ -403,15 +491,29 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
               onSelectClip={setSelectedClipId}
               onSeek={handleSeek}
               onClipChange={(clip, changes) => {
-                setClips((prev) => prev.map((c) => (c.id === clip.id ? { ...c, ...changes } : c)));
+                setClips((prev) =>
+                  prev.map((c) =>
+                    c.id === clip.id ? { ...c, ...changes } : c,
+                  ),
+                );
               }}
             />
           </div>
         </div>
 
-        <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
+        <div
+          className={`
+          w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white
+          dark:bg-zinc-900 overflow-y-auto
+        `}
+        >
           <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+            <h2
+              className={`
+              text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase
+              tracking-wider mb-2
+            `}
+            >
               Audio Tools
             </h2>
             <div className="grid grid-cols-3 gap-1.5">
@@ -427,14 +529,23 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                   <button
                     key={tool.id}
                     onClick={() => setActiveTool(isActive ? null : tool.id)}
-                    className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
+                    className={[
+                      `
+                        flex flex-col items-center gap-1 rounded-md border p-1.5
+                        text-center transition-colors
+                      `,
                       isActive
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
-                    }`}
+                        ? `
+                          border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                          text-indigo-700 dark:text-indigo-300
+                        `
+                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300',
+                    ].join(' ')}
                   >
                     <Icon className="h-3.5 w-3.5" />
-                    <span className="text-[9px] font-medium leading-tight">{tool.label}</span>
+                    <span className="text-[9px] font-medium leading-tight">
+                      {tool.label}
+                    </span>
                   </button>
                 );
               })}
@@ -454,7 +565,9 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                     size="sm"
                     className="w-full"
                   >
-                    {processing && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                    {processing && (
+                      <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                    )}
                     Split Audio
                   </Button>
                 </CardContent>
@@ -486,15 +599,23 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
               <Card className="border-zinc-200 dark:border-zinc-800">
                 <CardContent className="p-3 space-y-3">
                   <div>
-                    <Label className="text-[10px] text-zinc-500">Add audio clip</Label>
+                    <Label className="text-[10px] text-zinc-500">
+                      Add audio clip
+                    </Label>
                     <div className="flex gap-2 mt-1">
-                      <Select value={selectedAudioToAdd} onValueChange={setSelectedAudioToAdd}>
+                      <Select
+                        value={selectedAudioToAdd}
+                        onValueChange={setSelectedAudioToAdd}
+                      >
                         <SelectTrigger className="flex-1">
                           <SelectValue placeholder="Choose an audio file" />
                         </SelectTrigger>
                         <SelectContent>
                           {reorderMedia.map((item) => (
-                            <SelectItem key={item.id} value={item.id}>
+                            <SelectItem
+                              key={item.id}
+                              value={item.id}
+                            >
                               {item.original_filename}
                             </SelectItem>
                           ))}
@@ -513,9 +634,14 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-[10px] text-zinc-500">Clip order</Label>
+                    <Label className="text-[10px] text-zinc-500">
+                      Clip order
+                    </Label>
                     {clips.map((clip, index) => (
-                      <div key={clip.id} className="flex items-center gap-2 rounded border p-2">
+                      <div
+                        key={clip.id}
+                        className="flex items-center gap-2 rounded border p-2"
+                      >
                         <span className="flex-1 truncate text-xs">
                           {index + 1}. {clip.name}
                         </span>
@@ -550,7 +676,9 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                   >
                     {processing ? 'Exporting...' : 'Reorder & Export'}
                   </Button>
-                  {reorderError && <p className="text-[10px] text-red-600">{reorderError}</p>}
+                  {reorderError && (
+                    <p className="text-[10px] text-red-600">{reorderError}</p>
+                  )}
                 </CardContent>
               </Card>
             )}
@@ -585,7 +713,12 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
       {error && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+          <Alert
+            className={`
+            border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+            text-red-700 dark:text-red-300
+          `}
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -593,7 +726,12 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
       )}
       {success && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+          <Alert
+            className={`
+            border-green-200 dark:border-green-900 bg-green-50
+            dark:bg-green-900/20 text-green-700 dark:text-green-300
+          `}
+          >
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>
           </Alert>

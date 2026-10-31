@@ -57,7 +57,10 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Format</Label>
-        <Select value={format} onValueChange={setFormat}>
+        <Select
+          value={format}
+          onValueChange={setFormat}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select format" />
           </SelectTrigger>
@@ -77,7 +80,10 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Resolution</Label>
-        <Select value={resolution} onValueChange={setResolution}>
+        <Select
+          value={resolution}
+          onValueChange={setResolution}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select resolution" />
           </SelectTrigger>
@@ -93,7 +99,10 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Quality Preset</Label>
-        <Select value={quality} onValueChange={setQuality}>
+        <Select
+          value={quality}
+          onValueChange={setQuality}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select quality" />
           </SelectTrigger>
@@ -106,7 +115,11 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Target Bitrate (e.g. 2Mbps, optional)</Label>
-        <Input value={bitrate} onChange={(e) => setBitrate(e.target.value)} placeholder="e.g. 2M" />
+        <Input
+          value={bitrate}
+          onChange={(e) => setBitrate(e.target.value)}
+          placeholder="e.g. 2M"
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="compress-target-size">Target Size (MB, optional)</Label>
@@ -120,7 +133,11 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
           placeholder="e.g. 50"
         />
       </div>
-      <Button onClick={handleCompress} disabled={loading} className="w-full">
+      <Button
+        onClick={handleCompress}
+        disabled={loading}
+        className="w-full"
+      >
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

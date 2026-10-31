@@ -71,7 +71,10 @@ export function TransformTab({
     <div className="flex-1 overflow-y-auto p-3 space-y-4">
       <div className="space-y-2">
         <Label className="text-[10px] text-zinc-500">Operation</Label>
-        <Select value={operation} onValueChange={setOperation}>
+        <Select
+          value={operation}
+          onValueChange={setOperation}
+        >
           <SelectTrigger className="text-xs h-7">
             <SelectValue />
           </SelectTrigger>
@@ -85,34 +88,38 @@ export function TransformTab({
           </SelectContent>
         </Select>
       </div>
-      {operation !== 'speed' && (operation === 'scale' || operation === 'crop') && (
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1">
-            <Label className="text-[10px] text-zinc-500">Width</Label>
-            <Input
-              type="number"
-              placeholder="1280"
-              value={width}
-              onChange={(e) => setWidth(e.target.value)}
-              className="text-xs h-7"
-            />
+      {operation !== 'speed' &&
+        (operation === 'scale' || operation === 'crop') && (
+          <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1">
+              <Label className="text-[10px] text-zinc-500">Width</Label>
+              <Input
+                type="number"
+                placeholder="1280"
+                value={width}
+                onChange={(e) => setWidth(e.target.value)}
+                className="text-xs h-7"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-[10px] text-zinc-500">Height</Label>
+              <Input
+                type="number"
+                placeholder="720"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                className="text-xs h-7"
+              />
+            </div>
           </div>
-          <div className="space-y-1">
-            <Label className="text-[10px] text-zinc-500">Height</Label>
-            <Input
-              type="number"
-              placeholder="720"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-              className="text-xs h-7"
-            />
-          </div>
-        </div>
-      )}
+        )}
       {operation === 'rotate' && (
         <div className="space-y-1">
           <Label className="text-[10px] text-zinc-500">Angle</Label>
-          <Select value={angle} onValueChange={setAngle}>
+          <Select
+            value={angle}
+            onValueChange={setAngle}
+          >
             <SelectTrigger className="text-xs h-7">
               <SelectValue placeholder="Select angle" />
             </SelectTrigger>
@@ -158,7 +165,8 @@ export function TransformTab({
       </Button>
       <Alert className="border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
         <AlertDescription className="text-[10px]">
-          Flip/Flop mirror the video horizontally or vertically. Speed changes playback rate.
+          Flip/Flop mirror the video horizontally or vertically. Speed changes
+          playback rate.
         </AlertDescription>
       </Alert>
     </div>

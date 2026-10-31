@@ -3,7 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -106,7 +112,9 @@ export default function SettingsPage() {
       setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to change password');
+      setError(
+        err instanceof Error ? err.message : 'Failed to change password',
+      );
     } finally {
       setLoading(false);
     }
@@ -132,7 +140,12 @@ export default function SettingsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1
+            className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}
+          >
             Settings
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -150,7 +163,12 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1
+          className={`
+          text-3xl font-bold tracking-tight text-zinc-900
+          dark:text-zinc-50
+        `}
+        >
           Settings
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -168,16 +186,29 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mb-4">
+              <Alert
+                className={`
+                border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+                text-red-700 dark:text-red-300 mb-4
+              `}
+              >
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {success && (
-              <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4">
+              <Alert
+                className={`
+                border-green-200 dark:border-green-900 bg-green-50
+                dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4
+              `}
+              >
                 <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
-            <form onSubmit={handleUpdateProfile} className="space-y-4">
+            <form
+              onSubmit={handleUpdateProfile}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input
@@ -196,7 +227,10 @@ export default function SettingsPage() {
                   {user?.email || 'user@example.com'}
                 </p>
               </div>
-              <Button type="submit" disabled={profileLoading}>
+              <Button
+                type="submit"
+                disabled={profileLoading}
+              >
                 {profileLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -219,21 +253,39 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mb-4">
+              <Alert
+                className={`
+                border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+                text-red-700 dark:text-red-300 mb-4
+              `}
+              >
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {success && (
-              <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4">
+              <Alert
+                className={`
+                border-green-200 dark:border-green-900 bg-green-50
+                dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4
+              `}
+              >
                 <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
 
-            <form onSubmit={handleChangePassword} className="space-y-4">
+            <form
+              onSubmit={handleChangePassword}
+              className="space-y-4"
+            >
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Current Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                  <Lock
+                    className={`
+                    absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+                    text-zinc-400
+                  `}
+                  />
                   <Input
                     id="currentPassword"
                     type={showPasswords ? 'text' : 'password'}
@@ -247,10 +299,19 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={() => setShowPasswords(!showPasswords)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                    aria-label={showPasswords ? 'Hide password' : 'Show password'}
+                    className={`
+                      absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400
+                      hover:text-zinc-600 dark:hover:text-zinc-300
+                    `}
+                    aria-label={
+                      showPasswords ? 'Hide password' : 'Show password'
+                    }
                   >
-                    {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPasswords ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -258,7 +319,12 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                  <Lock
+                    className={`
+                    absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+                    text-zinc-400
+                  `}
+                  />
                   <Input
                     id="newPassword"
                     type={showPasswords ? 'text' : 'password'}
@@ -271,13 +337,20 @@ export default function SettingsPage() {
                     disabled={loading}
                   />
                 </div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-500">At least 8 characters</p>
+                <p className="text-xs text-zinc-500 dark:text-zinc-500">
+                  At least 8 characters
+                </p>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                  <Lock
+                    className={`
+                    absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+                    text-zinc-400
+                  `}
+                  />
                   <Input
                     id="confirmPassword"
                     type={showPasswords ? 'text' : 'password'}
@@ -291,7 +364,11 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading}
+              >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -307,7 +384,12 @@ export default function SettingsPage() {
 
         <Card className="border-zinc-200 dark:border-zinc-800 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+            <CardTitle
+              className={`
+              text-lg font-semibold text-zinc-900 dark:text-zinc-50
+              flex items-center gap-2
+            `}
+            >
               <Palette className="h-4 w-4" />
               Preferences
             </CardTitle>
@@ -315,19 +397,32 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mb-4">
+              <Alert
+                className={`
+                border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+                text-red-700 dark:text-red-300 mb-4
+              `}
+              >
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {success && (
-              <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4">
+              <Alert
+                className={`
+                border-green-200 dark:border-green-900 bg-green-50
+                dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4
+              `}
+              >
                 <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
             <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Theme</Label>
-                <Select value={theme} onValueChange={setTheme}>
+                <Select
+                  value={theme}
+                  onValueChange={setTheme}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select theme" />
                   </SelectTrigger>
@@ -340,7 +435,10 @@ export default function SettingsPage() {
               </div>
               <div className="space-y-2">
                 <Label>Language</Label>
-                <Select value={language} onValueChange={setLanguage}>
+                <Select
+                  value={language}
+                  onValueChange={setLanguage}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select language" />
                   </SelectTrigger>

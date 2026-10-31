@@ -5,16 +5,37 @@ import { cn } from 'cn';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { Select as SelectPrimitive } from 'radix-ui';
 
-function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />;
+function Select({
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Root>) {
+  return (
+    <SelectPrimitive.Root
+      data-slot="select"
+      {...props}
+    />
+  );
 }
 
-function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
-  return <SelectPrimitive.Group data-slot="select-group" {...props} />;
+function SelectGroup({
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Group>) {
+  return (
+    <SelectPrimitive.Group
+      data-slot="select-group"
+      {...props}
+    />
+  );
 }
 
-function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />;
+function SelectValue({
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Value>) {
+  return (
+    <SelectPrimitive.Value
+      data-slot="select-value"
+      {...props}
+    />
+  );
 }
 
 function SelectTrigger({
@@ -30,7 +51,28 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-fit cursor-pointer items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium whitespace-nowrap text-zinc-700 shadow-sm transition-[color,box-shadow,border-color,background-color] outline-none hover:border-zinc-300 hover:bg-zinc-50 focus-visible:border-indigo-400 focus-visible:ring-4 focus-visible:ring-indigo-500/10 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-red-400 data-[placeholder]:text-zinc-400 data-[size=default]:h-10 data-[size=sm]:h-9 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700 dark:hover:bg-zinc-900 dark:focus-visible:border-indigo-500/60 dark:focus-visible:ring-indigo-500/15 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-zinc-400 dark:[&_svg:not([class*='text-'])]:text-zinc-500",
+        `
+          flex w-fit cursor-pointer items-center justify-between gap-2
+          rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm
+          font-medium whitespace-nowrap text-zinc-700 shadow-sm
+          transition-[color,box-shadow,border-color,background-color]
+          outline-none hover:border-zinc-300 hover:bg-zinc-50
+          focus-visible:border-indigo-400 focus-visible:ring-4
+          focus-visible:ring-indigo-500/10 disabled:cursor-not-allowed
+          disabled:opacity-50 aria-invalid:border-red-400
+          data-[placeholder]:text-zinc-400 data-[size=default]:h-10
+          data-[size=sm]:h-9 *:data-[slot=select-value]:line-clamp-1
+          *:data-[slot=select-value]:flex
+          *:data-[slot=select-value]:items-center
+          *:data-[slot=select-value]:gap-2 dark:border-zinc-800
+          dark:bg-zinc-950 dark:text-zinc-200 dark:hover:border-zinc-700
+          dark:hover:bg-zinc-900 dark:focus-visible:border-indigo-500/60
+          dark:focus-visible:ring-indigo-500/15
+          [&_svg]:pointer-events-none [&_svg]:shrink-0
+          [&_svg:not([class*='size-'])]:size-4
+          [&_svg:not([class*='text-'])]:text-zinc-400
+          dark:[&_svg:not([class*='text-'])]:text-zinc-500
+        `,
         className,
       )}
       {...props}
@@ -55,9 +97,27 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={cn(
-          'relative z-50 max-h-(--radix-select-content-available-height) min-w-[11rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-xl border border-zinc-200/90 bg-white/95 p-1.5 text-zinc-900 shadow-[0_18px_45px_-20px_rgba(24,24,27,.35)] backdrop-blur-xl dark:border-zinc-800/90 dark:bg-zinc-900/95 dark:text-zinc-100 dark:shadow-[0_18px_45px_-20px_rgba(0,0,0,.6)] data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
+          `
+            relative z-50 max-h-(--radix-select-content-available-height)
+            min-w-[11rem] origin-(--radix-select-content-transform-origin)
+            overflow-x-hidden overflow-y-auto rounded-xl border
+            border-zinc-200/90 bg-white/95 p-1.5 text-zinc-900
+            shadow-[0_18px_45px_-20px_rgba(24,24,27,.35)] backdrop-blur-xl
+            dark:border-zinc-800/90 dark:bg-zinc-900/95 dark:text-zinc-100
+            dark:shadow-[0_18px_45px_-20px_rgba(0,0,0,.6)]
+            data-[side=bottom]:slide-in-from-top-2
+            data-[side=left]:slide-in-from-right-2
+            data-[side=right]:slide-in-from-left-2
+            data-[side=top]:slide-in-from-bottom-2
+            data-[state=closed]:animate-out data-[state=closed]:fade-out-0
+            data-[state=closed]:zoom-out-95 data-[state=open]:animate-in
+            data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95
+          `,
           position === 'popper' &&
-            'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
+            `
+              data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1
+              data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1
+            `,
           className,
         )}
         position={position}
@@ -69,7 +129,10 @@ function SelectContent({
           className={cn(
             'p-1',
             position === 'popper' &&
-              'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-1',
+              `
+                h-[var(--radix-select-trigger-height)] w-full
+                min-w-[var(--radix-select-trigger-width)] scroll-my-1
+              `,
           )}
         >
           {children}
@@ -80,12 +143,18 @@ function SelectContent({
   );
 }
 
-function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
+function SelectLabel({
+  className,
+  ...props
+}: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
       className={cn(
-        'px-2.5 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400 dark:text-zinc-500',
+        `
+          px-2.5 py-2 text-[11px] font-semibold uppercase
+          tracking-[0.12em] text-zinc-400 dark:text-zinc-500
+        `,
         className,
       )}
       {...props}
@@ -102,7 +171,17 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-pointer items-center gap-2 rounded-lg py-2 pr-8 pl-2.5 text-sm outline-hidden select-none transition-colors focus:bg-zinc-100 focus:text-zinc-950 data-[disabled]:pointer-events-none data-[disabled]:opacity-50 dark:focus:bg-zinc-800 dark:focus:text-white [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-zinc-400 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        `
+          relative flex w-full cursor-pointer items-center gap-2
+          rounded-lg py-2 pr-8 pl-2.5 text-sm outline-hidden select-none
+          transition-colors focus:bg-zinc-100 focus:text-zinc-950
+          data-[disabled]:pointer-events-none data-[disabled]:opacity-50
+          dark:focus:bg-zinc-800 dark:focus:text-white
+          [&_svg]:pointer-events-none [&_svg]:shrink-0
+          [&_svg:not([class*='size-'])]:size-4
+          [&_svg:not([class*='text-'])]:text-zinc-400 *:[span]:last:flex
+          *:[span]:last:items-center *:[span]:last:gap-2
+        `,
         className,
       )}
       {...props}
@@ -128,7 +207,10 @@ function SelectSeparator({
     <SelectPrimitive.Separator
       data-slot="select-separator"
       className={cn(
-        'pointer-events-none -mx-0.5 my-1.5 h-px bg-zinc-100 dark:bg-zinc-800',
+        `
+          pointer-events-none -mx-0.5 my-1.5 h-px bg-zinc-100
+          dark:bg-zinc-800
+        `,
         className,
       )}
       {...props}
@@ -144,7 +226,10 @@ function SelectScrollUpButton({
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
       className={cn(
-        'flex cursor-default items-center justify-center py-1 text-zinc-400',
+        `
+          flex cursor-default items-center justify-center py-1
+          text-zinc-400
+        `,
         className,
       )}
       {...props}
@@ -162,7 +247,10 @@ function SelectScrollDownButton({
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
       className={cn(
-        'flex cursor-default items-center justify-center py-1 text-zinc-400',
+        `
+          flex cursor-default items-center justify-center py-1
+          text-zinc-400
+        `,
         className,
       )}
       {...props}

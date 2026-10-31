@@ -20,7 +20,9 @@ import { Plus, Bell, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<NotificationResponse[]>([]);
+  const [notifications, setNotifications] = useState<NotificationResponse[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [event, setEvent] = useState('');
@@ -37,14 +39,20 @@ export default function NotificationsPage() {
     try {
       setError(null);
       const [data, unread] = await Promise.all([
-        api.listNotifications({ page, page_size: pageSize, unread_only: unreadOnly }),
+        api.listNotifications({
+          page,
+          page_size: pageSize,
+          unread_only: unreadOnly,
+        }),
         api.getUnreadNotificationCount(),
       ]);
       setNotifications(data.items);
       setTotalPages(data.total_pages);
       setUnreadCount(unread.unread_count);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load notifications');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load notifications',
+      );
     } finally {
       setLoading(false);
     }
@@ -67,7 +75,9 @@ export default function NotificationsPage() {
       setMessage('');
       await fetchNotifications();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create notification');
+      setError(
+        err instanceof Error ? err.message : 'Failed to create notification',
+      );
     }
   };
 
@@ -77,7 +87,11 @@ export default function NotificationsPage() {
       await api.markNotificationRead(id);
       await fetchNotifications();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to mark notification as read');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to mark notification as read',
+      );
     }
   };
 
@@ -87,7 +101,11 @@ export default function NotificationsPage() {
       await api.markAllNotificationsRead();
       await fetchNotifications();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to mark all notifications as read');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to mark all notifications as read',
+      );
     }
   };
 
@@ -103,14 +121,30 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300">
+        <div
+          className={`
+          rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm
+          text-red-700 dark:border-red-900/60 dark:bg-red-950/20
+          dark:text-red-300
+        `}
+        >
           {error}
         </div>
       )}
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div
+        className={`
+        flex flex-col gap-4 md:flex-row md:items-center
+        md:justify-between
+      `}
+      >
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1
+            className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}
+          >
             Notifications
           </h1>
           <p className="mt-1 text-zinc-600 dark:text-zinc-400">
@@ -137,7 +171,10 @@ export default function NotificationsPage() {
           >
             Mark all read
           </Button>
-          <Button onClick={() => setDialogOpen(true)} className="gap-2">
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="gap-2"
+          >
             <Plus className="h-4 w-4" />
             New Notification
           </Button>
@@ -148,7 +185,9 @@ export default function NotificationsPage() {
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="p-6 text-center">
             <p className="text-zinc-500 dark:text-zinc-400">
-              {unreadOnly ? 'No unread notifications.' : 'No notifications yet.'}
+              {unreadOnly
+                ? 'No unread notifications.'
+                : 'No notifications yet.'}
             </p>
           </CardContent>
         </Card>
@@ -157,10 +196,19 @@ export default function NotificationsPage() {
           {notifications.map((notification) => (
             <Card
               key={notification.id}
-              className={`border-zinc-200 dark:border-zinc-800 ${!notification.is_read ? 'border-l-4 border-l-indigo-500' : ''}`}
+              className={[
+                'border-zinc-200 dark:border-zinc-800',
+                !notification.is_read ? 'border-l-4 border-l-indigo-500' : '',
+              ].join(' ')}
             >
               <CardContent className="flex items-start gap-4 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                <div
+                  className={`
+                  flex h-10 w-10 items-center justify-center rounded-lg
+                  bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30
+                  dark:text-indigo-400
+                `}
+                >
                   <Bell className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -169,7 +217,10 @@ export default function NotificationsPage() {
                       {notification.event}
                     </p>
                     {!notification.is_read && (
-                      <Badge variant="default" className="text-xs">
+                      <Badge
+                        variant="default"
+                        className="text-xs"
+                      >
                         New
                       </Badge>
                     )}
@@ -178,7 +229,9 @@ export default function NotificationsPage() {
                     {notification.message}
                   </p>
                   <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(notification.created_at), {
+                      addSuffix: true,
+                    })}
                   </p>
                 </div>
                 {!notification.is_read && (
@@ -215,7 +268,9 @@ export default function NotificationsPage() {
               variant="outline"
               size="sm"
               disabled={page >= totalPages}
-              onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
+              onClick={() =>
+                setPage((value) => Math.min(totalPages, value + 1))
+              }
             >
               Next
             </Button>
@@ -223,15 +278,26 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Notification</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleCreate} className="space-y-4">
+          <form
+            onSubmit={handleCreate}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="event">Event</Label>
-              <Input id="event" value={event} onChange={(e) => setEvent(e.target.value)} required />
+              <Input
+                id="event"
+                value={event}
+                onChange={(e) => setEvent(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="message">Message</Label>
@@ -243,7 +309,11 @@ export default function NotificationsPage() {
               />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDialogOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create</Button>

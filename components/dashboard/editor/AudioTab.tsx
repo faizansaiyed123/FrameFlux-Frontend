@@ -44,7 +44,15 @@ function downloadBlob(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-type EditOp = 'trim' | 'cut' | 'split' | 'merge' | 'speed' | 'normalize' | 'fade' | 'silence';
+type EditOp =
+  | 'trim'
+  | 'cut'
+  | 'split'
+  | 'merge'
+  | 'speed'
+  | 'normalize'
+  | 'fade'
+  | 'silence';
 
 const editOps: { id: EditOp; label: string; icon: typeof Scissors }[] = [
   { id: 'trim', label: 'Trim', icon: Scissors },
@@ -123,7 +131,8 @@ export function AudioTab({
 
   useEffect(() => {
     return () => {
-      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
+      if (syncPreviewUrl?.startsWith('blob:'))
+        URL.revokeObjectURL(syncPreviewUrl);
     };
   }, [syncPreviewUrl]);
 
@@ -167,7 +176,11 @@ export function AudioTab({
     setError('');
     try {
       const data: Parameters<typeof api.editAudio>[1] = { operation: editOp };
-      if ((editOp === 'trim' || editOp === 'cut' || editOp === 'split') && editStart && editEnd) {
+      if (
+        (editOp === 'trim' || editOp === 'cut' || editOp === 'split') &&
+        editStart &&
+        editEnd
+      ) {
         data.start = parseFloat(editStart);
         data.end = parseFloat(editEnd);
       }
@@ -213,7 +226,10 @@ export function AudioTab({
         duration: atoVideoDuration ? parseFloat(atoVideoDuration) : undefined,
         output_format: atoVideoFormat,
       });
-      downloadBlob(blob as Blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_video.mp4');
+      downloadBlob(
+        blob as Blob,
+        media.original_filename.replace(/\.[^/.]+$/, '') + '_video.mp4',
+      );
       setAtoVideoOpen(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Audio to video failed');
@@ -231,7 +247,12 @@ export function AudioTab({
       };
       if (volumeFadeIn) data.fade_in = parseFloat(volumeFadeIn);
       if (volumeFadeOut) data.fade_out = parseFloat(volumeFadeOut);
-      await api.adjustVolume(media.id, data.volume, data.fade_in, data.fade_out);
+      await api.adjustVolume(
+        media.id,
+        data.volume,
+        data.fade_in,
+        data.fade_out,
+      );
       setSuccess(`Volume adjusted to ${volumeValue}x`);
       onProcessed?.();
     } catch (err) {
@@ -250,8 +271,14 @@ export function AudioTab({
     setError('');
     try {
       const result = await api.addAudio(media.id, addAudioFile.trim());
-      const blob = await api.getProcessedMedia(media.id, result.output_filename);
-      downloadBlob(blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_with_audio.mp4');
+      const blob = await api.getProcessedMedia(
+        media.id,
+        result.output_filename,
+      );
+      downloadBlob(
+        blob,
+        media.original_filename.replace(/\.[^/.]+$/, '') + '_with_audio.mp4',
+      );
       setSuccess(`Audio added and mixed: ${addAudioFile.trim()}`);
       onProcessed?.();
     } catch (err) {
@@ -269,12 +296,18 @@ export function AudioTab({
     setReplacingAudio(true);
     setError('');
     try {
-      const data: { audio_path: string; fade_in?: number; fade_out?: number } = {
-        audio_path: replaceAudioFile,
-      };
+      const data: { audio_path: string; fade_in?: number; fade_out?: number } =
+        {
+          audio_path: replaceAudioFile,
+        };
       if (replaceFadeIn) data.fade_in = parseFloat(replaceFadeIn);
       if (replaceFadeOut) data.fade_out = parseFloat(replaceFadeOut);
-      const result = await api.replaceAudio(media.id, data.audio_path, data.fade_in, data.fade_out);
+      const result = await api.replaceAudio(
+        media.id,
+        data.audio_path,
+        data.fade_in,
+        data.fade_out,
+      );
       setSuccess(`Audio replaced: ${result.output_filename}`);
       onProcessed?.();
     } catch (err) {
@@ -300,15 +333,22 @@ export function AudioTab({
         mix_volume: parseFloat(syncMixVolume) || 0.5,
         output_format: syncOutputFormat as 'mp4' | 'webm',
       };
-      if (syncVideoDuration) data.video_duration = parseFloat(syncVideoDuration);
-      if (syncAudioDuration) data.audio_duration = parseFloat(syncAudioDuration);
+      if (syncVideoDuration)
+        data.video_duration = parseFloat(syncVideoDuration);
+      if (syncAudioDuration)
+        data.audio_duration = parseFloat(syncAudioDuration);
       if (syncFadeIn) data.fade_in = parseFloat(syncFadeIn);
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
       const result = await api.syncAudioVideo(media.id, data);
-      const blob = await api.getProcessedMedia(media.id, result.output_filename);
+      const blob = await api.getProcessedMedia(
+        media.id,
+        result.output_filename,
+      );
       downloadBlob(
         blob,
-        media.original_filename.replace(/\.[^/.]+$/, '') + '_synced.' + syncOutputFormat,
+        media.original_filename.replace(/\.[^/.]+$/, '') +
+          '_synced.' +
+          syncOutputFormat,
       );
       setSuccess('Audio synced and downloaded successfully.');
       onProcessed?.();
@@ -340,8 +380,12 @@ export function AudioTab({
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
 
       const result = await api.syncAudioVideo(media.id, data);
-      const blob = await api.getProcessedMedia(media.id, result.output_filename);
-      if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
+      const blob = await api.getProcessedMedia(
+        media.id,
+        result.output_filename,
+      );
+      if (syncPreviewUrl?.startsWith('blob:'))
+        URL.revokeObjectURL(syncPreviewUrl);
       const url = URL.createObjectURL(blob);
       setSyncPreviewUrl(url);
       setSyncPreviewOpen(true);
@@ -352,14 +396,24 @@ export function AudioTab({
 
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-4">
-      <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+      <div
+        className={`
+        flex items-center gap-2 text-xs text-zinc-500
+        dark:text-zinc-400
+      `}
+      >
         <Music className="h-3.5 w-3.5" />
         <span>Audio: {media.audio_codec || 'Unknown'}</span>
       </div>
 
       <div>
-        <Label className="text-[10px] text-zinc-500">Extract Audio Format</Label>
-        <Select value={extractFormat} onValueChange={setExtractFormat}>
+        <Label className="text-[10px] text-zinc-500">
+          Extract Audio Format
+        </Label>
+        <Select
+          value={extractFormat}
+          onValueChange={setExtractFormat}
+        >
           <SelectTrigger className="text-xs h-7">
             <SelectValue />
           </SelectTrigger>
@@ -393,7 +447,10 @@ export function AudioTab({
       </div>
       <div className="space-y-2">
         <Label className="text-[10px] text-zinc-500">Convert Audio</Label>
-        <Select value={convertFormat} onValueChange={setConvertFormat}>
+        <Select
+          value={convertFormat}
+          onValueChange={setConvertFormat}
+        >
           <SelectTrigger className="text-xs h-7">
             <SelectValue />
           </SelectTrigger>
@@ -404,7 +461,11 @@ export function AudioTab({
             <SelectItem value="flac">FLAC</SelectItem>
           </SelectContent>
         </Select>
-        <Button onClick={handleConvert} disabled={converting} className="w-full text-xs">
+        <Button
+          onClick={handleConvert}
+          disabled={converting}
+          className="w-full text-xs"
+        >
           {converting ? (
             <>
               <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
@@ -416,7 +477,12 @@ export function AudioTab({
         </Button>
       </div>
 
-      <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-3">
+      <div
+        className={`
+        border-t border-zinc-200 dark:border-zinc-800 pt-4
+        space-y-3
+      `}
+      >
         <Label className="text-[10px] text-zinc-500">Edit Audio</Label>
         <div className="grid grid-cols-3 gap-1.5">
           {editOps.map((op) => {
@@ -426,14 +492,23 @@ export function AudioTab({
               <button
                 key={op.id}
                 onClick={() => setEditOp(op.id)}
-                className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
+                className={[
+                  `
+                    flex flex-col items-center gap-1 rounded-md border p-1.5
+                    text-center transition-colors
+                  `,
                   isActive
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
-                }`}
+                    ? `
+                      border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                      text-indigo-700 dark:text-indigo-300
+                    `
+                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300',
+                ].join(' ')}
               >
                 <Icon className="h-3.5 w-3.5" />
-                <span className="text-[9px] font-medium leading-tight">{op.label}</span>
+                <span className="text-[9px] font-medium leading-tight">
+                  {op.label}
+                </span>
               </button>
             );
           })}
@@ -466,7 +541,10 @@ export function AudioTab({
           {editOp === 'speed' && (
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Speed (x)</Label>
-              <Select value={editSpeed} onValueChange={setEditSpeed}>
+              <Select
+                value={editSpeed}
+                onValueChange={setEditSpeed}
+              >
                 <SelectTrigger className="text-xs h-7">
                   <SelectValue />
                 </SelectTrigger>
@@ -507,7 +585,9 @@ export function AudioTab({
           )}
           {editOp === 'silence' && (
             <div className="space-y-1">
-              <Label className="text-[9px] text-zinc-500">Silence Duration (s)</Label>
+              <Label className="text-[9px] text-zinc-500">
+                Silence Duration (s)
+              </Label>
               <Input
                 type="number"
                 step="0.1"
@@ -531,7 +611,11 @@ export function AudioTab({
             </div>
           )}
         </div>
-        <Button onClick={handleEdit} disabled={editing} className="w-full text-xs">
+        <Button
+          onClick={handleEdit}
+          disabled={editing}
+          className="w-full text-xs"
+        >
           {editing ? (
             <>
               <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
@@ -553,9 +637,16 @@ export function AudioTab({
           Audio to Video
         </Button>
         {atoVideoOpen && (
-          <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <div
+            className={`
+            space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+            dark:border-zinc-800
+          `}
+          >
             <div className="space-y-1">
-              <Label className="text-[9px] text-zinc-500">Background Color</Label>
+              <Label className="text-[9px] text-zinc-500">
+                Background Color
+              </Label>
               <Input
                 type="color"
                 value={atoVideoBgColor}
@@ -591,14 +682,22 @@ export function AudioTab({
                 }
                 className="w-3 h-3"
               />
-              <Label htmlFor="waveform" className="text-[9px] text-zinc-500">
+              <Label
+                htmlFor="waveform"
+                className="text-[9px] text-zinc-500"
+              >
                 Show Waveform
               </Label>
             </div>
             {atoVideoWaveform && (
               <div className="space-y-1">
-                <Label className="text-[9px] text-zinc-500">Visualizer Style</Label>
-                <Select value={atoVideoVisualizer} onValueChange={setAtoVideoVisualizer}>
+                <Label className="text-[9px] text-zinc-500">
+                  Visualizer Style
+                </Label>
+                <Select
+                  value={atoVideoVisualizer}
+                  onValueChange={setAtoVideoVisualizer}
+                >
                   <SelectTrigger className="text-xs h-7">
                     <SelectValue placeholder="Select style" />
                   </SelectTrigger>
@@ -613,7 +712,10 @@ export function AudioTab({
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Resolution</Label>
-                <Select value={atoVideoResolution} onValueChange={setAtoVideoResolution}>
+                <Select
+                  value={atoVideoResolution}
+                  onValueChange={setAtoVideoResolution}
+                >
                   <SelectTrigger className="text-xs h-7">
                     <SelectValue />
                   </SelectTrigger>
@@ -626,7 +728,10 @@ export function AudioTab({
               </div>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">FPS</Label>
-                <Select value={atoVideoFps} onValueChange={setAtoVideoFps}>
+                <Select
+                  value={atoVideoFps}
+                  onValueChange={setAtoVideoFps}
+                >
                   <SelectTrigger className="text-xs h-7">
                     <SelectValue />
                   </SelectTrigger>
@@ -640,7 +745,9 @@ export function AudioTab({
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
-                <Label className="text-[9px] text-zinc-500">Max Duration (s)</Label>
+                <Label className="text-[9px] text-zinc-500">
+                  Max Duration (s)
+                </Label>
                 <Input
                   type="number"
                   value={atoVideoDuration}
@@ -650,8 +757,13 @@ export function AudioTab({
                 />
               </div>
               <div className="space-y-1">
-                <Label className="text-[9px] text-zinc-500">Output Format</Label>
-                <Select value={atoVideoFormat} onValueChange={setAtoVideoFormat}>
+                <Label className="text-[9px] text-zinc-500">
+                  Output Format
+                </Label>
+                <Select
+                  value={atoVideoFormat}
+                  onValueChange={setAtoVideoFormat}
+                >
                   <SelectTrigger className="text-xs h-7">
                     <SelectValue />
                   </SelectTrigger>
@@ -688,11 +800,19 @@ export function AudioTab({
             <Volume2 className="mr-2 h-3.5 w-3.5" />
             Volume & Fade
           </Button>
-          <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <div
+            className={`
+            space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+            dark:border-zinc-800
+          `}
+          >
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Volume (x)</Label>
-                <Select value={volumeValue} onValueChange={setVolumeValue}>
+                <Select
+                  value={volumeValue}
+                  onValueChange={setVolumeValue}
+                >
                   <SelectTrigger className="text-xs h-7">
                     <SelectValue />
                   </SelectTrigger>
@@ -756,7 +876,10 @@ export function AudioTab({
 
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="addAudioFile" className="text-[10px] text-zinc-500">
+            <Label
+              htmlFor="addAudioFile"
+              className="text-[10px] text-zinc-500"
+            >
               Add Audio
             </Label>
             <p className="text-[10px] text-zinc-400">
@@ -798,9 +921,16 @@ export function AudioTab({
             <RotateCcw className="mr-2 h-3.5 w-3.5" />
             Replace Audio
           </Button>
-          <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <div
+            className={`
+            space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+            dark:border-zinc-800
+          `}
+          >
             <div className="space-y-1">
-              <Label className="text-[9px] text-zinc-500">Audio File (stored filename)</Label>
+              <Label className="text-[9px] text-zinc-500">
+                Audio File (stored filename)
+              </Label>
               <Input
                 value={replaceAudioFile}
                 onChange={(e) => setReplaceAudioFile(e.target.value)}
@@ -862,9 +992,17 @@ export function AudioTab({
             Sync External Audio
           </Button>
           {syncAudioOpen && (
-            <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+            <div
+              className={`
+              space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+              dark:border-zinc-800
+            `}
+            >
               <div className="space-y-1">
-                <Label htmlFor="syncExternalAudioFile" className="text-[9px] text-zinc-500">
+                <Label
+                  htmlFor="syncExternalAudioFile"
+                  className="text-[9px] text-zinc-500"
+                >
                   External Audio File (stored filename)
                 </Label>
                 <Input
@@ -900,7 +1038,9 @@ export function AudioTab({
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label className="text-[9px] text-zinc-500">Video Duration (s)</Label>
+                  <Label className="text-[9px] text-zinc-500">
+                    Video Duration (s)
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -911,7 +1051,9 @@ export function AudioTab({
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[9px] text-zinc-500">Audio Duration (s)</Label>
+                  <Label className="text-[9px] text-zinc-500">
+                    Audio Duration (s)
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -924,7 +1066,9 @@ export function AudioTab({
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label className="text-[9px] text-zinc-500">Fade In (s)</Label>
+                  <Label className="text-[9px] text-zinc-500">
+                    Fade In (s)
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -935,7 +1079,9 @@ export function AudioTab({
                   />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[9px] text-zinc-500">Fade Out (s)</Label>
+                  <Label className="text-[9px] text-zinc-500">
+                    Fade Out (s)
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -956,13 +1102,18 @@ export function AudioTab({
                   }
                   className="w-3 h-3"
                 />
-                <Label htmlFor="syncMix" className="text-[9px] text-zinc-500">
+                <Label
+                  htmlFor="syncMix"
+                  className="text-[9px] text-zinc-500"
+                >
                   Mix with original audio
                 </Label>
               </div>
               {syncMix && (
                 <div className="space-y-1">
-                  <Label className="text-[9px] text-zinc-500">Original Audio Volume</Label>
+                  <Label className="text-[9px] text-zinc-500">
+                    Original Audio Volume
+                  </Label>
                   <Input
                     type="number"
                     step="0.1"
@@ -976,8 +1127,13 @@ export function AudioTab({
               )}
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label className="text-[9px] text-zinc-500">Output Format</Label>
-                  <Select value={syncOutputFormat} onValueChange={setSyncOutputFormat}>
+                  <Label className="text-[9px] text-zinc-500">
+                    Output Format
+                  </Label>
+                  <Select
+                    value={syncOutputFormat}
+                    onValueChange={setSyncOutputFormat}
+                  >
                     <SelectTrigger className="text-xs h-7">
                       <SelectValue />
                     </SelectTrigger>
@@ -1022,19 +1178,40 @@ export function AudioTab({
       </div>
 
       {success && (
-        <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+        <Alert
+          className={`
+          border-green-200 dark:border-green-900 bg-green-50
+          dark:bg-green-900/20 text-green-700 dark:text-green-300
+        `}
+        >
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
-      <Alert className="border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400">
+      <Alert
+        className={`
+        border-zinc-200 dark:border-zinc-800 bg-zinc-50
+        dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400
+      `}
+      >
         <AlertDescription className="text-[10px]">
-          Volume and fade controls are available during playback using the main controls.
+          Volume and fade controls are available during playback using the main
+          controls.
         </AlertDescription>
       </Alert>
 
       {syncPreviewOpen && syncPreviewUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <div
+          className={`
+          fixed inset-0 z-50 flex items-center justify-center
+          bg-black/70 p-4
+        `}
+        >
+          <div
+            className={`
+            bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6
+            max-h-[90vh] overflow-y-auto
+          `}
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Film className="h-5 w-5 text-indigo-600" />
@@ -1053,8 +1230,17 @@ export function AudioTab({
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="bg-black rounded-lg overflow-hidden mb-4 flex items-center justify-center h-64">
-              <video src={syncPreviewUrl} controls className="max-h-full max-w-full" />
+            <div
+              className={`
+              bg-black rounded-lg overflow-hidden mb-4 flex
+              items-center justify-center h-64
+            `}
+            >
+              <video
+                src={syncPreviewUrl}
+                controls
+                className="max-h-full max-w-full"
+              />
             </div>
             <div className="flex items-center gap-2">
               <Button

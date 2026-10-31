@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { api } from '@/lib/api/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -48,8 +54,18 @@ const tools = [
     icon: Wand2,
     description: 'Change format, resolution, or bitrate',
   },
-  { id: 'edit', label: 'Trim / Cut', icon: Scissors, description: 'Cut or extract segments' },
-  { id: 'merge', label: 'Merge', icon: Merge, description: 'Combine multiple media files' },
+  {
+    id: 'edit',
+    label: 'Trim / Cut',
+    icon: Scissors,
+    description: 'Cut or extract segments',
+  },
+  {
+    id: 'merge',
+    label: 'Merge',
+    icon: Merge,
+    description: 'Combine multiple media files',
+  },
   {
     id: 'transform',
     label: 'Transform',
@@ -62,8 +78,18 @@ const tools = [
     icon: Snowflake,
     description: 'Pause at a specific moment',
   },
-  { id: 'overlay', label: 'Overlay', icon: Image, description: 'Add text or watermark' },
-  { id: 'split', label: 'Split', icon: Split, description: 'Divide into multiple parts' },
+  {
+    id: 'overlay',
+    label: 'Overlay',
+    icon: Image,
+    description: 'Add text or watermark',
+  },
+  {
+    id: 'split',
+    label: 'Split',
+    icon: Split,
+    description: 'Divide into multiple parts',
+  },
   {
     id: 'clips',
     label: 'Clips',
@@ -72,7 +98,10 @@ const tools = [
   },
 ] as const;
 
-export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) {
+export function MediaProcessing({
+  mediaId,
+  onProcessed,
+}: MediaProcessingProps) {
   const [operation, setOperation] = useState<OperationType>('convert');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -91,31 +120,53 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
     try {
       switch (operation) {
         case 'convert':
-          await api.convertMedia(mediaId, data as Parameters<typeof api.convertMedia>[1]);
+          await api.convertMedia(
+            mediaId,
+            data as Parameters<typeof api.convertMedia>[1],
+          );
           break;
         case 'edit':
-          await api.editMedia(mediaId, data as Parameters<typeof api.editMedia>[1]);
+          await api.editMedia(
+            mediaId,
+            data as Parameters<typeof api.editMedia>[1],
+          );
           break;
         case 'merge':
           await api.mergeMedia(mediaId, data.media_ids as string[]);
           break;
         case 'transform':
-          await api.transformMedia(mediaId, data as Parameters<typeof api.transformMedia>[1]);
+          await api.transformMedia(
+            mediaId,
+            data as Parameters<typeof api.transformMedia>[1],
+          );
           break;
         case 'freeze':
-          await api.freezeFrame(mediaId, data.timestamp as number, data.duration as number);
+          await api.freezeFrame(
+            mediaId,
+            data.timestamp as number,
+            data.duration as number,
+          );
           break;
         case 'overlay':
-          await api.overlayMedia(mediaId, data as Parameters<typeof api.overlayMedia>[1]);
+          await api.overlayMedia(
+            mediaId,
+            data as Parameters<typeof api.overlayMedia>[1],
+          );
           break;
         case 'split':
           await api.splitMedia(mediaId, data.split_points as number[]);
           break;
         case 'clips':
           if (data.sub_operation === 'keep') {
-            await api.keepClips(mediaId, data.clips as { start: number; end: number }[]);
+            await api.keepClips(
+              mediaId,
+              data.clips as { start: number; end: number }[],
+            );
           } else if (data.sub_operation === 'delete') {
-            await api.deleteClips(mediaId, data.clips as { start: number; end: number }[]);
+            await api.deleteClips(
+              mediaId,
+              data.clips as { start: number; end: number }[],
+            );
           } else if (data.sub_operation === 'reorder') {
             await api.reorderClips(mediaId, data.media_ids as string[]);
           } else if (data.sub_operation === 'append') {
@@ -136,21 +187,61 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
   const renderForm = () => {
     switch (operation) {
       case 'convert':
-        return <ConvertForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <ConvertForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       case 'edit':
-        return <EditForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <EditForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       case 'merge':
-        return <MergeForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <MergeForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       case 'transform':
-        return <TransformForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <TransformForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       case 'freeze':
-        return <FreezeForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <FreezeForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       case 'overlay':
-        return <OverlayForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <OverlayForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       case 'split':
-        return <SplitForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <SplitForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       case 'clips':
-        return <ClipsForm onSubmit={handleSubmit} loading={loading} />;
+        return (
+          <ClipsForm
+            onSubmit={handleSubmit}
+            loading={loading}
+          />
+        );
       default:
         return null;
     }
@@ -164,16 +255,28 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
         <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           Video Editor
         </CardTitle>
-        <CardDescription>Select a tool below to edit or enhance your media</CardDescription>
+        <CardDescription>
+          Select a tool below to edit or enhance your media
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {error && (
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+          <Alert
+            className={`
+            border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+            text-red-700 dark:text-red-300
+          `}
+          >
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
         {success && (
-          <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+          <Alert
+            className={`
+            border-green-200 dark:border-green-900 bg-green-50
+            dark:bg-green-900/20 text-green-700 dark:text-green-300
+          `}
+          >
             <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
@@ -189,11 +292,21 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
                   setOperation(tool.id as OperationType);
                   resetForm();
                 }}
-                className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${
+                className={[
+                  `
+                    flex flex-col items-center gap-2 rounded-lg border p-4
+                    text-center transition-colors
+                  `,
                   isActive
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
-                }`}
+                    ? `
+                      border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                      text-indigo-700 dark:text-indigo-300
+                    `
+                    : `
+                      border-zinc-200 dark:border-zinc-700
+                      hover:border-zinc-300 dark:hover:border-zinc-600
+                    `,
+                ].join(' ')}
               >
                 <Icon className="h-5 w-5" />
                 <span className="text-sm font-medium">{tool.label}</span>
@@ -207,7 +320,9 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
 
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-6">
           <div className="flex items-center gap-2 mb-4">
-            {activeTool && <activeTool.icon className="h-4 w-4 text-zinc-500" />}
+            {activeTool && (
+              <activeTool.icon className="h-4 w-4 text-zinc-500" />
+            )}
             <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
               {activeTool?.label} Settings
             </h3>
@@ -259,7 +374,10 @@ function ConvertForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="format">Output Format</Label>
@@ -293,7 +411,10 @@ function ConvertForm({
 
         <div className="space-y-2">
           <Label htmlFor="resolution">Resolution Preset</Label>
-          <Select value={resolution} onValueChange={setResolution}>
+          <Select
+            value={resolution}
+            onValueChange={setResolution}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Keep original" />
             </SelectTrigger>
@@ -313,7 +434,10 @@ function ConvertForm({
 
         <div className="space-y-2">
           <Label htmlFor="videoCodec">Video Codec</Label>
-          <Select value={videoCodec} onValueChange={setVideoCodec}>
+          <Select
+            value={videoCodec}
+            onValueChange={setVideoCodec}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Default" />
             </SelectTrigger>
@@ -352,7 +476,10 @@ function ConvertForm({
 
         <div className="space-y-2">
           <Label htmlFor="audioCodec">Audio Codec</Label>
-          <Select value={audioCodec} onValueChange={setAudioCodec}>
+          <Select
+            value={audioCodec}
+            onValueChange={setAudioCodec}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Default" />
             </SelectTrigger>
@@ -369,7 +496,10 @@ function ConvertForm({
 
         <div className="space-y-2">
           <Label htmlFor="fpsPreset">Frame Rate Preset</Label>
-          <Select value={fpsPreset} onValueChange={setFpsPreset}>
+          <Select
+            value={fpsPreset}
+            onValueChange={setFpsPreset}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Keep original" />
             </SelectTrigger>
@@ -399,7 +529,10 @@ function ConvertForm({
 
         <div className="space-y-2">
           <Label htmlFor="aspectRatioPreset">Aspect Ratio Preset</Label>
-          <Select value={aspectRatioPreset} onValueChange={setAspectRatioPreset}>
+          <Select
+            value={aspectRatioPreset}
+            onValueChange={setAspectRatioPreset}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Keep original" />
             </SelectTrigger>
@@ -447,7 +580,10 @@ function ConvertForm({
         </div>
       </div>
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Start Conversion
       </Button>
@@ -476,10 +612,16 @@ function EditForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label>Operation</Label>
-        <Select value={operation} onValueChange={setOperation}>
+        <Select
+          value={operation}
+          onValueChange={setOperation}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -518,7 +660,10 @@ function EditForm({
         </div>
       </div>
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Apply Edit
       </Button>
@@ -545,7 +690,10 @@ function MergeForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label htmlFor="mediaIds">Media Files to Merge</Label>
         <Input
@@ -560,7 +708,10 @@ function MergeForm({
         </p>
       </div>
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Merge Media
       </Button>
@@ -596,10 +747,16 @@ function TransformForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label>Transform Type</Label>
-        <Select value={op} onValueChange={setOp}>
+        <Select
+          value={op}
+          onValueChange={setOp}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -667,7 +824,10 @@ function TransformForm({
         </div>
       )}
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Apply Transform
       </Button>
@@ -694,7 +854,10 @@ function FreezeForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="timestamp">Timestamp (seconds)</Label>
@@ -721,7 +884,10 @@ function FreezeForm({
         </div>
       </div>
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Create Freeze Frame
       </Button>
@@ -767,10 +933,16 @@ function OverlayForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label>Overlay Type</Label>
-        <Select value={mode} onValueChange={setMode}>
+        <Select
+          value={mode}
+          onValueChange={setMode}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -810,11 +982,21 @@ function OverlayForm({
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="x">X Position</Label>
-          <Input id="x" type="number" value={x} onChange={(e) => setX(e.target.value)} />
+          <Input
+            id="x"
+            type="number"
+            value={x}
+            onChange={(e) => setX(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="y">Y Position</Label>
-          <Input id="y" type="number" value={y} onChange={(e) => setY(e.target.value)} />
+          <Input
+            id="y"
+            type="number"
+            value={y}
+            onChange={(e) => setY(e.target.value)}
+          />
         </div>
         {mode === 'text' && (
           <div className="space-y-2">
@@ -843,7 +1025,10 @@ function OverlayForm({
         )}
       </div>
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Apply Overlay
       </Button>
@@ -870,7 +1055,10 @@ function SplitForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label htmlFor="splitPoints">Split Points (seconds)</Label>
         <Input
@@ -885,7 +1073,10 @@ function SplitForm({
         </p>
       </div>
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Split Media
       </Button>
@@ -925,10 +1116,16 @@ function ClipsForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4"
+    >
       <div className="space-y-2">
         <Label>Clip Operation</Label>
-        <Select value={subOperation} onValueChange={setSubOperation}>
+        <Select
+          value={subOperation}
+          onValueChange={setSubOperation}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -968,12 +1165,16 @@ function ClipsForm({
             required
           />
           <p className="text-xs text-zinc-500 dark:text-zinc-500">
-            Enter media filenames or IDs in the desired order, separated by commas.
+            Enter media filenames or IDs in the desired order, separated by
+            commas.
           </p>
         </div>
       )}
 
-      <Button type="submit" disabled={loading}>
+      <Button
+        type="submit"
+        disabled={loading}
+      >
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Apply Clip Operation
       </Button>

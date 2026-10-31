@@ -34,7 +34,8 @@ export class ResumableUploader {
           ? 'error'
           : this.paused
             ? 'paused'
-            : this.uploadedChunks.size === this.totalChunks && this.totalChunks > 0
+            : this.uploadedChunks.size === this.totalChunks &&
+                this.totalChunks > 0
               ? 'complete'
               : this.uploadId
                 ? 'uploading'
@@ -88,7 +89,8 @@ export class ResumableUploader {
       this.uploadError = null;
     } catch (err) {
       this.failedChunk = index;
-      this.uploadError = err instanceof Error ? err.message : 'Chunk upload failed';
+      this.uploadError =
+        err instanceof Error ? err.message : 'Chunk upload failed';
       throw err;
     }
   }
@@ -152,7 +154,9 @@ export class ResumableUploader {
       throw new Error('Upload not initialized');
     }
     if (this.uploadedChunks.size !== this.totalChunks) {
-      throw new Error(`Missing chunks: ${this.totalChunks - this.uploadedChunks.size} remaining`);
+      throw new Error(
+        `Missing chunks: ${this.totalChunks - this.uploadedChunks.size} remaining`,
+      );
     }
     return api.finalizeResumableUpload(this.uploadId);
   }
