@@ -766,7 +766,10 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
           {tracks.map((t, i) => (
             <div
               key={i}
-              className="text-xs p-2 rounded border border-zinc-200 dark:border-zinc-800"
+              className={`
+                text-xs p-2 rounded border border-zinc-200
+                dark:border-zinc-800
+              `}
             >
               <p className="font-medium">
                 {t.language || 'Unknown'} {t.is_default ? '(Default)' : ''}{' '}
@@ -778,7 +781,10 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
         </div>
       )}
       {syncPreviewUrl && (
-        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+        <div className={`
+          rounded-lg border border-zinc-200 dark:border-zinc-800
+          overflow-hidden
+        `}>
           <video src={syncPreviewUrl} controls className="w-full max-h-48" />
         </div>
       )}
