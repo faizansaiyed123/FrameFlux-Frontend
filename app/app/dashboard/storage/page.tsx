@@ -70,7 +70,11 @@ export default function StoragePage() {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardHeader className="flex flex-row items-center gap-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+            <div className={`
+              flex h-10 w-10 items-center justify-center rounded-lg
+              bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+              dark:text-indigo-400
+            `}>
               <HardDrive className="h-5 w-5" />
             </div>
             <div>
