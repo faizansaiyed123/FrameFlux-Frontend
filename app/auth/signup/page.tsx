@@ -37,7 +37,10 @@ export default function SignupPage() {
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
       <div className="grid min-h-screen lg:grid-cols-[1.05fr_.95fr]">
-        <section className="relative hidden overflow-hidden bg-zinc-950 px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
+        <section className={`
+          relative hidden overflow-hidden bg-zinc-950 px-10 py-12
+          text-white lg:flex lg:flex-col lg:justify-between xl:px-16
+        `}>
           <div className="absolute inset-0 ff-grid opacity-30" />
           <Link
             href="/"
@@ -50,7 +53,10 @@ export default function SignupPage() {
             <span className="font-semibold tracking-tight">FrameFlux</span>
           </Link>
           <div className="relative z-10 max-w-xl pb-10">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300">
+            <div className={`
+              mb-6 inline-flex items-center gap-2 rounded-full border
+              border-white/10 bg-white/5 px-3 py-1.5 text-xs text-zinc-300
+            `}>
               <Zap className="h-3.5 w-3.5" /> Start building your workflow
             </div>
             <h1 className="text-5xl font-semibold leading-[1.05] tracking-[-0.04em] xl:text-6xl">
@@ -71,12 +77,20 @@ export default function SignupPage() {
           <div className="w-full max-w-md">
             <Link
               href="/"
-              className="mb-10 inline-flex cursor-pointer items-center gap-2 text-sm text-zinc-500 transition hover:text-zinc-900 dark:hover:text-white lg:hidden"
+              className={`
+                mb-10 inline-flex cursor-pointer items-center gap-2 text-sm
+                text-zinc-500 transition hover:text-zinc-900
+                dark:hover:text-white lg:hidden
+              `}
             >
               <ArrowLeft className="h-4 w-4" /> Back to home
             </Link>
             <div className="mb-8">
-              <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-950 text-white shadow-sm dark:bg-white dark:text-zinc-950 lg:hidden">
+              <div className={`
+                mb-5 flex h-11 w-11 items-center justify-center rounded-xl
+                bg-zinc-950 text-white shadow-sm dark:bg-white
+                dark:text-zinc-950 lg:hidden
+              `}>
                 <span className="h-3 w-3 rounded-[3px] bg-current" />
               </div>
               <h2 className="text-3xl font-semibold tracking-[-0.03em] text-zinc-950 dark:text-white">
@@ -87,7 +101,10 @@ export default function SignupPage() {
               </p>
             </div>
             {error && (
-              <Alert className="mb-5 border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+              <Alert className={`
+                mb-5 border-red-200 bg-red-50 text-red-700 dark:border-red-900
+                dark:bg-red-950/30 dark:text-red-300
+              `}>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -143,7 +160,10 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                    className={`
+                      absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer
+                      text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200
+                    `}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
