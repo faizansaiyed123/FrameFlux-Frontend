@@ -297,7 +297,10 @@ export default function ProjectDetailPage() {
           {media.length === 0 ? (
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
+                <div className={`
+                  flex h-16 w-16 items-center justify-center rounded-lg
+                  bg-zinc-100 dark:bg-zinc-800 mb-4
+                `}>
                   <Film className="h-8 w-8 text-zinc-400" />
                 </div>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
@@ -315,7 +318,11 @@ export default function ProjectDetailPage() {
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                        <div className={`
+                          flex h-10 w-10 items-center justify-center rounded-lg
+                          bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                          dark:text-indigo-400
+                        `}>
                           <Film className="h-5 w-5" />
                         </div>
                         <div>
@@ -352,7 +359,11 @@ export default function ProjectDetailPage() {
               {folders.map((folder) => (
                 <Card key={folder.id} className="border-zinc-200 dark:border-zinc-800">
                   <CardContent className="p-4 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                    <div className={`
+                      flex h-10 w-10 items-center justify-center rounded-lg
+                      bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                      dark:text-indigo-400
+                    `}>
                       <FolderOpen className="h-5 w-5" />
                     </div>
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
@@ -378,7 +389,11 @@ export default function ProjectDetailPage() {
               {workflows.map((wf) => (
                 <Card key={wf.id} className="border-zinc-200 dark:border-zinc-800">
                   <CardContent className="p-4 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                    <div className={`
+                      flex h-10 w-10 items-center justify-center rounded-lg
+                      bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                      dark:text-indigo-400
+                    `}>
                       <Workflow className="h-5 w-5" />
                     </div>
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{wf.name}</p>
@@ -400,7 +415,11 @@ export default function ProjectDetailPage() {
               {history.map((entry) => (
                 <Card key={entry.id} className="border-zinc-200 dark:border-zinc-800">
                   <CardContent className="p-4 flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                    <div className={`
+                      flex h-10 w-10 items-center justify-center rounded-lg
+                      bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                      dark:text-indigo-400
+                    `}>
                       <History className="h-5 w-5" />
                     </div>
                     <div>
