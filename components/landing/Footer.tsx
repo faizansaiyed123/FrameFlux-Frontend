@@ -26,7 +26,10 @@ export function Footer() {
               className="flex cursor-pointer items-center gap-2.5"
               aria-label="FrameFlux home"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
+              <span className={`
+                flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950
+                text-white dark:bg-white dark:text-zinc-950
+              `}>
                 <span className="h-2.5 w-2.5 rounded-[3px] bg-current" />
               </span>
               <span className="font-semibold tracking-tight text-zinc-950 dark:text-white">
@@ -38,7 +41,11 @@ export function Footer() {
             </p>
             <a
               href="mailto:hello@frameflux.io"
-              className="mt-5 inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
+              className={`
+                mt-5 inline-flex cursor-pointer items-center gap-2 text-sm
+                font-medium text-zinc-700 hover:text-zinc-950 dark:text-zinc-300
+                dark:hover:text-white
+              `}
             >
               <Mail className="h-4 w-4" /> hello@frameflux.io
             </a>
@@ -54,7 +61,10 @@ export function Footer() {
                     <li key={link.label}>
                       <Link
                         href={link.href}
-                        className="cursor-pointer text-sm text-zinc-500 transition hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white"
+                        className={`
+                          cursor-pointer text-sm text-zinc-500 transition
+                          hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-white
+                        `}
                       >
                         {link.label}
                       </Link>
