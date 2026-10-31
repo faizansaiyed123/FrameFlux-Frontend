@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { api } from '@/lib/api/client';
@@ -67,7 +73,7 @@ export default function BatchPage() {
   }, [fetchAvailableMedia]);
 
   const toggleMediaSelection = (id: string) => {
-    setMediaIds(prev => prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]);
+    setMediaIds((prev) => (prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]));
   };
 
   const handleBatch = async () => {
@@ -111,8 +117,12 @@ export default function BatchPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Batch Processing</h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Apply the same operation to multiple media files</p>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Batch Processing
+        </h1>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          Apply the same operation to multiple media files
+        </p>
       </div>
 
       <Card className="border-zinc-200 dark:border-zinc-800">
@@ -135,20 +145,32 @@ export default function BatchPage() {
               {mediaLoading ? (
                 <div className="text-center py-4 text-zinc-500 dark:text-zinc-400">Loading...</div>
               ) : availableMedia.length === 0 ? (
-                <div className="text-center py-4 text-zinc-500 dark:text-zinc-400">No media files found</div>
+                <div className="text-center py-4 text-zinc-500 dark:text-zinc-400">
+                  No media files found
+                </div>
               ) : (
                 <div className="space-y-1">
                   {availableMedia.map((media) => (
-                    <label key={media.id} className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
+                    <label
+                      key={media.id}
+                      className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                    >
                       <Checkbox
                         checked={mediaIds.includes(media.id)}
                         onCheckedChange={() => toggleMediaSelection(media.id)}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">{media.original_filename}</p>
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+                          {media.original_filename}
+                        </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {media.mime_type} • {media.file_size > 0 ? `${(media.file_size / 1024 / 1024).toFixed(1)} MB` : 'Unknown size'}
-                          {media.duration ? ` • ${Math.floor(media.duration / 60)}:${(media.duration % 60).toFixed(0).padStart(2, '0')}` : ''}
+                          {media.mime_type} •{' '}
+                          {media.file_size > 0
+                            ? `${(media.file_size / 1024 / 1024).toFixed(1)} MB`
+                            : 'Unknown size'}
+                          {media.duration
+                            ? ` • ${Math.floor(media.duration / 60)}:${(media.duration % 60).toFixed(0).padStart(2, '0')}`
+                            : ''}
                         </p>
                       </div>
                     </label>
@@ -156,7 +178,9 @@ export default function BatchPage() {
                 </div>
               )}
             </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">{mediaIds.length} file(s) selected</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              {mediaIds.length} file(s) selected
+            </p>
           </div>
           <div className="space-y-2">
             <Label>Operation</Label>
@@ -182,7 +206,11 @@ export default function BatchPage() {
               </SelectContent>
             </Select>
           </div>
-          <Button onClick={handleBatch} disabled={loading || mediaIds.length === 0} className="w-full">
+          <Button
+            onClick={handleBatch}
+            disabled={loading || mediaIds.length === 0}
+            className="w-full"
+          >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -206,12 +234,22 @@ export default function BatchPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Job ID: {job.job_id}</p>
+                <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                  Job ID: {job.job_id}
+                </p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   {job.total} total • {job.completed} completed • {job.failed} failed
                 </p>
               </div>
-              <Badge variant={job.status === 'completed' ? 'default' : job.status === 'failed' ? 'destructive' : 'secondary'}>
+              <Badge
+                variant={
+                  job.status === 'completed'
+                    ? 'default'
+                    : job.status === 'failed'
+                      ? 'destructive'
+                      : 'secondary'
+                }
+              >
                 {job.status}
               </Badge>
             </div>
@@ -223,18 +261,31 @@ export default function BatchPage() {
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {job.results.map((result, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                <div
+                  key={idx}
+                  className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                >
                   <div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{result.filename}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {result.filename}
+                    </p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">{result.media_id}</p>
-                    {result.error && <p className="text-xs text-red-600 dark:text-red-400">{result.error}</p>}
+                    {result.error && (
+                      <p className="text-xs text-red-600 dark:text-red-400">{result.error}</p>
+                    )}
                   </div>
                   <div className="flex items-center gap-3">
-                    <Badge variant={
-                      result.status === 'completed' ? 'default' :
-                      result.status === 'failed' ? 'destructive' :
-                      result.status === 'processing' ? 'secondary' : 'outline'
-                    }>
+                    <Badge
+                      variant={
+                        result.status === 'completed'
+                          ? 'default'
+                          : result.status === 'failed'
+                            ? 'destructive'
+                            : result.status === 'processing'
+                              ? 'secondary'
+                              : 'outline'
+                      }
+                    >
                       {result.status}
                     </Badge>
                     {result.status === 'processing' && (

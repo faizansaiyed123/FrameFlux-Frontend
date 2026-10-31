@@ -34,8 +34,7 @@ export default function FavoritesPage() {
     try {
       await api.removeFavorite(mediaId);
       fetchFavorites();
-    } catch {
-    }
+    } catch {}
   };
 
   if (loading) {
@@ -50,7 +49,9 @@ export default function FavoritesPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Favorites</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Favorites
+        </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">Your favorite media files</p>
       </div>
 
@@ -60,7 +61,9 @@ export default function FavoritesPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
               <Heart className="h-8 w-8 text-zinc-400" />
             </div>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">No favorites yet</h3>
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
+              No favorites yet
+            </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-sm">
               Mark media files as favorites to see them here.
             </p>
@@ -72,7 +75,9 @@ export default function FavoritesPage() {
             <Card key={fav.id} className="border-zinc-200 dark:border-zinc-800">
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Media ID: {fav.media_id}</p>
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                    Media ID: {fav.media_id}
+                  </p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Added {formatDistanceToNow(new Date(fav.created_at), { addSuffix: true })}
                   </p>

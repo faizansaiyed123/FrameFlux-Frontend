@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '@/lib/api/client';
 import { Loader2, Download } from 'lucide-react';
@@ -61,15 +67,34 @@ export function GifForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Start Time (seconds)</Label>
-        <Input type="number" step="0.1" value={start} onChange={(e) => setStart(e.target.value)} min="0" />
+        <Input
+          type="number"
+          step="0.1"
+          value={start}
+          onChange={(e) => setStart(e.target.value)}
+          min="0"
+        />
       </div>
       <div className="space-y-2">
         <Label>Duration (seconds)</Label>
-        <Input type="number" step="0.1" value={duration} onChange={(e) => setDuration(e.target.value)} min="0.5" max="30" />
+        <Input
+          type="number"
+          step="0.1"
+          value={duration}
+          onChange={(e) => setDuration(e.target.value)}
+          min="0.5"
+          max="30"
+        />
       </div>
       <div className="space-y-2">
         <Label>Width (px)</Label>
-        <Input type="number" value={width} onChange={(e) => setWidth(e.target.value)} min="100" max="1280" />
+        <Input
+          type="number"
+          value={width}
+          onChange={(e) => setWidth(e.target.value)}
+          min="100"
+          max="1280"
+        />
       </div>
       <div className="space-y-2">
         <Label>Frame Rate (fps)</Label>
@@ -100,7 +125,9 @@ export function GifForm({ mediaId }: Props) {
             <SelectItem value="20">Fast (20)</SelectItem>
           </SelectContent>
         </Select>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">Lower = better quality, larger file</p>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          Lower = better quality, larger file
+        </p>
       </div>
       <Button onClick={handleGenerate} disabled={loading} className="w-full">
         {loading ? (

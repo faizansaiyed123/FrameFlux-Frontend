@@ -69,8 +69,8 @@ export const useAuthStore = create<AuthState>()(
           state.setLoading(false);
         }
       },
-    }
-  )
+    },
+  ),
 );
 
 export function useAuth() {

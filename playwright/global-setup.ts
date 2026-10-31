@@ -7,7 +7,7 @@ const TEST_NAME = 'Test User';
 const AUTH_FILE = path.join(__dirname, '.auth/user.json');
 
 function uniqueEmail() {
-  return `test_${Date.now()}_${Math.random().toString(36).slice(2,8)}@example.com`;
+  return `test_${Date.now()}_${Math.random().toString(36).slice(2, 8)}@example.com`;
 }
 
 async function signupAndLogin(page: Page, email: string) {
@@ -23,11 +23,11 @@ async function signupAndLogin(page: Page, email: string) {
 export default async function globalSetup() {
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  
+
   const email = uniqueEmail();
   await signupAndLogin(page, email);
-  
+
   await page.context().storageState({ path: AUTH_FILE });
-  
+
   await browser.close();
 }

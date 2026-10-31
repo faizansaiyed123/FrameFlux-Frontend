@@ -4,7 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api/client';
-import type { StorageUsageResponse, StorageByTypeResponse, StorageByFolderResponse } from '@/types/api';
+import type {
+  StorageUsageResponse,
+  StorageByTypeResponse,
+  StorageByFolderResponse,
+} from '@/types/api';
 import { Loader2, HardDrive, FolderOpen, Film } from 'lucide-react';
 
 function formatBytes(bytes: number): string {
@@ -57,7 +61,9 @@ export default function StoragePage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Storage</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Storage
+        </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">Monitor your storage usage</p>
       </div>
 
@@ -69,11 +75,15 @@ export default function StoragePage() {
             </div>
             <div>
               <CardTitle className="text-base">Total Storage</CardTitle>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{formatBytes(usage?.total_size || 0)}</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
+                {formatBytes(usage?.total_size || 0)}
+              </p>
             </div>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">{usage?.total_files || 0} files</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              {usage?.total_files || 0} files
+            </p>
           </CardContent>
         </Card>
 
@@ -91,10 +101,16 @@ export default function StoragePage() {
               <div className="space-y-3">
                 {byType.map((item) => (
                   <div key={item.media_type} className="flex items-center justify-between">
-                    <span className="text-sm text-zinc-700 dark:text-zinc-300 capitalize">{item.media_type}</span>
+                    <span className="text-sm text-zinc-700 dark:text-zinc-300 capitalize">
+                      {item.media_type}
+                    </span>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-zinc-500 dark:text-zinc-400">{item.count} files</span>
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24 text-right">{formatBytes(item.total_size)}</span>
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                        {item.count} files
+                      </span>
+                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24 text-right">
+                        {formatBytes(item.total_size)}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -119,8 +135,12 @@ export default function StoragePage() {
                   <div key={item.folder} className="flex items-center justify-between">
                     <span className="text-sm text-zinc-700 dark:text-zinc-300">{item.folder}</span>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm text-zinc-500 dark:text-zinc-400">{item.count} files</span>
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24 text-right">{formatBytes(item.total_size)}</span>
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                        {item.count} files
+                      </span>
+                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24 text-right">
+                        {formatBytes(item.total_size)}
+                      </span>
                     </div>
                   </div>
                 ))}

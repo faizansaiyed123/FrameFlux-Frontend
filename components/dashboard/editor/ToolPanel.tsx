@@ -4,8 +4,25 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, Scissors, Split, Gauge, Image, Snowflake, RefreshCw, Merge, ClipboardList, Trash2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Loader2,
+  Scissors,
+  Split,
+  Gauge,
+  Image,
+  Snowflake,
+  RefreshCw,
+  Merge,
+  ClipboardList,
+  Trash2,
+} from 'lucide-react';
 import { Clip } from './EditorWorkspace';
 
 interface ToolPanelProps {
@@ -34,14 +51,26 @@ const multiClipTools = [
   { id: 'clips', label: 'Clips', icon: ClipboardList, description: 'Clip operations' },
 ] as const;
 
-export function ToolPanel({ activeTool, onSelectTool, selectedClip, clips, currentTime, onSplit, onDelete, onApply, processing }: ToolPanelProps) {
+export function ToolPanel({
+  activeTool,
+  onSelectTool,
+  selectedClip,
+  clips,
+  currentTime,
+  onSplit,
+  onDelete,
+  onApply,
+  processing,
+}: ToolPanelProps) {
   const hasSelection = !!selectedClip;
   const hasMultipleClips = clips.length >= 2;
 
   return (
     <div className="flex h-full flex-col">
       <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
-        <h2 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Tools</h2>
+        <h2 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+          Tools
+        </h2>
         <div className="space-y-2">
           {hasSelection && (
             <div className="grid grid-cols-3 gap-1.5">
@@ -98,13 +127,22 @@ export function ToolPanel({ activeTool, onSelectTool, selectedClip, clips, curre
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Split Clip</CardTitle>
-              <CardDescription className="text-[10px]">Split at the current playhead position.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Split at the current playhead position.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                 Playhead: {formatTime(currentTime)}
               </div>
-              <Button onClick={() => { onSplit(); onApply(); }} size="sm" className="w-full">
+              <Button
+                onClick={() => {
+                  onSplit();
+                  onApply();
+                }}
+                size="sm"
+                className="w-full"
+              >
                 <Split className="mr-1.5 h-3.5 w-3.5" />
                 Split
               </Button>
@@ -116,17 +154,23 @@ export function ToolPanel({ activeTool, onSelectTool, selectedClip, clips, curre
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Trim</CardTitle>
-              <CardDescription className="text-[10px]">Drag clip edges on the timeline to trim.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Drag clip edges on the timeline to trim.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <Label className="text-[10px] text-zinc-500">Start</Label>
-                  <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">{formatTime(selectedClip.start)}</p>
+                  <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">
+                    {formatTime(selectedClip.start)}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-[10px] text-zinc-500">End</Label>
-                  <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">{formatTime(selectedClip.end)}</p>
+                  <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">
+                    {formatTime(selectedClip.end)}
+                  </p>
                 </div>
               </div>
               <Button onClick={onDelete} variant="destructive" size="sm" className="w-full">
@@ -177,7 +221,9 @@ export function ToolPanel({ activeTool, onSelectTool, selectedClip, clips, curre
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Freeze Frame</CardTitle>
-              <CardDescription className="text-[10px]">Create a freeze frame at the playhead.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Create a freeze frame at the playhead.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div>
@@ -196,7 +242,9 @@ export function ToolPanel({ activeTool, onSelectTool, selectedClip, clips, curre
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Merge Clips</CardTitle>
-              <CardDescription className="text-[10px]">Merge selected clips into one.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Merge selected clips into one.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="text-[10px] text-zinc-500 dark:text-zinc-400">
@@ -214,7 +262,9 @@ export function ToolPanel({ activeTool, onSelectTool, selectedClip, clips, curre
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Clip Operations</CardTitle>
-              <CardDescription className="text-[10px]">Keep, delete, reorder, or append.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Keep, delete, reorder, or append.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <ClipOperations selectedClipId={selectedClip.id} onDelete={onDelete} />
@@ -233,12 +283,7 @@ function SpeedSelector() {
       <Label className="text-[10px] text-zinc-500">Speed</Label>
       <div className="grid grid-cols-4 gap-1.5">
         {speeds.map((speed) => (
-          <Button
-            key={speed}
-            variant="outline"
-            size="sm"
-            className="text-xs h-7"
-          >
+          <Button key={speed} variant="outline" size="sm" className="text-xs h-7">
             {speed}x
           </Button>
         ))}

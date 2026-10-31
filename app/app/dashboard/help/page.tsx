@@ -1,12 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {
-  BookOpen,
-  MessageSquare,
-  FileText,
-  ExternalLink,
-} from 'lucide-react';
+import { BookOpen, MessageSquare, FileText, ExternalLink } from 'lucide-react';
 
 const helpResources = [
   {
@@ -33,7 +28,9 @@ export default function HelpPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Help & Support</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Help & Support
+        </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">Get help with FrameFlux</p>
       </div>
 
@@ -47,7 +44,9 @@ export default function HelpPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 mb-4">
               <resource.icon className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-1">{resource.title}</h3>
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-1">
+              {resource.title}
+            </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400">{resource.description}</p>
             <div className="mt-4 flex items-center text-sm text-indigo-600 dark:text-indigo-400">
               Visit

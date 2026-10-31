@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+
+# Keep npm's generated lockfile in npm's canonical format.
+package-lock.json

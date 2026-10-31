@@ -13,7 +13,15 @@ interface TimelineProps {
   onClipChange: (clip: Clip, changes: Partial<Clip>) => void;
 }
 
-export function Timeline({ clips, selectedClipId, currentTime, duration, onSelectClip, onSeek, onClipChange }: TimelineProps) {
+export function Timeline({
+  clips,
+  selectedClipId,
+  currentTime,
+  duration,
+  onSelectClip,
+  onSeek,
+  onClipChange,
+}: TimelineProps) {
   const timelineRef = useRef<HTMLDivElement>(null);
   const [timelineWidth, setTimelineWidth] = useState(800);
   const pixelsPerSecond = timelineWidth / Math.max(duration, 1);
@@ -28,67 +36,76 @@ export function Timeline({ clips, selectedClipId, currentTime, duration, onSelec
     return () => observer.disconnect();
   }, []);
 
-  const handleTimelineClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!timelineRef.current || duration <= 0) return;
-    const rect = timelineRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const time = (x / rect.width) * duration;
-    onSeek(Math.max(0, Math.min(duration, time)));
-  }, [duration, onSeek]);
+  const handleTimelineClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!timelineRef.current || duration <= 0) return;
+      const rect = timelineRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const time = (x / rect.width) * duration;
+      onSeek(Math.max(0, Math.min(duration, time)));
+    },
+    [duration, onSeek],
+  );
 
-  const handleClipMouseDown = useCallback((e: React.MouseEvent, clip: Clip) => {
-    e.stopPropagation();
-    onSelectClip(clip.id);
+  const handleClipMouseDown = useCallback(
+    (e: React.MouseEvent, clip: Clip) => {
+      e.stopPropagation();
+      onSelectClip(clip.id);
 
-    const startX = e.clientX;
-    const originalStart = clip.start;
-    const originalEnd = clip.end;
-    const clipDuration = originalEnd - originalStart;
+      const startX = e.clientX;
+      const originalStart = clip.start;
+      const originalEnd = clip.end;
+      const clipDuration = originalEnd - originalStart;
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const deltaTime = deltaX / pixelsPerSecond;
-      const newStart = Math.max(0, Math.min(originalStart + deltaTime, duration - clipDuration));
-      const newEnd = newStart + clipDuration;
-      onClipChange(clip, { start: newStart, end: newEnd });
-    };
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const deltaX = moveEvent.clientX - startX;
+        const deltaTime = deltaX / pixelsPerSecond;
+        const newStart = Math.max(0, Math.min(originalStart + deltaTime, duration - clipDuration));
+        const newEnd = newStart + clipDuration;
+        onClipChange(clip, { start: newStart, end: newEnd });
+      };
 
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [pixelsPerSecond, duration, onSelectClip, onClipChange]);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    },
+    [pixelsPerSecond, duration, onSelectClip, onClipChange],
+  );
 
-  const handleEdgeMouseDown = useCallback((e: React.MouseEvent, clip: Clip, edge: 'left' | 'right') => {
-    e.stopPropagation();
-    onSelectClip(clip.id);
+  const handleEdgeMouseDown = useCallback(
+    (e: React.MouseEvent, clip: Clip, edge: 'left' | 'right') => {
+      e.stopPropagation();
+      onSelectClip(clip.id);
 
-    const startX = e.clientX;
-    const originalValue = edge === 'left' ? clip.start : clip.end;
+      const startX = e.clientX;
+      const originalValue = edge === 'left' ? clip.start : clip.end;
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = moveEvent.clientX - startX;
-      const deltaTime = deltaX / pixelsPerSecond;
-      if (edge === 'left') {
-        const newStart = Math.max(0, Math.min(originalValue + deltaTime, clip.end - 0.1));
-        onClipChange(clip, { start: newStart });
-      } else {
-        const newEnd = Math.min(duration, Math.max(originalValue + deltaTime, clip.start + 0.1));
-        onClipChange(clip, { end: newEnd });
-      }
-    };
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const deltaX = moveEvent.clientX - startX;
+        const deltaTime = deltaX / pixelsPerSecond;
+        if (edge === 'left') {
+          const newStart = Math.max(0, Math.min(originalValue + deltaTime, clip.end - 0.1));
+          onClipChange(clip, { start: newStart });
+        } else {
+          const newEnd = Math.min(duration, Math.max(originalValue + deltaTime, clip.start + 0.1));
+          onClipChange(clip, { end: newEnd });
+        }
+      };
 
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
+      const handleMouseUp = () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [pixelsPerSecond, duration, onSelectClip, onClipChange]);
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    },
+    [pixelsPerSecond, duration, onSelectClip, onClipChange],
+  );
 
   const playheadPosition = duration > 0 ? (currentTime / duration) * timelineWidth : 0;
 
@@ -103,8 +120,10 @@ export function Timeline({ clips, selectedClipId, currentTime, duration, onSelec
           className="absolute top-0 h-full border-l border-zinc-200 dark:border-zinc-700"
           style={{ left: `${(i / safeDuration) * 100}%` }}
         >
-          <span className="absolute top-1 left-1 text-[10px] text-zinc-400 font-mono">{formatTime(i)}</span>
-        </div>
+          <span className="absolute top-1 left-1 text-[10px] text-zinc-400 font-mono">
+            {formatTime(i)}
+          </span>
+        </div>,
       );
     }
     return markers;
@@ -123,7 +142,9 @@ export function Timeline({ clips, selectedClipId, currentTime, duration, onSelec
       <div className="flex items-center justify-between px-4 py-1 border-b border-zinc-200 dark:border-zinc-800">
         <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Timeline</span>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-zinc-400">{clips.length} clip{clips.length !== 1 ? 's' : ''}</span>
+          <span className="text-[10px] text-zinc-400">
+            {clips.length} clip{clips.length !== 1 ? 's' : ''}
+          </span>
         </div>
       </div>
 
@@ -159,7 +180,9 @@ export function Timeline({ clips, selectedClipId, currentTime, duration, onSelec
                   onMouseDown={(e) => handleClipMouseDown(e, clip)}
                 >
                   <div className="px-2 py-1 h-full flex flex-col justify-between overflow-hidden">
-                    <span className="text-[10px] font-medium text-zinc-700 dark:text-zinc-200 truncate">{clip.name}</span>
+                    <span className="text-[10px] font-medium text-zinc-700 dark:text-zinc-200 truncate">
+                      {clip.name}
+                    </span>
                     <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
                       {formatTime(clip.start)} - {formatTime(clip.end)}
                     </span>

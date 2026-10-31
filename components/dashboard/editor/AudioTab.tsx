@@ -1,18 +1,47 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '@/lib/api/client';
 import type { Media } from '@/types/api';
-import { Download, Loader2, AlertCircle, Music, Scissors, Split, Gauge, Sliders, Ban, Waves, Film, Volume2, VolumeX, RotateCcw, Link, Eye, X } from 'lucide-react';
+import {
+  Download,
+  Loader2,
+  AlertCircle,
+  Music,
+  Scissors,
+  Split,
+  Gauge,
+  Sliders,
+  Ban,
+  Waves,
+  Film,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  Link,
+  Eye,
+  X,
+} from 'lucide-react';
 
 function downloadBlob(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 type EditOp = 'trim' | 'cut' | 'split' | 'merge' | 'speed' | 'normalize' | 'fade' | 'silence';
@@ -27,7 +56,15 @@ const editOps: { id: EditOp; label: string; icon: typeof Scissors }[] = [
   { id: 'silence', label: 'Silence', icon: Ban },
 ];
 
-export function AudioTab({ media, setError, onProcessed }: { media: Media; setError: (e: string) => void; onProcessed?: () => void; }) {
+export function AudioTab({
+  media,
+  setError,
+  onProcessed,
+}: {
+  media: Media;
+  setError: (e: string) => void;
+  onProcessed?: () => void;
+}) {
   const [extracting, setExtracting] = useState(false);
   const [converting, setConverting] = useState(false);
   const [convertFormat, setConvertFormat] = useState('mp3');
@@ -91,25 +128,43 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
   }, [syncPreviewUrl]);
 
   const handleExtract = async () => {
-    setExtracting(true); setError('');
+    setExtracting(true);
+    setError('');
     try {
-      const blob = await api.extractAudio(media.id, { format: extractFormat, quality_preset: 'medium' });
-      downloadBlob(blob as Blob, media.original_filename.replace(/\.[^/.]+$/, '') + '.' + extractFormat);
-    } catch (err) { setError(err instanceof Error ? err.message : 'Extract failed'); }
-    finally { setExtracting(false); }
+      const blob = await api.extractAudio(media.id, {
+        format: extractFormat,
+        quality_preset: 'medium',
+      });
+      downloadBlob(
+        blob as Blob,
+        media.original_filename.replace(/\.[^/.]+$/, '') + '.' + extractFormat,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Extract failed');
+    } finally {
+      setExtracting(false);
+    }
   };
 
   const handleConvert = async () => {
-    setConverting(true); setError('');
+    setConverting(true);
+    setError('');
     try {
       const blob = await api.convertAudio(media.id, { format: convertFormat });
-      downloadBlob(blob as Blob, media.original_filename.replace(/\.[^/.]+$/, '') + '.' + convertFormat);
-    } catch (err) { setError(err instanceof Error ? err.message : 'Convert failed'); }
-    finally { setConverting(false); }
+      downloadBlob(
+        blob as Blob,
+        media.original_filename.replace(/\.[^/.]+$/, '') + '.' + convertFormat,
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Convert failed');
+    } finally {
+      setConverting(false);
+    }
   };
 
   const handleEdit = async () => {
-    setEditing(true); setError('');
+    setEditing(true);
+    setError('');
     try {
       const data: Parameters<typeof api.editAudio>[1] = { operation: editOp };
       if ((editOp === 'trim' || editOp === 'cut' || editOp === 'split') && editStart && editEnd) {
@@ -127,17 +182,24 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
         data.silence_duration = parseFloat(silenceDuration);
       }
       if (editOp === 'merge' && mergeFiles.trim()) {
-        data.target_files = mergeFiles.split(',').map((f) => f.trim()).filter(Boolean);
+        data.target_files = mergeFiles
+          .split(',')
+          .map((f) => f.trim())
+          .filter(Boolean);
       }
       const result = await api.editAudio(media.id, data);
       setSuccess(`Audio ${editOp} complete: ${result.output_filename}`);
       onProcessed?.();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Edit failed'); }
-    finally { setEditing(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Edit failed');
+    } finally {
+      setEditing(false);
+    }
   };
 
   const handleAudioToVideo = async () => {
-    setAtoVideoProcessing(true); setError('');
+    setAtoVideoProcessing(true);
+    setError('');
     try {
       const blob = await api.audioToVideo(media.id, {
         background_color: atoVideoBgColor,
@@ -153,53 +215,82 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       });
       downloadBlob(blob as Blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_video.mp4');
       setAtoVideoOpen(false);
-    } catch (err) { setError(err instanceof Error ? err.message : 'Audio to video failed'); }
-    finally { setAtoVideoProcessing(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Audio to video failed');
+    } finally {
+      setAtoVideoProcessing(false);
+    }
   };
 
   const handleAdjustVolume = async () => {
-    setAdjustingVolume(true); setError('');
+    setAdjustingVolume(true);
+    setError('');
     try {
-      const data: { volume: number; fade_in?: number; fade_out?: number } = { volume: parseFloat(volumeValue) || 1 };
+      const data: { volume: number; fade_in?: number; fade_out?: number } = {
+        volume: parseFloat(volumeValue) || 1,
+      };
       if (volumeFadeIn) data.fade_in = parseFloat(volumeFadeIn);
       if (volumeFadeOut) data.fade_out = parseFloat(volumeFadeOut);
       await api.adjustVolume(media.id, data.volume, data.fade_in, data.fade_out);
       setSuccess(`Volume adjusted to ${volumeValue}x`);
       onProcessed?.();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Volume adjust failed'); }
-    finally { setAdjustingVolume(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Volume adjust failed');
+    } finally {
+      setAdjustingVolume(false);
+    }
   };
 
   const handleAddAudio = async () => {
-    if (!addAudioFile.trim()) { setError('Select an audio file'); return; }
-    setAddingAudio(true); setError('');
+    if (!addAudioFile.trim()) {
+      setError('Select an audio file');
+      return;
+    }
+    setAddingAudio(true);
+    setError('');
     try {
       const result = await api.addAudio(media.id, addAudioFile.trim());
       const blob = await api.getProcessedMedia(media.id, result.output_filename);
       downloadBlob(blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_with_audio.mp4');
       setSuccess(`Audio added and mixed: ${addAudioFile.trim()}`);
       onProcessed?.();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Add audio failed'); }
-    finally { setAddingAudio(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Add audio failed');
+    } finally {
+      setAddingAudio(false);
+    }
   };
 
   const handleReplaceAudio = async () => {
-    if (!replaceAudioFile.trim()) { setError('Select an audio file'); return; }
-    setReplacingAudio(true); setError('');
+    if (!replaceAudioFile.trim()) {
+      setError('Select an audio file');
+      return;
+    }
+    setReplacingAudio(true);
+    setError('');
     try {
-      const data: { audio_path: string; fade_in?: number; fade_out?: number } = { audio_path: replaceAudioFile };
+      const data: { audio_path: string; fade_in?: number; fade_out?: number } = {
+        audio_path: replaceAudioFile,
+      };
       if (replaceFadeIn) data.fade_in = parseFloat(replaceFadeIn);
       if (replaceFadeOut) data.fade_out = parseFloat(replaceFadeOut);
       const result = await api.replaceAudio(media.id, data.audio_path, data.fade_in, data.fade_out);
       setSuccess(`Audio replaced: ${result.output_filename}`);
       onProcessed?.();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Replace audio failed'); }
-    finally { setReplacingAudio(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Replace audio failed');
+    } finally {
+      setReplacingAudio(false);
+    }
   };
 
   const handleSyncAudioVideo = async () => {
-    if (!syncAudioFile.trim()) { setError('Select an audio file'); return; }
-    setSyncProcessing(true); setError('');
+    if (!syncAudioFile.trim()) {
+      setError('Select an audio file');
+      return;
+    }
+    setSyncProcessing(true);
+    setError('');
     try {
       const data: Parameters<typeof api.syncAudioVideo>[1] = {
         audio_path: syncAudioFile,
@@ -215,15 +306,24 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
       const result = await api.syncAudioVideo(media.id, data);
       const blob = await api.getProcessedMedia(media.id, result.output_filename);
-      downloadBlob(blob, media.original_filename.replace(/\.[^/.]+$/, '') + '_synced.' + syncOutputFormat);
+      downloadBlob(
+        blob,
+        media.original_filename.replace(/\.[^/.]+$/, '') + '_synced.' + syncOutputFormat,
+      );
       setSuccess('Audio synced and downloaded successfully.');
       onProcessed?.();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Sync failed'); }
-    finally { setSyncProcessing(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Sync failed');
+    } finally {
+      setSyncProcessing(false);
+    }
   };
 
   const handleSyncPreview = async () => {
-    if (!syncAudioFile.trim()) { setError('Select an audio file'); return; }
+    if (!syncAudioFile.trim()) {
+      setError('Select an audio file');
+      return;
+    }
     setError('');
     try {
       const data: Parameters<typeof api.syncAudioVideo>[1] = {
@@ -238,14 +338,16 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       };
       if (syncFadeIn) data.fade_in = parseFloat(syncFadeIn);
       if (syncFadeOut) data.fade_out = parseFloat(syncFadeOut);
-      
+
       const result = await api.syncAudioVideo(media.id, data);
       const blob = await api.getProcessedMedia(media.id, result.output_filename);
       if (syncPreviewUrl?.startsWith('blob:')) URL.revokeObjectURL(syncPreviewUrl);
       const url = URL.createObjectURL(blob);
       setSyncPreviewUrl(url);
       setSyncPreviewOpen(true);
-    } catch (err) { setError(err instanceof Error ? err.message : 'Preview failed'); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Preview failed');
+    }
   };
 
   return (
@@ -258,7 +360,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
       <div>
         <Label className="text-[10px] text-zinc-500">Extract Audio Format</Label>
         <Select value={extractFormat} onValueChange={setExtractFormat}>
-          <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="text-xs h-7">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="mp3">MP3</SelectItem>
             <SelectItem value="wav">WAV</SelectItem>
@@ -272,15 +376,27 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
         </Select>
       </div>
       <div>
-        <Button onClick={handleExtract} disabled={extracting} className="w-full justify-start" variant="outline" size="sm">
-          {extracting ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Download className="mr-2 h-3.5 w-3.5" />}
+        <Button
+          onClick={handleExtract}
+          disabled={extracting}
+          className="w-full justify-start"
+          variant="outline"
+          size="sm"
+        >
+          {extracting ? (
+            <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Download className="mr-2 h-3.5 w-3.5" />
+          )}
           Extract Audio ({extractFormat.toUpperCase()})
         </Button>
       </div>
       <div className="space-y-2">
         <Label className="text-[10px] text-zinc-500">Convert Audio</Label>
         <Select value={convertFormat} onValueChange={setConvertFormat}>
-          <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="text-xs h-7">
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="aac">AAC</SelectItem>
             <SelectItem value="mp3">MP3</SelectItem>
@@ -289,7 +405,14 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           </SelectContent>
         </Select>
         <Button onClick={handleConvert} disabled={converting} className="w-full text-xs">
-          {converting ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Converting...</> : 'Convert & Download'}
+          {converting ? (
+            <>
+              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+              Converting...
+            </>
+          ) : (
+            'Convert & Download'
+          )}
         </Button>
       </div>
 
@@ -304,7 +427,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
                 key={op.id}
                 onClick={() => setEditOp(op.id)}
                 className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
-                  isActive ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300' : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
+                  isActive
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -318,11 +443,23 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
             <>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Start (s)</Label>
-                <Input type="number" step="0.1" value={editStart} onChange={(e) => setEditStart(e.target.value)} className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={editStart}
+                  onChange={(e) => setEditStart(e.target.value)}
+                  className="text-xs h-7"
+                />
               </div>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">End (s)</Label>
-                <Input type="number" step="0.1" value={editEnd} onChange={(e) => setEditEnd(e.target.value)} className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={editEnd}
+                  onChange={(e) => setEditEnd(e.target.value)}
+                  className="text-xs h-7"
+                />
               </div>
             </>
           )}
@@ -330,7 +467,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Speed (x)</Label>
               <Select value={editSpeed} onValueChange={setEditSpeed}>
-                <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="text-xs h-7">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="0.5">0.5x</SelectItem>
                   <SelectItem value="0.75">0.75x</SelectItem>
@@ -346,33 +485,70 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
             <>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Fade In (s)</Label>
-                <Input type="number" step="0.1" value={fadeIn} onChange={(e) => setFadeIn(e.target.value)} className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={fadeIn}
+                  onChange={(e) => setFadeIn(e.target.value)}
+                  className="text-xs h-7"
+                />
               </div>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Fade Out (s)</Label>
-                <Input type="number" step="0.1" value={fadeOut} onChange={(e) => setFadeOut(e.target.value)} className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={fadeOut}
+                  onChange={(e) => setFadeOut(e.target.value)}
+                  className="text-xs h-7"
+                />
               </div>
             </>
           )}
           {editOp === 'silence' && (
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Silence Duration (s)</Label>
-              <Input type="number" step="0.1" value={silenceDuration} onChange={(e) => setSilenceDuration(e.target.value)} className="text-xs h-7" />
+              <Input
+                type="number"
+                step="0.1"
+                value={silenceDuration}
+                onChange={(e) => setSilenceDuration(e.target.value)}
+                className="text-xs h-7"
+              />
             </div>
           )}
           {editOp === 'merge' && (
             <div className="col-span-2 space-y-1">
-              <Label className="text-[9px] text-zinc-500">Target Files (comma-separated stored filenames)</Label>
-              <Input placeholder="e.g. audio1.mp3, audio2.mp3" value={mergeFiles} onChange={(e) => setMergeFiles(e.target.value)} className="text-xs h-7" />
+              <Label className="text-[9px] text-zinc-500">
+                Target Files (comma-separated stored filenames)
+              </Label>
+              <Input
+                placeholder="e.g. audio1.mp3, audio2.mp3"
+                value={mergeFiles}
+                onChange={(e) => setMergeFiles(e.target.value)}
+                className="text-xs h-7"
+              />
             </div>
           )}
         </div>
         <Button onClick={handleEdit} disabled={editing} className="w-full text-xs">
-          {editing ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Processing...</> : `Edit Audio: ${editOp}`}</Button>
+          {editing ? (
+            <>
+              <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+              Processing...
+            </>
+          ) : (
+            `Edit Audio: ${editOp}`
+          )}
+        </Button>
       </div>
 
       <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
-        <Button onClick={() => setAtoVideoOpen(!atoVideoOpen)} variant="outline" className="w-full justify-start text-xs">
+        <Button
+          onClick={() => setAtoVideoOpen(!atoVideoOpen)}
+          variant="outline"
+          className="w-full justify-start text-xs"
+        >
           <Film className="mr-2 h-3.5 w-3.5" />
           Audio to Video
         </Button>
@@ -380,25 +556,52 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
           <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Background Color</Label>
-              <Input type="color" value={atoVideoBgColor} onChange={(e) => setAtoVideoBgColor(e.target.value)} className="h-7" />
+              <Input
+                type="color"
+                value={atoVideoBgColor}
+                onChange={(e) => setAtoVideoBgColor(e.target.value)}
+                className="h-7"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Title</Label>
-              <Input value={atoVideoTitle} onChange={(e) => setAtoVideoTitle(e.target.value)} placeholder="Optional title" className="text-xs h-7" />
+              <Input
+                value={atoVideoTitle}
+                onChange={(e) => setAtoVideoTitle(e.target.value)}
+                placeholder="Optional title"
+                className="text-xs h-7"
+              />
             </div>
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Text</Label>
-              <Input value={atoVideoText} onChange={(e) => setAtoVideoText(e.target.value)} placeholder="Optional text overlay" className="text-xs h-7" />
+              <Input
+                value={atoVideoText}
+                onChange={(e) => setAtoVideoText(e.target.value)}
+                placeholder="Optional text overlay"
+                className="text-xs h-7"
+              />
             </div>
             <div className="flex items-center gap-2">
-              <input type="checkbox" id="waveform" checked={atoVideoWaveform} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAtoVideoWaveform(e.target.checked)} className="w-3 h-3" />
-              <Label htmlFor="waveform" className="text-[9px] text-zinc-500">Show Waveform</Label>
+              <input
+                type="checkbox"
+                id="waveform"
+                checked={atoVideoWaveform}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setAtoVideoWaveform(e.target.checked)
+                }
+                className="w-3 h-3"
+              />
+              <Label htmlFor="waveform" className="text-[9px] text-zinc-500">
+                Show Waveform
+              </Label>
             </div>
             {atoVideoWaveform && (
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Visualizer Style</Label>
                 <Select value={atoVideoVisualizer} onValueChange={setAtoVideoVisualizer}>
-                  <SelectTrigger className="text-xs h-7"><SelectValue placeholder="Select style" /></SelectTrigger>
+                  <SelectTrigger className="text-xs h-7">
+                    <SelectValue placeholder="Select style" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="bars">Bars</SelectItem>
                     <SelectItem value="wave">Wave</SelectItem>
@@ -411,7 +614,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Resolution</Label>
                 <Select value={atoVideoResolution} onValueChange={setAtoVideoResolution}>
-                  <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="text-xs h-7">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="1280x720">720p</SelectItem>
                     <SelectItem value="1920x1080">1080p</SelectItem>
@@ -422,7 +627,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">FPS</Label>
                 <Select value={atoVideoFps} onValueChange={setAtoVideoFps}>
-                  <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="text-xs h-7">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="24">24</SelectItem>
                     <SelectItem value="30">30</SelectItem>
@@ -434,12 +641,20 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Max Duration (s)</Label>
-                <Input type="number" value={atoVideoDuration} onChange={(e) => setAtoVideoDuration(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                <Input
+                  type="number"
+                  value={atoVideoDuration}
+                  onChange={(e) => setAtoVideoDuration(e.target.value)}
+                  placeholder="Optional"
+                  className="text-xs h-7"
+                />
               </div>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Output Format</Label>
                 <Select value={atoVideoFormat} onValueChange={setAtoVideoFormat}>
-                  <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="text-xs h-7">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="mp4">MP4</SelectItem>
                     <SelectItem value="webm">WebM</SelectItem>
@@ -447,14 +662,29 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
                 </Select>
               </div>
             </div>
-            <Button onClick={handleAudioToVideo} disabled={atoVideoProcessing} className="w-full text-xs">
-              {atoVideoProcessing ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Generating...</> : 'Generate Video'}
+            <Button
+              onClick={handleAudioToVideo}
+              disabled={atoVideoProcessing}
+              className="w-full text-xs"
+            >
+              {atoVideoProcessing ? (
+                <>
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                'Generate Video'
+              )}
             </Button>
           </div>
         )}
 
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
-          <Button onClick={() => setAtoVideoOpen(!atoVideoOpen)} variant="outline" className="w-full justify-start text-xs">
+          <Button
+            onClick={() => setAtoVideoOpen(!atoVideoOpen)}
+            variant="outline"
+            className="w-full justify-start text-xs"
+          >
             <Volume2 className="mr-2 h-3.5 w-3.5" />
             Volume & Fade
           </Button>
@@ -463,7 +693,9 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Volume (x)</Label>
                 <Select value={volumeValue} onValueChange={setVolumeValue}>
-                  <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="text-xs h-7">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="0">Mute</SelectItem>
                     <SelectItem value="0.25">0.25x</SelectItem>
@@ -479,25 +711,57 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
               </div>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Fade In (s)</Label>
-                <Input type="number" step="0.1" value={volumeFadeIn} onChange={(e) => setVolumeFadeIn(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={volumeFadeIn}
+                  onChange={(e) => setVolumeFadeIn(e.target.value)}
+                  placeholder="Optional"
+                  className="text-xs h-7"
+                />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Fade Out (s)</Label>
-                <Input type="number" step="0.1" value={volumeFadeOut} onChange={(e) => setVolumeFadeOut(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={volumeFadeOut}
+                  onChange={(e) => setVolumeFadeOut(e.target.value)}
+                  placeholder="Optional"
+                  className="text-xs h-7"
+                />
               </div>
             </div>
-            <Button onClick={handleAdjustVolume} disabled={adjustingVolume} className="w-full text-xs">
-              {adjustingVolume ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Applying...</> : <><Volume2 className="mr-1 h-3.5 w-3.5" />Apply Volume</>}
+            <Button
+              onClick={handleAdjustVolume}
+              disabled={adjustingVolume}
+              className="w-full text-xs"
+            >
+              {adjustingVolume ? (
+                <>
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                  Applying...
+                </>
+              ) : (
+                <>
+                  <Volume2 className="mr-1 h-3.5 w-3.5" />
+                  Apply Volume
+                </>
+              )}
             </Button>
           </div>
         </div>
 
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="addAudioFile" className="text-[10px] text-zinc-500">Add Audio</Label>
-            <p className="text-[10px] text-zinc-400">Mix a separate uploaded audio file with the existing audio track.</p>
+            <Label htmlFor="addAudioFile" className="text-[10px] text-zinc-500">
+              Add Audio
+            </Label>
+            <p className="text-[10px] text-zinc-400">
+              Mix a separate uploaded audio file with the existing audio track.
+            </p>
             <Input
               id="addAudioFile"
               value={addAudioFile}
@@ -505,94 +769,218 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
               placeholder="e.g. music.mp3"
               className="text-xs h-7"
             />
-            <Button onClick={handleAddAudio} disabled={addingAudio || !addAudioFile.trim()} className="w-full text-xs">
-              {addingAudio ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Adding...</> : <><Music className="mr-1 h-3.5 w-3.5" />Add Audio</>}
+            <Button
+              onClick={handleAddAudio}
+              disabled={addingAudio || !addAudioFile.trim()}
+              className="w-full text-xs"
+            >
+              {addingAudio ? (
+                <>
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <Music className="mr-1 h-3.5 w-3.5" />
+                  Add Audio
+                </>
+              )}
             </Button>
           </div>
         </div>
 
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
-          <Button onClick={() => setAtoVideoOpen(!atoVideoOpen)} variant="outline" className="w-full justify-start text-xs">
+          <Button
+            onClick={() => setAtoVideoOpen(!atoVideoOpen)}
+            variant="outline"
+            className="w-full justify-start text-xs"
+          >
             <RotateCcw className="mr-2 h-3.5 w-3.5" />
             Replace Audio
           </Button>
           <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Audio File (stored filename)</Label>
-              <Input value={replaceAudioFile} onChange={(e) => setReplaceAudioFile(e.target.value)} placeholder="e.g. music.mp3" className="text-xs h-7" />
+              <Input
+                value={replaceAudioFile}
+                onChange={(e) => setReplaceAudioFile(e.target.value)}
+                placeholder="e.g. music.mp3"
+                className="text-xs h-7"
+              />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Fade In (s)</Label>
-                <Input type="number" step="0.1" value={replaceFadeIn} onChange={(e) => setReplaceFadeIn(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={replaceFadeIn}
+                  onChange={(e) => setReplaceFadeIn(e.target.value)}
+                  placeholder="Optional"
+                  className="text-xs h-7"
+                />
               </div>
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Fade Out (s)</Label>
-                <Input type="number" step="0.1" value={replaceFadeOut} onChange={(e) => setReplaceFadeOut(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={replaceFadeOut}
+                  onChange={(e) => setReplaceFadeOut(e.target.value)}
+                  placeholder="Optional"
+                  className="text-xs h-7"
+                />
               </div>
             </div>
-            <Button onClick={handleReplaceAudio} disabled={replacingAudio || !replaceAudioFile.trim()} className="w-full text-xs">
-              {replacingAudio ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Replacing...</> : <><RotateCcw className="mr-1 h-3.5 w-3.5" />Replace Audio</>}
+            <Button
+              onClick={handleReplaceAudio}
+              disabled={replacingAudio || !replaceAudioFile.trim()}
+              className="w-full text-xs"
+            >
+              {replacingAudio ? (
+                <>
+                  <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                  Replacing...
+                </>
+              ) : (
+                <>
+                  <RotateCcw className="mr-1 h-3.5 w-3.5" />
+                  Replace Audio
+                </>
+              )}
             </Button>
           </div>
         </div>
 
         <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4">
-          <Button onClick={() => setSyncAudioOpen(!syncAudioOpen)} variant="outline" className="w-full justify-start text-xs">
+          <Button
+            onClick={() => setSyncAudioOpen(!syncAudioOpen)}
+            variant="outline"
+            className="w-full justify-start text-xs"
+          >
             <Link className="mr-2 h-3.5 w-3.5" />
             Sync External Audio
           </Button>
           {syncAudioOpen && (
             <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
               <div className="space-y-1">
-                <Label htmlFor="syncExternalAudioFile" className="text-[9px] text-zinc-500">External Audio File (stored filename)</Label>
-                <Input id="syncExternalAudioFile" value={syncAudioFile} onChange={(e) => setSyncAudioFile(e.target.value)} placeholder="e.g. soundtrack.mp3" className="text-xs h-7" />
+                <Label htmlFor="syncExternalAudioFile" className="text-[9px] text-zinc-500">
+                  External Audio File (stored filename)
+                </Label>
+                <Input
+                  id="syncExternalAudioFile"
+                  value={syncAudioFile}
+                  onChange={(e) => setSyncAudioFile(e.target.value)}
+                  placeholder="e.g. soundtrack.mp3"
+                  className="text-xs h-7"
+                />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Offset (s)</Label>
-                  <Input type="number" step="0.1" value={syncOffset} onChange={(e) => setSyncOffset(e.target.value)} placeholder="0 (negative = advance)" className="text-xs h-7" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={syncOffset}
+                    onChange={(e) => setSyncOffset(e.target.value)}
+                    placeholder="0 (negative = advance)"
+                    className="text-xs h-7"
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Volume (x)</Label>
-                  <Input type="number" step="0.1" value={syncVolume} onChange={(e) => setSyncVolume(e.target.value)} className="text-xs h-7" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={syncVolume}
+                    onChange={(e) => setSyncVolume(e.target.value)}
+                    className="text-xs h-7"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Video Duration (s)</Label>
-                  <Input type="number" step="0.1" value={syncVideoDuration} onChange={(e) => setSyncVideoDuration(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={syncVideoDuration}
+                    onChange={(e) => setSyncVideoDuration(e.target.value)}
+                    placeholder="Optional"
+                    className="text-xs h-7"
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Audio Duration (s)</Label>
-                  <Input type="number" step="0.1" value={syncAudioDuration} onChange={(e) => setSyncAudioDuration(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={syncAudioDuration}
+                    onChange={(e) => setSyncAudioDuration(e.target.value)}
+                    placeholder="Optional"
+                    className="text-xs h-7"
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Fade In (s)</Label>
-                  <Input type="number" step="0.1" value={syncFadeIn} onChange={(e) => setSyncFadeIn(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={syncFadeIn}
+                    onChange={(e) => setSyncFadeIn(e.target.value)}
+                    placeholder="Optional"
+                    className="text-xs h-7"
+                  />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Fade Out (s)</Label>
-                  <Input type="number" step="0.1" value={syncFadeOut} onChange={(e) => setSyncFadeOut(e.target.value)} placeholder="Optional" className="text-xs h-7" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={syncFadeOut}
+                    onChange={(e) => setSyncFadeOut(e.target.value)}
+                    placeholder="Optional"
+                    className="text-xs h-7"
+                  />
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <input type="checkbox" id="syncMix" checked={syncMix} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSyncMix(e.target.checked)} className="w-3 h-3" />
-                <Label htmlFor="syncMix" className="text-[9px] text-zinc-500">Mix with original audio</Label>
+                <input
+                  type="checkbox"
+                  id="syncMix"
+                  checked={syncMix}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setSyncMix(e.target.checked)
+                  }
+                  className="w-3 h-3"
+                />
+                <Label htmlFor="syncMix" className="text-[9px] text-zinc-500">
+                  Mix with original audio
+                </Label>
               </div>
               {syncMix && (
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Original Audio Volume</Label>
-                  <Input type="number" step="0.1" min="0" max="1" value={syncMixVolume} onChange={(e) => setSyncMixVolume(e.target.value)} className="text-xs h-7" />
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="1"
+                    value={syncMixVolume}
+                    onChange={(e) => setSyncMixVolume(e.target.value)}
+                    className="text-xs h-7"
+                  />
                 </div>
               )}
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[9px] text-zinc-500">Output Format</Label>
                   <Select value={syncOutputFormat} onValueChange={setSyncOutputFormat}>
-                    <SelectTrigger className="text-xs h-7"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="text-xs h-7">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="mp4">MP4</SelectItem>
                       <SelectItem value="webm">WebM</SelectItem>
@@ -601,12 +989,31 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button onClick={handleSyncPreview} disabled={syncProcessing || !syncAudioFile.trim()} variant="outline" className="flex-1 text-xs">
+                <Button
+                  onClick={handleSyncPreview}
+                  disabled={syncProcessing || !syncAudioFile.trim()}
+                  variant="outline"
+                  className="flex-1 text-xs"
+                >
                   <Eye className="mr-1 h-3.5 w-3.5" />
                   Preview (5s)
                 </Button>
-                <Button onClick={handleSyncAudioVideo} disabled={syncProcessing || !syncAudioFile.trim()} className="flex-1 text-xs">
-                  {syncProcessing ? <><Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />Syncing...</> : <><Link className="mr-1 h-3.5 w-3.5" />Sync & Export</>}
+                <Button
+                  onClick={handleSyncAudioVideo}
+                  disabled={syncProcessing || !syncAudioFile.trim()}
+                  className="flex-1 text-xs"
+                >
+                  {syncProcessing ? (
+                    <>
+                      <Loader2 className="mr-1 h-3.5 w-3.5 animate-spin" />
+                      Syncing...
+                    </>
+                  ) : (
+                    <>
+                      <Link className="mr-1 h-3.5 w-3.5" />
+                      Sync & Export
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -620,21 +1027,45 @@ export function AudioTab({ media, setError, onProcessed }: { media: Media; setEr
         </Alert>
       )}
       <Alert className="border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400">
-        <AlertDescription className="text-[10px]">Volume and fade controls are available during playback using the main controls.</AlertDescription>
+        <AlertDescription className="text-[10px]">
+          Volume and fade controls are available during playback using the main controls.
+        </AlertDescription>
       </Alert>
 
       {syncPreviewOpen && syncPreviewUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
           <div className="bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2"><Film className="h-5 w-5 text-indigo-600" /><h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Sync Preview (5s)</h2></div>
-              <Button variant="ghost" size="icon" onClick={() => { setSyncPreviewOpen(false); setSyncPreviewUrl(null); }}><X className="h-4 w-4" /></Button>
+              <div className="flex items-center gap-2">
+                <Film className="h-5 w-5 text-indigo-600" />
+                <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+                  Sync Preview (5s)
+                </h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setSyncPreviewOpen(false);
+                  setSyncPreviewUrl(null);
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
             <div className="bg-black rounded-lg overflow-hidden mb-4 flex items-center justify-center h-64">
               <video src={syncPreviewUrl} controls className="max-h-full max-w-full" />
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => { setSyncPreviewOpen(false); setSyncPreviewUrl(null); }}>Close</Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSyncPreviewOpen(false);
+                  setSyncPreviewUrl(null);
+                }}
+              >
+                Close
+              </Button>
             </div>
           </div>
         </div>

@@ -57,14 +57,20 @@ export default function ProjectsPage() {
   }, []);
 
   useEffect(() => {
-    fetchProjects();
+    const timer = window.setTimeout(() => {
+      void fetchProjects();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchProjects]);
 
   const handleCreate = async () => {
     if (!formData.name.trim()) return;
     setSubmitting(true);
     try {
-      await api.createProject({ name: formData.name, description: formData.description || undefined });
+      await api.createProject({
+        name: formData.name,
+        description: formData.description || undefined,
+      });
       setFormData({ name: '', description: '' });
       setCreateOpen(false);
       await fetchProjects();
@@ -79,7 +85,10 @@ export default function ProjectsPage() {
     if (!selectedProject || !formData.name.trim()) return;
     setSubmitting(true);
     try {
-      await api.updateProject(selectedProject.id, { name: formData.name, description: formData.description || undefined });
+      await api.updateProject(selectedProject.id, {
+        name: formData.name,
+        description: formData.description || undefined,
+      });
       setEditOpen(false);
       setSelectedProject(null);
       setFormData({ name: '', description: '' });
@@ -122,7 +131,9 @@ export default function ProjectsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Projects</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Projects
+          </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your video projects</p>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -138,7 +149,9 @@ export default function ProjectsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Projects</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Projects
+          </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your video projects</p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
@@ -164,7 +177,9 @@ export default function ProjectsPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
               <FolderOpen className="h-8 w-8 text-zinc-400" />
             </div>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">No projects yet</h3>
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
+              No projects yet
+            </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 max-w-sm">
               Create your first project to start organizing and processing your media files.
             </p>
@@ -177,7 +192,10 @@ export default function ProjectsPage() {
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
-            <Card key={project.id} className="border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors">
+            <Card
+              key={project.id}
+              className="border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+            >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
@@ -205,7 +223,10 @@ export default function ProjectsPage() {
                         <Pencil className="mr-2 h-4 w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => openDelete(project)} className="text-red-600 dark:text-red-400">
+                      <DropdownMenuItem
+                        onClick={() => openDelete(project)}
+                        className="text-red-600 dark:text-red-400"
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </DropdownMenuItem>
@@ -231,7 +252,9 @@ export default function ProjectsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Project</DialogTitle>
-            <DialogDescription>Create a new project to organize your media files.</DialogDescription>
+            <DialogDescription>
+              Create a new project to organize your media files.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -322,7 +345,8 @@ export default function ProjectsPage() {
           <DialogHeader>
             <DialogTitle>Delete Project</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;{selectedProject?.name}&quot;? This action cannot be undone.
+              Are you sure you want to delete &quot;{selectedProject?.name}&quot;? This action
+              cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

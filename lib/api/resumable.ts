@@ -28,7 +28,17 @@ export class ResumableUploader {
       totalSize: this.totalSize,
       uploadedChunks: new Set(this.uploadedChunks),
       totalChunks: this.totalChunks,
-      status: this.cancelled ? 'error' : this.uploadError ? 'error' : this.paused ? 'paused' : this.uploadedChunks.size === this.totalChunks && this.totalChunks > 0 ? 'complete' : this.uploadId ? 'uploading' : 'idle',
+      status: this.cancelled
+        ? 'error'
+        : this.uploadError
+          ? 'error'
+          : this.paused
+            ? 'paused'
+            : this.uploadedChunks.size === this.totalChunks && this.totalChunks > 0
+              ? 'complete'
+              : this.uploadId
+                ? 'uploading'
+                : 'idle',
       error: this.uploadError,
     };
   }
@@ -83,7 +93,9 @@ export class ResumableUploader {
     }
   }
 
-  async uploadAll(onProgress?: (progress: number, uploaded: number, total: number) => void): Promise<void> {
+  async uploadAll(
+    onProgress?: (progress: number, uploaded: number, total: number) => void,
+  ): Promise<void> {
     this.paused = false;
     this.cancelled = false;
     this.uploadError = null;

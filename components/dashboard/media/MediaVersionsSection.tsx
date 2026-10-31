@@ -3,7 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api/client';
 import { Loader2, Download, Trash2, RotateCcw, Eye, GitCompare } from 'lucide-react';
@@ -47,7 +53,14 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [compareMode, setCompareMode] = useState(false);
   const [compareVersion, setCompareVersion] = useState<MediaVersion | null>(null);
-  interface MediaComparison { size_diff: number; storage_saved: number; duration_diff?: number | null; resolution_match: boolean; video_codec_match: boolean; audio_codec_match: boolean; }
+  interface MediaComparison {
+    size_diff: number;
+    storage_saved: number;
+    duration_diff?: number | null;
+    resolution_match: boolean;
+    video_codec_match: boolean;
+    audio_codec_match: boolean;
+  }
   const [comparison, setComparison] = useState<MediaComparison | null>(null);
   const [comparisonLoading, setComparisonLoading] = useState(false);
 
@@ -74,17 +87,16 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       const blob = await api.getMediaVersionFile(mediaId, version.id);
       const filename = version.original_filename || version.stored_filename;
       downloadBlob(blob, filename);
-    } catch {
-    }
+    } catch {}
   };
 
   const handleRestore = async (version: MediaVersion) => {
-    if (!confirm(`Restore version ${version.version_number}? This will replace the current file.`)) return;
+    if (!confirm(`Restore version ${version.version_number}? This will replace the current file.`))
+      return;
     try {
       await api.restoreMediaVersion(mediaId, version.id);
       fetchVersions();
-    } catch {
-    }
+    } catch {}
   };
 
   const handleDelete = async (version: MediaVersion) => {
@@ -92,8 +104,7 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
     try {
       await api.deleteMediaVersion(mediaId, version.id);
       fetchVersions();
-    } catch {
-    }
+    } catch {}
   };
 
   const handleCompare = async (v1: MediaVersion, v2: MediaVersion) => {
@@ -108,8 +119,7 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
     }
   };
 
-  const handleCompareWithCurrent = async (version: MediaVersion) => {
-  };
+  const handleCompareWithCurrent = async (version: MediaVersion) => {};
 
   const openDetails = (version: MediaVersion) => {
     setSelectedVersion(version);
@@ -134,11 +144,15 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
       <Card className="border-zinc-200 dark:border-zinc-800">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>File Versions</CardTitle>
-          <Badge variant="outline" className="text-xs">{versions.length} versions</Badge>
+          <Badge variant="outline" className="text-xs">
+            {versions.length} versions
+          </Badge>
         </CardHeader>
         <CardContent>
           {versions.length === 0 ? (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">No versions yet. Process this file to create versions.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              No versions yet. Process this file to create versions.
+            </p>
           ) : (
             <div className="space-y-2">
               {versions.map((version) => (
@@ -180,7 +194,9 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
                 </div>
                 <div>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">Created</p>
-                  <p className="font-medium">{formatDistanceToNow(new Date(selectedVersion.created_at), { addSuffix: true })}</p>
+                  <p className="font-medium">
+                    {formatDistanceToNow(new Date(selectedVersion.created_at), { addSuffix: true })}
+                  </p>
                 </div>
                 {selectedVersion.file_size && (
                   <div>
@@ -191,13 +207,18 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
                 {selectedVersion.duration && (
                   <div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">Duration</p>
-                    <p className="font-medium">{Math.floor(selectedVersion.duration / 60)}:{(selectedVersion.duration % 60).toFixed(0).padStart(2, '0')}</p>
+                    <p className="font-medium">
+                      {Math.floor(selectedVersion.duration / 60)}:
+                      {(selectedVersion.duration % 60).toFixed(0).padStart(2, '0')}
+                    </p>
                   </div>
                 )}
                 {selectedVersion.width && selectedVersion.height && (
                   <div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">Resolution</p>
-                    <p className="font-medium">{selectedVersion.width} × {selectedVersion.height}</p>
+                    <p className="font-medium">
+                      {selectedVersion.width} × {selectedVersion.height}
+                    </p>
                   </div>
                 )}
                 {selectedVersion.video_codec && (
@@ -215,7 +236,9 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>Close</Button>
+              <Button variant="outline" onClick={() => setDetailDialogOpen(false)}>
+                Close
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -230,45 +253,69 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
             <div className="space-y-4 py-4">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Version #{compareVersion?.version_number}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Version #{compareVersion?.version_number}
+                  </p>
                   <p className="font-medium">{compareVersion?.label || '—'}</p>
                 </div>
                 <div className="p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Version #{versions[0]?.version_number}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Version #{versions[0]?.version_number}
+                  </p>
                   <p className="font-medium">{versions[0]?.label || 'Current'}</p>
                 </div>
               </div>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-zinc-500 dark:text-zinc-400">Size Difference</span>
-                  <span className="font-medium">{comparison.size_diff > 0 ? '+' : ''}{comparison.size_diff} bytes ({comparison.storage_saved > 0 ? 'saved' : 'larger'})</span>
+                  <span className="font-medium">
+                    {comparison.size_diff > 0 ? '+' : ''}
+                    {comparison.size_diff} bytes (
+                    {comparison.storage_saved > 0 ? 'saved' : 'larger'})
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-zinc-500 dark:text-zinc-400">Duration Difference</span>
-                  <span className="font-medium">{comparison.duration_diff?.toFixed(1) || 'N/A'}s</span>
+                  <span className="font-medium">
+                    {comparison.duration_diff?.toFixed(1) || 'N/A'}s
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-zinc-500 dark:text-zinc-400">Resolution Match</span>
-                  <span className={`font-medium ${comparison.resolution_match ? 'text-green-600' : 'text-red-600'}`}>
+                  <span
+                    className={`font-medium ${comparison.resolution_match ? 'text-green-600' : 'text-red-600'}`}
+                  >
                     {comparison.resolution_match ? 'Yes' : 'No'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-zinc-500 dark:text-zinc-400">Video Codec Match</span>
-                  <span className={`font-medium ${comparison.video_codec_match ? 'text-green-600' : 'text-red-600'}`}>
+                  <span
+                    className={`font-medium ${comparison.video_codec_match ? 'text-green-600' : 'text-red-600'}`}
+                  >
                     {comparison.video_codec_match ? 'Yes' : 'No'}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-zinc-500 dark:text-zinc-400">Audio Codec Match</span>
-                  <span className={`font-medium ${comparison.audio_codec_match ? 'text-green-600' : 'text-red-600'}`}>
+                  <span
+                    className={`font-medium ${comparison.audio_codec_match ? 'text-green-600' : 'text-red-600'}`}
+                  >
                     {comparison.audio_codec_match ? 'Yes' : 'No'}
                   </span>
                 </div>
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => { setCompareMode(false); setComparison(null); }}>Close</Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setCompareMode(false);
+                  setComparison(null);
+                }}
+              >
+                Close
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -277,7 +324,15 @@ export function MediaVersionsSection({ mediaId, mediaFilename }: Props) {
   );
 }
 
-function VersionRow({ version, mediaId, onDownload, onRestore, onDelete, onDetails, onCompare }: {
+function VersionRow({
+  version,
+  mediaId,
+  onDownload,
+  onRestore,
+  onDelete,
+  onDetails,
+  onCompare,
+}: {
   version: MediaVersion;
   mediaId: string;
   onDownload: (v: MediaVersion) => void;
@@ -303,7 +358,9 @@ function VersionRow({ version, mediaId, onDownload, onRestore, onDelete, onDetai
           <span className="text-sm font-medium">v{version.version_number}</span>
         </div>
         <div>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-500">{version.label || 'Unnamed version'}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-500">
+            {version.label || 'Unnamed version'}
+          </p>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
             {formatDistanceToNow(new Date(version.created_at), { addSuffix: true })}
           </p>
@@ -325,7 +382,13 @@ function VersionRow({ version, mediaId, onDownload, onRestore, onDelete, onDetai
         <Button variant="ghost" size="icon" onClick={onCompare} title="Compare with latest">
           <GitCompare className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => onDelete(version)} title="Delete" className="text-red-600 hover:text-red-700">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDelete(version)}
+          title="Delete"
+          className="text-red-600 hover:text-red-700"
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>

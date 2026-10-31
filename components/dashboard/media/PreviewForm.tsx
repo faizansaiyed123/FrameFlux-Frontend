@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '@/lib/api/client';
 import { Loader2 } from 'lucide-react';
@@ -87,7 +93,12 @@ export function PreviewForm({ mediaId }: Props) {
       )}
       <div className="space-y-2">
         <Label>Preview Type</Label>
-        <Select value={type} onValueChange={(v) => { if (v === 'video' || v === 'gif' || v === 'thumbnail') setType(v); }}>
+        <Select
+          value={type}
+          onValueChange={(v) => {
+            if (v === 'video' || v === 'gif' || v === 'thumbnail') setType(v);
+          }}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
@@ -100,24 +111,55 @@ export function PreviewForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Duration (seconds)</Label>
-        <Input type="number" value={duration} onChange={(e) => setDuration(e.target.value)} min="1" max="60" />
+        <Input
+          type="number"
+          value={duration}
+          onChange={(e) => setDuration(e.target.value)}
+          min="1"
+          max="60"
+        />
       </div>
       <div className="space-y-2">
         <Label>Start Time (seconds)</Label>
-        <Input type="number" value={start} onChange={(e) => setStart(e.target.value)} min="0" step="0.1" />
+        <Input
+          type="number"
+          value={start}
+          onChange={(e) => setStart(e.target.value)}
+          min="0"
+          step="0.1"
+        />
       </div>
       <div className="space-y-2">
         <Label>Frame Rate (fps)</Label>
-        <Input type="number" value={fps} onChange={(e) => setFps(e.target.value)} min="1" max="120" />
+        <Input
+          type="number"
+          value={fps}
+          onChange={(e) => setFps(e.target.value)}
+          min="1"
+          max="120"
+        />
       </div>
       <div className="space-y-2">
         <Label>Width (px)</Label>
-        <Input type="number" value={width} onChange={(e) => setWidth(e.target.value)} min="100" max="1920" />
+        <Input
+          type="number"
+          value={width}
+          onChange={(e) => setWidth(e.target.value)}
+          min="100"
+          max="1920"
+        />
       </div>
       {!isThumbnail && (
         <div className="space-y-2">
           <Label>Height (px, auto if empty)</Label>
-          <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} min="100" max="1080" placeholder="auto" />
+          <Input
+            type="number"
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+            min="100"
+            max="1080"
+            placeholder="auto"
+          />
         </div>
       )}
       {isThumbnail && (

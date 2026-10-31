@@ -6,26 +6,70 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Wand2, Scissors, Merge, RefreshCw, Snowflake, Image, Split, ClipboardList } from 'lucide-react';
+import {
+  Loader2,
+  Wand2,
+  Scissors,
+  Merge,
+  RefreshCw,
+  Snowflake,
+  Image,
+  Split,
+  ClipboardList,
+} from 'lucide-react';
 
 interface MediaProcessingProps {
   mediaId: string;
   onProcessed?: () => void;
 }
 
-type OperationType = 'convert' | 'edit' | 'merge' | 'transform' | 'freeze' | 'overlay' | 'split' | 'clips';
+type OperationType =
+  | 'convert'
+  | 'edit'
+  | 'merge'
+  | 'transform'
+  | 'freeze'
+  | 'overlay'
+  | 'split'
+  | 'clips';
 
 const tools = [
-  { id: 'convert', label: 'Convert', icon: Wand2, description: 'Change format, resolution, or bitrate' },
+  {
+    id: 'convert',
+    label: 'Convert',
+    icon: Wand2,
+    description: 'Change format, resolution, or bitrate',
+  },
   { id: 'edit', label: 'Trim / Cut', icon: Scissors, description: 'Cut or extract segments' },
   { id: 'merge', label: 'Merge', icon: Merge, description: 'Combine multiple media files' },
-  { id: 'transform', label: 'Transform', icon: RefreshCw, description: 'Scale, rotate, crop, or speed' },
-  { id: 'freeze', label: 'Freeze Frame', icon: Snowflake, description: 'Pause at a specific moment' },
+  {
+    id: 'transform',
+    label: 'Transform',
+    icon: RefreshCw,
+    description: 'Scale, rotate, crop, or speed',
+  },
+  {
+    id: 'freeze',
+    label: 'Freeze Frame',
+    icon: Snowflake,
+    description: 'Pause at a specific moment',
+  },
   { id: 'overlay', label: 'Overlay', icon: Image, description: 'Add text or watermark' },
   { id: 'split', label: 'Split', icon: Split, description: 'Divide into multiple parts' },
-  { id: 'clips', label: 'Clips', icon: ClipboardList, description: 'Keep, delete, reorder, or append' },
+  {
+    id: 'clips',
+    label: 'Clips',
+    icon: ClipboardList,
+    description: 'Keep, delete, reorder, or append',
+  },
 ] as const;
 
 export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) {
@@ -117,7 +161,9 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
   return (
     <Card className="border-zinc-200 dark:border-zinc-800">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Video Editor</CardTitle>
+        <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+          Video Editor
+        </CardTitle>
         <CardDescription>Select a tool below to edit or enhance your media</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -139,7 +185,10 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
             return (
               <button
                 key={tool.id}
-                onClick={() => { setOperation(tool.id as OperationType); resetForm(); }}
+                onClick={() => {
+                  setOperation(tool.id as OperationType);
+                  resetForm();
+                }}
                 className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${
                   isActive
                     ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
@@ -148,7 +197,9 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
               >
                 <Icon className="h-5 w-5" />
                 <span className="text-sm font-medium">{tool.label}</span>
-                <span className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">{tool.description}</span>
+                <span className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
+                  {tool.description}
+                </span>
               </button>
             );
           })}
@@ -168,7 +219,13 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
   );
 }
 
-function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function ConvertForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [format, setFormat] = useState('mp4');
   const [resolution, setResolution] = useState('');
   const [customWidth, setCustomWidth] = useState('');
@@ -206,7 +263,16 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="format">Output Format</Label>
-          <Select value={format} onValueChange={(v) => { setFormat(v); if (v === 'webm') { setVideoCodec('vp9'); setAudioCodec(''); } }}>
+          <Select
+            value={format}
+            onValueChange={(v) => {
+              setFormat(v);
+              if (v === 'webm') {
+                setVideoCodec('vp9');
+                setAudioCodec('');
+              }
+            }}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -264,12 +330,24 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
 
         <div className="space-y-2">
           <Label htmlFor="customWidth">Custom Width</Label>
-          <Input id="customWidth" type="number" placeholder="e.g. 1920" value={customWidth} onChange={(e) => setCustomWidth(e.target.value)} />
+          <Input
+            id="customWidth"
+            type="number"
+            placeholder="e.g. 1920"
+            value={customWidth}
+            onChange={(e) => setCustomWidth(e.target.value)}
+          />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="customHeight">Custom Height</Label>
-          <Input id="customHeight" type="number" placeholder="e.g. 1080" value={customHeight} onChange={(e) => setCustomHeight(e.target.value)} />
+          <Input
+            id="customHeight"
+            type="number"
+            placeholder="e.g. 1080"
+            value={customHeight}
+            onChange={(e) => setCustomHeight(e.target.value)}
+          />
         </div>
 
         <div className="space-y-2">
@@ -308,7 +386,15 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
 
         <div className="space-y-2">
           <Label htmlFor="customFps">Custom Frame Rate</Label>
-          <Input id="customFps" type="number" step="0.01" min="1" placeholder="e.g. 29.97" value={customFps} onChange={(e) => setCustomFps(e.target.value)} />
+          <Input
+            id="customFps"
+            type="number"
+            step="0.01"
+            min="1"
+            placeholder="e.g. 29.97"
+            value={customFps}
+            onChange={(e) => setCustomFps(e.target.value)}
+          />
         </div>
 
         <div className="space-y-2">
@@ -329,18 +415,35 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
 
         <div className="space-y-2">
           <Label htmlFor="customAspectRatio">Custom Aspect Ratio</Label>
-          <Input id="customAspectRatio" placeholder="e.g. 2.35:1 or 16:10" value={customAspectRatio} onChange={(e) => setCustomAspectRatio(e.target.value)} />
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Format: W:H or decimal (e.g. 16:9, 2.35:1)</p>
+          <Input
+            id="customAspectRatio"
+            placeholder="e.g. 2.35:1 or 16:10"
+            value={customAspectRatio}
+            onChange={(e) => setCustomAspectRatio(e.target.value)}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Format: W:H or decimal (e.g. 16:9, 2.35:1)
+          </p>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="videoBitrate">Video Bitrate</Label>
-          <Input id="videoBitrate" placeholder="e.g. 2M" value={videoBitrate} onChange={(e) => setVideoBitrate(e.target.value)} />
+          <Input
+            id="videoBitrate"
+            placeholder="e.g. 2M"
+            value={videoBitrate}
+            onChange={(e) => setVideoBitrate(e.target.value)}
+          />
         </div>
 
         <div className="space-y-2 lg:col-span-2">
           <Label htmlFor="audioBitrate">Audio Bitrate</Label>
-          <Input id="audioBitrate" placeholder="e.g. 128k" value={audioBitrate} onChange={(e) => setAudioBitrate(e.target.value)} />
+          <Input
+            id="audioBitrate"
+            placeholder="e.g. 128k"
+            value={audioBitrate}
+            onChange={(e) => setAudioBitrate(e.target.value)}
+          />
         </div>
       </div>
 
@@ -352,7 +455,13 @@ function ConvertForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
   );
 }
 
-function EditForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function EditForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [operation, setOperation] = useState('trim');
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
@@ -385,11 +494,27 @@ function EditForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkno
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="start">Start Time (seconds)</Label>
-          <Input id="start" type="number" step="0.1" placeholder="0" value={start} onChange={(e) => setStart(e.target.value)} required />
+          <Input
+            id="start"
+            type="number"
+            step="0.1"
+            placeholder="0"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+            required
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="end">End Time (seconds)</Label>
-          <Input id="end" type="number" step="0.1" placeholder="10" value={end} onChange={(e) => setEnd(e.target.value)} required />
+          <Input
+            id="end"
+            type="number"
+            step="0.1"
+            placeholder="10"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+            required
+          />
         </div>
       </div>
 
@@ -401,12 +526,21 @@ function EditForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkno
   );
 }
 
-function MergeForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function MergeForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [mediaIds, setMediaIds] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const ids = mediaIds.split(',').map((id) => id.trim()).filter(Boolean);
+    const ids = mediaIds
+      .split(',')
+      .map((id) => id.trim())
+      .filter(Boolean);
     onSubmit({ media_ids: ids });
   };
 
@@ -434,7 +568,13 @@ function MergeForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkn
   );
 }
 
-function TransformForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function TransformForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [op, setOp] = useState('scale');
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
@@ -476,11 +616,23 @@ function TransformForm({ onSubmit, loading }: { onSubmit: (data: Record<string, 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="width">Width</Label>
-            <Input id="width" type="number" placeholder="1280" value={width} onChange={(e) => setWidth(e.target.value)} />
+            <Input
+              id="width"
+              type="number"
+              placeholder="1280"
+              value={width}
+              onChange={(e) => setWidth(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="height">Height</Label>
-            <Input id="height" type="number" placeholder="720" value={height} onChange={(e) => setHeight(e.target.value)} />
+            <Input
+              id="height"
+              type="number"
+              placeholder="720"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+            />
           </div>
         </div>
       )}
@@ -488,15 +640,30 @@ function TransformForm({ onSubmit, loading }: { onSubmit: (data: Record<string, 
       {op === 'rotate' && (
         <div className="space-y-2">
           <Label htmlFor="angle">Angle (degrees)</Label>
-          <Input id="angle" type="number" placeholder="90" value={angle} onChange={(e) => setAngle(e.target.value)} />
+          <Input
+            id="angle"
+            type="number"
+            placeholder="90"
+            value={angle}
+            onChange={(e) => setAngle(e.target.value)}
+          />
         </div>
       )}
 
       {op === 'speed' && (
         <div className="space-y-2">
           <Label htmlFor="speed">Speed Multiplier</Label>
-          <Input id="speed" type="number" step="0.1" placeholder="1.5" value={speed} onChange={(e) => setSpeed(e.target.value)} />
-          <p className="text-xs text-zinc-500 dark:text-zinc-500">1.0 = normal, 2.0 = double speed, 0.5 = half speed</p>
+          <Input
+            id="speed"
+            type="number"
+            step="0.1"
+            placeholder="1.5"
+            value={speed}
+            onChange={(e) => setSpeed(e.target.value)}
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-500">
+            1.0 = normal, 2.0 = double speed, 0.5 = half speed
+          </p>
         </div>
       )}
 
@@ -508,7 +675,13 @@ function TransformForm({ onSubmit, loading }: { onSubmit: (data: Record<string, 
   );
 }
 
-function FreezeForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function FreezeForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [timestamp, setTimestamp] = useState('');
   const [duration, setDuration] = useState('');
 
@@ -525,11 +698,26 @@ function FreezeForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unk
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="timestamp">Timestamp (seconds)</Label>
-          <Input id="timestamp" type="number" step="0.1" placeholder="5.5" value={timestamp} onChange={(e) => setTimestamp(e.target.value)} required />
+          <Input
+            id="timestamp"
+            type="number"
+            step="0.1"
+            placeholder="5.5"
+            value={timestamp}
+            onChange={(e) => setTimestamp(e.target.value)}
+            required
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="duration">Duration (seconds)</Label>
-          <Input id="duration" type="number" step="0.1" placeholder="2" value={duration} onChange={(e) => setDuration(e.target.value)} />
+          <Input
+            id="duration"
+            type="number"
+            step="0.1"
+            placeholder="2"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+          />
         </div>
       </div>
 
@@ -541,7 +729,13 @@ function FreezeForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unk
   );
 }
 
-function OverlayForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function OverlayForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [mode, setMode] = useState('text');
   const [text, setText] = useState('');
   const [imageFilename, setImageFilename] = useState('');
@@ -590,14 +784,26 @@ function OverlayForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
       {mode === 'text' && (
         <div className="space-y-2">
           <Label htmlFor="text">Text Content</Label>
-          <Input id="text" placeholder="Live Broadcast" value={text} onChange={(e) => setText(e.target.value)} required />
+          <Input
+            id="text"
+            placeholder="Live Broadcast"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            required
+          />
         </div>
       )}
 
       {mode === 'watermark' && (
         <div className="space-y-2">
           <Label htmlFor="imageFilename">Image Filename</Label>
-          <Input id="imageFilename" placeholder="logo.png" value={imageFilename} onChange={(e) => setImageFilename(e.target.value)} required />
+          <Input
+            id="imageFilename"
+            placeholder="logo.png"
+            value={imageFilename}
+            onChange={(e) => setImageFilename(e.target.value)}
+            required
+          />
         </div>
       )}
 
@@ -613,13 +819,26 @@ function OverlayForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
         {mode === 'text' && (
           <div className="space-y-2">
             <Label htmlFor="fontSize">Font Size</Label>
-            <Input id="fontSize" type="number" value={fontSize} onChange={(e) => setFontSize(e.target.value)} />
+            <Input
+              id="fontSize"
+              type="number"
+              value={fontSize}
+              onChange={(e) => setFontSize(e.target.value)}
+            />
           </div>
         )}
         {mode === 'watermark' && (
           <div className="space-y-2">
             <Label htmlFor="opacity">Opacity</Label>
-            <Input id="opacity" type="number" step="0.1" min="0" max="1" value={opacity} onChange={(e) => setOpacity(e.target.value)} />
+            <Input
+              id="opacity"
+              type="number"
+              step="0.1"
+              min="0"
+              max="1"
+              value={opacity}
+              onChange={(e) => setOpacity(e.target.value)}
+            />
           </div>
         )}
       </div>
@@ -632,12 +851,21 @@ function OverlayForm({ onSubmit, loading }: { onSubmit: (data: Record<string, un
   );
 }
 
-function SplitForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function SplitForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [splitPoints, setSplitPoints] = useState('10, 25.5, 60');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const points = splitPoints.split(',').map((p) => Number(p.trim())).filter((n) => !isNaN(n));
+    const points = splitPoints
+      .split(',')
+      .map((p) => Number(p.trim()))
+      .filter((n) => !isNaN(n));
     onSubmit({ split_points: points });
   };
 
@@ -645,7 +873,13 @@ function SplitForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkn
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="splitPoints">Split Points (seconds)</Label>
-        <Input id="splitPoints" placeholder="10, 25.5, 60" value={splitPoints} onChange={(e) => setSplitPoints(e.target.value)} required />
+        <Input
+          id="splitPoints"
+          placeholder="10, 25.5, 60"
+          value={splitPoints}
+          onChange={(e) => setSplitPoints(e.target.value)}
+          required
+        />
         <p className="text-xs text-zinc-500 dark:text-zinc-500">
           Enter timestamps where the video should be split, separated by commas.
         </p>
@@ -659,7 +893,13 @@ function SplitForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkn
   );
 }
 
-function ClipsForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unknown>) => void; loading: boolean }) {
+function ClipsForm({
+  onSubmit,
+  loading,
+}: {
+  onSubmit: (data: Record<string, unknown>) => void;
+  loading: boolean;
+}) {
   const [subOperation, setSubOperation] = useState('keep');
   const [clipsInput, setClipsInput] = useState('0-10, 20-30');
   const [mediaIds, setMediaIds] = useState('');
@@ -667,13 +907,19 @@ function ClipsForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkn
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (subOperation === 'reorder' || subOperation === 'append') {
-      const ids = mediaIds.split(',').map((id) => id.trim()).filter(Boolean);
+      const ids = mediaIds
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean);
       onSubmit({ sub_operation: subOperation, media_ids: ids });
     } else {
-      const clips = clipsInput.split(',').map((clip) => {
-        const [start, end] = clip.split('-').map((n) => Number(n.trim()));
-        return { start, end };
-      }).filter((c) => !isNaN(c.start) && !isNaN(c.end));
+      const clips = clipsInput
+        .split(',')
+        .map((clip) => {
+          const [start, end] = clip.split('-').map((n) => Number(n.trim()));
+          return { start, end };
+        })
+        .filter((c) => !isNaN(c.start) && !isNaN(c.end));
       onSubmit({ sub_operation: subOperation, clips });
     }
   };
@@ -698,7 +944,13 @@ function ClipsForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkn
       {(subOperation === 'keep' || subOperation === 'delete') && (
         <div className="space-y-2">
           <Label htmlFor="clips">Clip Ranges (start-end)</Label>
-          <Input id="clips" placeholder="0-10, 20-30" value={clipsInput} onChange={(e) => setClipsInput(e.target.value)} required />
+          <Input
+            id="clips"
+            placeholder="0-10, 20-30"
+            value={clipsInput}
+            onChange={(e) => setClipsInput(e.target.value)}
+            required
+          />
           <p className="text-xs text-zinc-500 dark:text-zinc-500">
             Enter time ranges in seconds, separated by commas.
           </p>
@@ -708,7 +960,13 @@ function ClipsForm({ onSubmit, loading }: { onSubmit: (data: Record<string, unkn
       {(subOperation === 'reorder' || subOperation === 'append') && (
         <div className="space-y-2">
           <Label htmlFor="mediaIds">Media IDs</Label>
-          <Input id="mediaIds" placeholder="clip2.mp4, clip1.mp4" value={mediaIds} onChange={(e) => setMediaIds(e.target.value)} required />
+          <Input
+            id="mediaIds"
+            placeholder="clip2.mp4, clip1.mp4"
+            value={mediaIds}
+            onChange={(e) => setMediaIds(e.target.value)}
+            required
+          />
           <p className="text-xs text-zinc-500 dark:text-zinc-500">
             Enter media filenames or IDs in the desired order, separated by commas.
           </p>

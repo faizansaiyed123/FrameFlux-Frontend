@@ -7,7 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { api } from '@/lib/api/client';
 import { Loader2, Lock, Eye, EyeOff, Palette } from 'lucide-react';
 
@@ -59,8 +65,8 @@ export default function SettingsPage() {
     try {
       const data = await api.listPreferences();
       setPrefs(data);
-      const themePref = data.find(p => p.key === 'theme');
-      const langPref = data.find(p => p.key === 'language');
+      const themePref = data.find((p) => p.key === 'theme');
+      const langPref = data.find((p) => p.key === 'language');
       if (themePref) setTheme(themePref.value);
       if (langPref) setLanguage(langPref.value);
     } catch {
@@ -126,8 +132,12 @@ export default function SettingsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Settings</h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your account settings and preferences</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Settings
+          </h1>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+            Manage your account settings and preferences
+          </p>
         </div>
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="h-48 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded-xl" />
@@ -140,14 +150,20 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Settings</h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your account settings and preferences</p>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Settings
+        </h1>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          Manage your account settings and preferences
+        </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Profile</CardTitle>
+            <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+              Profile
+            </CardTitle>
             <CardDescription>Your account information</CardDescription>
           </CardHeader>
           <CardContent>
@@ -173,8 +189,12 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Email</Label>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">{user?.email || 'user@example.com'}</p>
+                <Label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Email
+                </Label>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                  {user?.email || 'user@example.com'}
+                </p>
               </div>
               <Button type="submit" disabled={profileLoading}>
                 {profileLoading ? (
@@ -192,7 +212,9 @@ export default function SettingsPage() {
 
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Change Password</CardTitle>
+            <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+              Change Password
+            </CardTitle>
             <CardDescription>Update your account password</CardDescription>
           </CardHeader>
           <CardContent>
@@ -328,7 +350,11 @@ export default function SettingsPage() {
                 </Select>
               </div>
             </div>
-            <Button onClick={handleSavePreferences} disabled={loading || prefsLoading} className="mt-4">
+            <Button
+              onClick={handleSavePreferences}
+              disabled={loading || prefsLoading}
+              className="mt-4"
+            >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

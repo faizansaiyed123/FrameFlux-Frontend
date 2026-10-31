@@ -29,10 +29,7 @@ class ApiClient {
     }
   }
 
-  private async request<T>(
-    endpoint: string,
-    options: RequestInit = {}
-  ): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const headers: HeadersInit = {
       ...options.headers,
     };
@@ -65,17 +62,23 @@ class ApiClient {
   }
 
   async signup(data: { email: string; password: string; full_name?: string }) {
-    return this.request<{ access_token: string; token_type: string; expires_in: number }>('/auth/signup', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    return this.request<{ access_token: string; token_type: string; expires_in: number }>(
+      '/auth/signup',
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
   }
 
   async login(data: { email: string; password: string }) {
-    return this.request<{ access_token: string; token_type: string; expires_in: number }>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    return this.request<{ access_token: string; token_type: string; expires_in: number }>(
+      '/auth/login',
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+    );
   }
 
   async logout() {
@@ -133,14 +136,16 @@ class ApiClient {
   }
 
   async listProjects() {
-    return this.request<{
-      id: string;
-      user_id: string | null;
-      name: string;
-      description: string | null;
-      created_at: string;
-      updated_at: string;
-    }[]>('/projects');
+    return this.request<
+      {
+        id: string;
+        user_id: string | null;
+        name: string;
+        description: string | null;
+        created_at: string;
+        updated_at: string;
+      }[]
+    >('/projects');
   }
 
   async createProject(data: { name: string; description?: string }) {
@@ -187,26 +192,28 @@ class ApiClient {
   }
 
   async listProjectMedia(projectId: string) {
-    return this.request<{
-      id: string;
-      user_id: string | null;
-      original_filename: string;
-      stored_filename: string;
-      media_type: string;
-      mime_type: string;
-      file_size: number;
-      project_id: string | null;
-      processing_status: string;
-      processed_filename: string | null;
-      processing_error: string | null;
-      duration: number | null;
-      width: number | null;
-      height: number | null;
-      video_codec: string | null;
-      audio_codec: string | null;
-      fps: string | null;
-      created_at: string;
-    }[]>(`/projects/${projectId}/media`);
+    return this.request<
+      {
+        id: string;
+        user_id: string | null;
+        original_filename: string;
+        stored_filename: string;
+        media_type: string;
+        mime_type: string;
+        file_size: number;
+        project_id: string | null;
+        processing_status: string;
+        processed_filename: string | null;
+        processing_error: string | null;
+        duration: number | null;
+        width: number | null;
+        height: number | null;
+        video_codec: string | null;
+        audio_codec: string | null;
+        fps: string | null;
+        created_at: string;
+      }[]
+    >(`/projects/${projectId}/media`);
   }
 
   async processProject(projectId: string) {
@@ -230,17 +237,19 @@ class ApiClient {
   }
 
   async listProjectFolders(projectId: string) {
-    return this.request<{
-      id: string;
-      name: string;
-      parent_id: string | null;
-    }[]>(`/projects/${projectId}/folders`);
+    return this.request<
+      {
+        id: string;
+        name: string;
+        parent_id: string | null;
+      }[]
+    >(`/projects/${projectId}/folders`);
   }
 
   async createProjectFolder(projectId: string, name: string, parentId?: string) {
     return this.request<{ id: string; name: string; parent_id: string | null }>(
       `/projects/${projectId}/folders?name=${encodeURIComponent(name)}${parentId ? `&parent_id=${parentId}` : ''}`,
-      { method: 'POST' }
+      { method: 'POST' },
     );
   }
 
@@ -249,12 +258,14 @@ class ApiClient {
   }
 
   async listProjectHistory(projectId: string) {
-    return this.request<{
-      id: string;
-      operation: string;
-      status: string;
-      created_at: string;
-    }[]>(`/projects/${projectId}/history`);
+    return this.request<
+      {
+        id: string;
+        operation: string;
+        status: string;
+        created_at: string;
+      }[]
+    >(`/projects/${projectId}/history`);
   }
 
   async getDashboardOverview() {
@@ -333,26 +344,28 @@ class ApiClient {
   async uploadMultipleMedia(files: File[]) {
     const formData = new FormData();
     files.forEach((file) => formData.append('files', file));
-    return this.request<{
-      id: string;
-      user_id: string | null;
-      original_filename: string;
-      stored_filename: string;
-      media_type: string;
-      mime_type: string;
-      file_size: number;
-      project_id: string | null;
-      processing_status: string;
-      processed_filename: string | null;
-      processing_error: string | null;
-      duration: number | null;
-      width: number | null;
-      height: number | null;
-      video_codec: string | null;
-      audio_codec: string | null;
-      fps: string | null;
-      created_at: string;
-    }[]>('/media/upload-multiple', {
+    return this.request<
+      {
+        id: string;
+        user_id: string | null;
+        original_filename: string;
+        stored_filename: string;
+        media_type: string;
+        mime_type: string;
+        file_size: number;
+        project_id: string | null;
+        processing_status: string;
+        processed_filename: string | null;
+        processing_error: string | null;
+        duration: number | null;
+        width: number | null;
+        height: number | null;
+        video_codec: string | null;
+        audio_codec: string | null;
+        fps: string | null;
+        created_at: string;
+      }[]
+    >('/media/upload-multiple', {
       method: 'POST',
       headers: {},
       body: formData,
@@ -371,28 +384,30 @@ class ApiClient {
     if (params?.folder) query.set('folder', params.folder);
     if (params?.tag) query.set('tag', params.tag);
     const qs = query.toString();
-    return this.request<{
-      id: string;
-      user_id: string | null;
-      original_filename: string;
-      stored_filename: string;
-      media_type: string;
-      mime_type: string;
-      file_size: number;
-      project_id: string | null;
-      folder: string | null;
-      tags: string[] | null;
-      processing_status: string;
-      processed_filename: string | null;
-      processing_error: string | null;
-      duration: number | null;
-      width: number | null;
-      height: number | null;
-      video_codec: string | null;
-      audio_codec: string | null;
-      fps: string | null;
-      created_at: string;
-    }[]>(`/media${qs ? `?${qs}` : ''}`);
+    return this.request<
+      {
+        id: string;
+        user_id: string | null;
+        original_filename: string;
+        stored_filename: string;
+        media_type: string;
+        mime_type: string;
+        file_size: number;
+        project_id: string | null;
+        folder: string | null;
+        tags: string[] | null;
+        processing_status: string;
+        processed_filename: string | null;
+        processing_error: string | null;
+        duration: number | null;
+        width: number | null;
+        height: number | null;
+        video_codec: string | null;
+        audio_codec: string | null;
+        fps: string | null;
+        created_at: string;
+      }[]
+    >(`/media${qs ? `?${qs}` : ''}`);
   }
 
   async getMedia(id: string) {
@@ -429,9 +444,12 @@ class ApiClient {
   }
 
   async getProcessedMedia(id: string, downloadType: string = 'processed') {
-    const response = await fetch(`${this.baseUrl}/media/${id}/download?download_type=${encodeURIComponent(downloadType)}`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/media/${id}/download?download_type=${encodeURIComponent(downloadType)}`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to fetch processed media');
     return response.blob();
   }
@@ -485,21 +503,24 @@ class ApiClient {
     }>(`/media/${id}/process`, { method: 'POST' });
   }
 
-  async compressMedia(id: string, data: {
-    format?: string;
-    width?: number;
-    height?: number;
-    fps?: number;
-    video_bitrate?: string;
-    audio_bitrate?: string;
-    video_codec?: string;
-    audio_codec?: string;
-    aspect_ratio?: string;
-    compression_preset?: string;
-    quality?: number;
-    resolution?: string;
-    target_size_mb?: number;
-  }) {
+  async compressMedia(
+    id: string,
+    data: {
+      format?: string;
+      width?: number;
+      height?: number;
+      fps?: number;
+      video_bitrate?: string;
+      audio_bitrate?: string;
+      video_codec?: string;
+      audio_codec?: string;
+      aspect_ratio?: string;
+      compression_preset?: string;
+      quality?: number;
+      resolution?: string;
+      target_size_mb?: number;
+    },
+  ) {
     return this.request<{
       media_id: string;
       status: string;
@@ -511,19 +532,22 @@ class ApiClient {
     });
   }
 
-  async convertMedia(id: string, data: {
-    format: string;
-    width?: number;
-    height?: number;
-    fps?: number;
-    video_bitrate?: string;
-    audio_bitrate?: string;
-    video_codec?: string;
-    audio_codec?: string;
-    aspect_ratio?: string;
-    quality?: number;
-    resolution?: string;
-  }) {
+  async convertMedia(
+    id: string,
+    data: {
+      format: string;
+      width?: number;
+      height?: number;
+      fps?: number;
+      video_bitrate?: string;
+      audio_bitrate?: string;
+      video_codec?: string;
+      audio_codec?: string;
+      aspect_ratio?: string;
+      quality?: number;
+      resolution?: string;
+    },
+  ) {
     return this.request<{
       media_id: string;
       status: string;
@@ -535,7 +559,10 @@ class ApiClient {
     });
   }
 
-  async editMedia(id: string, data: { operation: 'trim' | 'cut' | 'extract'; start: number; end: number }) {
+  async editMedia(
+    id: string,
+    data: { operation: 'trim' | 'cut' | 'extract'; start: number; end: number },
+  ) {
     return this.request<{
       media_id: string;
       status: string;
@@ -573,15 +600,18 @@ class ApiClient {
     });
   }
 
-  async transformMedia(id: string, data: {
-    operation: string;
-    width?: number;
-    height?: number;
-    x?: number;
-    y?: number;
-    angle?: number;
-    speed?: number;
-  }) {
+  async transformMedia(
+    id: string,
+    data: {
+      operation: string;
+      width?: number;
+      height?: number;
+      x?: number;
+      y?: number;
+      angle?: number;
+      speed?: number;
+    },
+  ) {
     return this.request<{
       media_id: string;
       status: string;
@@ -607,24 +637,27 @@ class ApiClient {
     });
   }
 
-  async overlayMedia(id: string, data: {
-    operation?: string;
-    text?: string;
-    image_filename?: string;
-    x?: number;
-    y?: number;
-    font_size?: number;
-    opacity?: number;
-    overlays?: {
-      operation: 'text' | 'image' | 'watermark';
+  async overlayMedia(
+    id: string,
+    data: {
+      operation?: string;
       text?: string;
       image_filename?: string;
-      x: number;
-      y: number;
-      font_size: number;
-      opacity: number;
-    }[];
-  }) {
+      x?: number;
+      y?: number;
+      font_size?: number;
+      opacity?: number;
+      overlays?: {
+        operation: 'text' | 'image' | 'watermark';
+        text?: string;
+        image_filename?: string;
+        x: number;
+        y: number;
+        font_size: number;
+        opacity: number;
+      }[];
+    },
+  ) {
     return this.request<{
       media_id: string;
       status: string;
@@ -726,16 +759,20 @@ class ApiClient {
   }
 
   async batchDownload(mediaIds: string[]) {
-    return this.request<{ jobs: { media_id: string; original_filename: string; file_size: number }[]; total: number }>(
-      '/media/batch-download',
-      {
-        method: 'POST',
-        body: JSON.stringify({ media_ids: mediaIds }),
-      }
-    );
+    return this.request<{
+      jobs: { media_id: string; original_filename: string; file_size: number }[];
+      total: number;
+    }>('/media/batch-download', {
+      method: 'POST',
+      body: JSON.stringify({ media_ids: mediaIds }),
+    });
   }
 
-  async initResumableUpload(data: { original_filename: string; total_size: number; chunk_size?: number }) {
+  async initResumableUpload(data: {
+    original_filename: string;
+    total_size: number;
+    chunk_size?: number;
+  }) {
     return this.request<{ upload_id: string }>('/media/resumable/init', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -752,11 +789,15 @@ class ApiClient {
   }
 
   async pauseResumableUpload(uploadId: string) {
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/pause`, { method: 'POST' });
+    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/pause`, {
+      method: 'POST',
+    });
   }
 
   async resumeResumableUpload(uploadId: string) {
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/resume`, { method: 'POST' });
+    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/resume`, {
+      method: 'POST',
+    });
   }
 
   async retryChunk(uploadId: string, index: number, chunk: Blob) {
@@ -796,13 +837,16 @@ class ApiClient {
     }>(`/media/resumable/${uploadId}/finalize`, { method: 'POST' });
   }
 
-  async adjustVideo(id: string, data: {
-    brightness?: number;
-    contrast?: number;
-    saturation?: number;
-    gamma?: number;
-    hue?: number;
-  }) {
+  async adjustVideo(
+    id: string,
+    data: {
+      brightness?: number;
+      contrast?: number;
+      saturation?: number;
+      gamma?: number;
+      hue?: number;
+    },
+  ) {
     return this.request<{
       output_filename: string;
       operation: string;
@@ -846,15 +890,18 @@ class ApiClient {
     });
   }
 
-  async extractAudio(mediaId: string, data: {
-    format?: string;
-    bitrate?: string;
-    sample_rate?: number;
-    start?: number;
-    end?: number;
-    channels?: number;
-    quality_preset?: string;
-  }) {
+  async extractAudio(
+    mediaId: string,
+    data: {
+      format?: string;
+      bitrate?: string;
+      sample_rate?: number;
+      start?: number;
+      end?: number;
+      channels?: number;
+      quality_preset?: string;
+    },
+  ) {
     const query = new URLSearchParams();
     if (data.format) query.set('format', data.format);
     if (data.bitrate) query.set('bitrate', data.bitrate);
@@ -883,21 +930,28 @@ class ApiClient {
     if (fadeIn !== undefined) query.set('fade_in', String(fadeIn));
     if (fadeOut !== undefined) query.set('fade_out', String(fadeOut));
 
-    return this.request<{ output_filename: string }>(`/audio/${mediaId}/replace-audio?${query.toString()}`, {
-      method: 'POST',
-    });
+    return this.request<{ output_filename: string }>(
+      `/audio/${mediaId}/replace-audio?${query.toString()}`,
+      {
+        method: 'POST',
+      },
+    );
   }
 
-  async addAudio(mediaId: string, audioPath: string, options?: {
-    audioOffset?: number;
-    videoDuration?: number;
-    audioDuration?: number;
-    fadeIn?: number;
-    fadeOut?: number;
-    volume?: number;
-    mixVolume?: number;
-    outputFormat?: 'mp4' | 'webm';
-  }) {
+  async addAudio(
+    mediaId: string,
+    audioPath: string,
+    options?: {
+      audioOffset?: number;
+      videoDuration?: number;
+      audioDuration?: number;
+      fadeIn?: number;
+      fadeOut?: number;
+      volume?: number;
+      mixVolume?: number;
+      outputFormat?: 'mp4' | 'webm';
+    },
+  ) {
     return this.request<{
       output_filename: string;
       operation: string;
@@ -918,18 +972,21 @@ class ApiClient {
       }),
     });
   }
-  async syncAudioVideo(mediaId: string, data: {
-    audio_path: string;
-    audio_offset?: number;
-    video_duration?: number;
-    audio_duration?: number;
-    fade_in?: number;
-    fade_out?: number;
-    volume?: number;
-    mix?: boolean;
-    mix_volume?: number;
-    output_format?: 'mp4' | 'webm';
-  }) {
+  async syncAudioVideo(
+    mediaId: string,
+    data: {
+      audio_path: string;
+      audio_offset?: number;
+      video_duration?: number;
+      audio_duration?: number;
+      fade_in?: number;
+      fade_out?: number;
+      volume?: number;
+      mix?: boolean;
+      mix_volume?: number;
+      output_format?: 'mp4' | 'webm';
+    },
+  ) {
     return this.request<{
       output_filename: string;
       operation: string;
@@ -940,13 +997,16 @@ class ApiClient {
     });
   }
 
-  async convertAudio(mediaId: string, data: {
-    format: string;
-    bitrate?: string;
-    sample_rate?: number;
-    channels?: number;
-    quality?: string;
-  }) {
+  async convertAudio(
+    mediaId: string,
+    data: {
+      format: string;
+      bitrate?: string;
+      sample_rate?: number;
+      channels?: number;
+      quality?: string;
+    },
+  ) {
     const query = new URLSearchParams();
     if (data.format) query.set('format', data.format);
     if (data.bitrate) query.set('bitrate', data.bitrate);
@@ -966,36 +1026,42 @@ class ApiClient {
     return response.blob();
   }
 
-  async editAudio(mediaId: string, data: {
-    operation: string;
-    start?: number;
-    end?: number;
-    speed?: number;
-    fade_in?: number;
-    fade_out?: number;
-    silence_duration?: number;
-    target_files?: string[];
-  }) {
+  async editAudio(
+    mediaId: string,
+    data: {
+      operation: string;
+      start?: number;
+      end?: number;
+      speed?: number;
+      fade_in?: number;
+      fade_out?: number;
+      silence_duration?: number;
+      target_files?: string[];
+    },
+  ) {
     return this.request<{ output_filename: string }>(`/audio/${mediaId}/edit`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async audioToVideo(mediaId: string, data: {
-    background_image?: string;
-    background_color?: string;
-    title?: string;
-    text?: string;
-    watermark?: string;
-    show_waveform?: boolean;
-    visualizer_style?: string;
-    resolution?: string;
-    fps?: number;
-    aspect_ratio?: string;
-    duration?: number;
-    output_format?: string;
-  }) {
+  async audioToVideo(
+    mediaId: string,
+    data: {
+      background_image?: string;
+      background_color?: string;
+      title?: string;
+      text?: string;
+      watermark?: string;
+      show_waveform?: boolean;
+      visualizer_style?: string;
+      resolution?: string;
+      fps?: number;
+      aspect_ratio?: string;
+      duration?: number;
+      output_format?: string;
+    },
+  ) {
     const response = await fetch(`${this.baseUrl}/audio/${mediaId}/to-video`, {
       method: 'POST',
       body: JSON.stringify(data),
@@ -1008,7 +1074,13 @@ class ApiClient {
     return response.blob();
   }
 
-  async getThumbnail(mediaId: string, timestamp?: number, width?: number, height?: number, fmt?: string) {
+  async getThumbnail(
+    mediaId: string,
+    timestamp?: number,
+    width?: number,
+    height?: number,
+    fmt?: string,
+  ) {
     const query = new URLSearchParams();
     if (timestamp !== undefined) query.set('timestamp', String(timestamp));
     if (width !== undefined) query.set('width', String(width));
@@ -1028,10 +1100,19 @@ class ApiClient {
     if (width !== undefined) query.set('width', String(width));
     if (fmt) query.set('fmt', fmt);
     const qs = query.toString();
-    return this.request<{ thumbnails: string[] }>(`/thumbnails/${mediaId}/set${qs ? `?${qs}` : ''}`);
+    return this.request<{ thumbnails: string[] }>(
+      `/thumbnails/${mediaId}/set${qs ? `?${qs}` : ''}`,
+    );
   }
 
-  async cropThumbnail(mediaId: string, timestamp: number, x: number, y: number, width: number, height: number) {
+  async cropThumbnail(
+    mediaId: string,
+    timestamp: number,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ) {
     return this.request<{ path: string }>(`/thumbnails/${mediaId}/crop`, {
       method: 'POST',
       body: JSON.stringify({ timestamp, x, y, width, height }),
@@ -1045,14 +1126,18 @@ class ApiClient {
     });
   }
 
-  async burnSubtitles(mediaId: string, subtitlePath: string, data: {
-    font_size?: number;
-    font_color?: string;
-    background_color?: string;
-    position?: string;
-    font?: string;
-    alignment?: string;
-  }) {
+  async burnSubtitles(
+    mediaId: string,
+    subtitlePath: string,
+    data: {
+      font_size?: number;
+      font_color?: string;
+      background_color?: string;
+      position?: string;
+      font?: string;
+      alignment?: string;
+    },
+  ) {
     const query = new URLSearchParams();
     query.set('subtitle_path', subtitlePath);
     if (data.font_size) query.set('font_size', String(data.font_size));
@@ -1083,11 +1168,15 @@ class ApiClient {
     return response.json();
   }
 
-  async muxSubtitles(mediaId: string, subtitlePath: string, data: {
-    language?: string;
-    is_default?: boolean;
-    is_forced?: boolean;
-  }) {
+  async muxSubtitles(
+    mediaId: string,
+    subtitlePath: string,
+    data: {
+      language?: string;
+      is_default?: boolean;
+      is_forced?: boolean;
+    },
+  ) {
     const query = new URLSearchParams();
     query.set('subtitle_path', subtitlePath);
     if (data.language) query.set('language', data.language);
@@ -1103,24 +1192,35 @@ class ApiClient {
   }
 
   async listSubtitleTracks(mediaId: string) {
-    return this.request<{
-      id: number | string;
-      codec: string | null;
-      language: string | null;
-      title: string | null;
-      is_default: boolean;
-      is_forced: boolean;
-    }[]>(`/subtitles/${mediaId}/tracks`);
+    return this.request<
+      {
+        id: number | string;
+        codec: string | null;
+        language: string | null;
+        title: string | null;
+        is_default: boolean;
+        is_forced: boolean;
+      }[]
+    >(`/subtitles/${mediaId}/tracks`);
   }
 
-  async editSubtitle(mediaId: string, data: {
-    subtitle_path: string;
-    operation: 'update_text' | 'update_timing' | 'add_entry' | 'delete_entry' | 'split_entry' | 'merge_entries';
-    entry_index?: number;
-    text?: string;
-    start?: number;
-    end?: number;
-  }) {
+  async editSubtitle(
+    mediaId: string,
+    data: {
+      subtitle_path: string;
+      operation:
+        | 'update_text'
+        | 'update_timing'
+        | 'add_entry'
+        | 'delete_entry'
+        | 'split_entry'
+        | 'merge_entries';
+      entry_index?: number;
+      text?: string;
+      start?: number;
+      end?: number;
+    },
+  ) {
     const response = await fetch(this.baseUrl + '/subtitles/' + mediaId + '/edit', {
       method: 'POST',
       headers: {
@@ -1135,12 +1235,15 @@ class ApiClient {
     }
     return response.blob();
   }
-  async syncSubtitles(mediaId: string, data: {
-    subtitle_path: string;
-    offset_seconds?: number;
-    scale?: number;
-    preview?: boolean;
-  }): Promise<Blob | { preview_url: string; offset: number; scale: number }> {
+  async syncSubtitles(
+    mediaId: string,
+    data: {
+      subtitle_path: string;
+      offset_seconds?: number;
+      scale?: number;
+      preview?: boolean;
+    },
+  ): Promise<Blob | { preview_url: string; offset: number; scale: number }> {
     const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/sync`, {
       method: 'POST',
       headers: {
@@ -1160,12 +1263,15 @@ class ApiClient {
     return response.blob();
   }
 
-  async generateVideoPreview(mediaId: string, data: {
-    duration?: number;
-    start?: number;
-    width?: number;
-    fps?: number;
-  }) {
+  async generateVideoPreview(
+    mediaId: string,
+    data: {
+      duration?: number;
+      start?: number;
+      width?: number;
+      fps?: number;
+    },
+  ) {
     const query = new URLSearchParams();
     if (data.duration) query.set('duration', String(data.duration));
     if (data.start) query.set('start', String(data.start));
@@ -1179,13 +1285,16 @@ class ApiClient {
     return response.blob();
   }
 
-  async generateGifPreview(mediaId: string, data: {
-    duration?: number;
-    start?: number;
-    width?: number;
-    fps?: number;
-    quality?: number;
-  }) {
+  async generateGifPreview(
+    mediaId: string,
+    data: {
+      duration?: number;
+      start?: number;
+      width?: number;
+      fps?: number;
+      quality?: number;
+    },
+  ) {
     const query = new URLSearchParams();
     if (data.duration) query.set('duration', String(data.duration));
     if (data.start) query.set('start', String(data.start));
@@ -1200,33 +1309,42 @@ class ApiClient {
     return response.blob();
   }
 
-  async generateThumbnailPreview(mediaId: string, data: {
-    timestamp?: number;
-    width?: number;
-    height?: number;
-    fmt?: string;
-  }) {
+  async generateThumbnailPreview(
+    mediaId: string,
+    data: {
+      timestamp?: number;
+      width?: number;
+      height?: number;
+      fmt?: string;
+    },
+  ) {
     const query = new URLSearchParams();
     if (data.timestamp !== undefined) query.set('timestamp', String(data.timestamp));
     if (data.width !== undefined) query.set('width', String(data.width));
     if (data.height !== undefined) query.set('height', String(data.height));
     if (data.fmt) query.set('fmt', data.fmt);
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/preview/${mediaId}/thumbnail${qs ? `?${qs}` : ''}`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/preview/${mediaId}/thumbnail${qs ? `?${qs}` : ''}`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to generate thumbnail preview');
     return response.blob();
   }
 
-  async generateGif(mediaId: string, data: {
-    start?: number;
-    end?: number;
-    duration?: number;
-    width?: number;
-    fps?: number;
-    quality?: number;
-  }) {
+  async generateGif(
+    mediaId: string,
+    data: {
+      start?: number;
+      end?: number;
+      duration?: number;
+      width?: number;
+      fps?: number;
+      quality?: number;
+    },
+  ) {
     const query = new URLSearchParams();
     if (data.start !== undefined) query.set('start', String(data.start));
     if (data.end !== undefined) query.set('end', String(data.end));
@@ -1272,30 +1390,56 @@ class ApiClient {
   }
 
   async batchProcess(mediaIds: string[], operation: string, options?: Record<string, unknown>) {
-    return this.request<{ job_id: string; total_items: number; operation: string; status: string; results: { media_id: string; filename: string }[] }>('/batch/process', {
+    return this.request<{
+      job_id: string;
+      total_items: number;
+      operation: string;
+      status: string;
+      results: { media_id: string; filename: string }[];
+    }>('/batch/process', {
       method: 'POST',
       body: JSON.stringify({ media_ids: mediaIds, operation, options }),
     });
   }
 
   async getBatchStatus(jobId: string) {
-    return this.request<{ job_id: string; status: string; total: number; completed: number; failed: number; results: { media_id: string; filename: string; status: string; progress: number; error?: string; output_filename?: string }[] }>(`/batch/${jobId}/status`);
+    return this.request<{
+      job_id: string;
+      status: string;
+      total: number;
+      completed: number;
+      failed: number;
+      results: {
+        media_id: string;
+        filename: string;
+        status: string;
+        progress: number;
+        error?: string;
+        output_filename?: string;
+      }[];
+    }>(`/batch/${jobId}/status`);
   }
 
   async listPresets() {
-    return this.request<{
-      id: string;
-      user_id: string | null;
-      name: string;
-      description: string | null;
-      is_builtin: boolean;
-      settings: Record<string, unknown>;
-      created_at: string;
-      updated_at: string;
-    }[]>('/presets');
+    return this.request<
+      {
+        id: string;
+        user_id: string | null;
+        name: string;
+        description: string | null;
+        is_builtin: boolean;
+        settings: Record<string, unknown>;
+        created_at: string;
+        updated_at: string;
+      }[]
+    >('/presets');
   }
 
-  async createPreset(data: { name: string; description?: string; settings: Record<string, unknown> }) {
+  async createPreset(data: {
+    name: string;
+    description?: string;
+    settings: Record<string, unknown>;
+  }) {
     return this.request<{
       id: string;
       user_id: string | null;
@@ -1311,7 +1455,10 @@ class ApiClient {
     });
   }
 
-  async updatePreset(presetId: string, data: { name?: string; description?: string; settings?: Record<string, unknown> }) {
+  async updatePreset(
+    presetId: string,
+    data: { name?: string; description?: string; settings?: Record<string, unknown> },
+  ) {
     return this.request<{
       id: string;
       user_id: string | null;
@@ -1332,19 +1479,25 @@ class ApiClient {
   }
 
   async listWorkflows() {
-    return this.request<{
-      id: string;
-      user_id: string | null;
-      name: string;
-      description: string | null;
-      is_builtin: boolean;
-      operations: { type: string; params: Record<string, unknown> }[];
-      created_at: string;
-      updated_at: string;
-    }[]>('/workflows');
+    return this.request<
+      {
+        id: string;
+        user_id: string | null;
+        name: string;
+        description: string | null;
+        is_builtin: boolean;
+        operations: { type: string; params: Record<string, unknown> }[];
+        created_at: string;
+        updated_at: string;
+      }[]
+    >('/workflows');
   }
 
-  async createWorkflow(data: { name: string; description?: string; operations: { type: string; params?: Record<string, unknown> }[] }) {
+  async createWorkflow(data: {
+    name: string;
+    description?: string;
+    operations: { type: string; params?: Record<string, unknown> }[];
+  }) {
     return this.request<{
       id: string;
       user_id: string | null;
@@ -1373,7 +1526,14 @@ class ApiClient {
     }>(`/workflows/${id}`);
   }
 
-  async updateWorkflow(id: string, data: { name?: string; description?: string; operations?: { type: string; params?: Record<string, unknown> }[] }) {
+  async updateWorkflow(
+    id: string,
+    data: {
+      name?: string;
+      description?: string;
+      operations?: { type: string; params?: Record<string, unknown> }[];
+    },
+  ) {
     return this.request<{
       id: string;
       user_id: string | null;
@@ -1403,14 +1563,16 @@ class ApiClient {
   }
 
   async listMediaVersions(mediaId: string) {
-    return this.request<{
-      id: string;
-      version_number: number;
-      label: string;
-      stored_filename: string;
-      processing_status: string;
-      created_at: string;
-    }[]>(`/media/${mediaId}/versions`);
+    return this.request<
+      {
+        id: string;
+        version_number: number;
+        label: string;
+        stored_filename: string;
+        processing_status: string;
+        created_at: string;
+      }[]
+    >(`/media/${mediaId}/versions`);
   }
 
   async getMediaVersion(mediaId: string, versionId: string) {
@@ -1425,9 +1587,12 @@ class ApiClient {
   }
 
   async getMediaVersionFile(mediaId: string, versionId: string) {
-    const response = await fetch(`${this.baseUrl}/media/${mediaId}/versions/${versionId}/download`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/media/${mediaId}/versions/${versionId}/download`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to fetch version file');
     return response.blob();
   }
@@ -1471,7 +1636,13 @@ class ApiClient {
     }>(`/comparisons/${mediaAId}/${mediaBId}`);
   }
 
-  async createShare(data: { media_id: string; password?: string; expires_in_hours?: number; allow_download?: boolean; allowed_domains?: string }) {
+  async createShare(data: {
+    media_id: string;
+    password?: string;
+    expires_in_hours?: number;
+    allow_download?: boolean;
+    allowed_domains?: string;
+  }) {
     return this.request<{
       id: string;
       media_id: string;
@@ -1505,18 +1676,20 @@ class ApiClient {
   }
 
   async listShares() {
-    return this.request<{
-      id: string;
-      media_id: string;
-      token: string;
-      has_password: boolean;
-      expires_at: string | null;
-      is_active: boolean;
-      allow_download: boolean;
-      view_count: number;
-      allowed_domains: string | null;
-      created_at: string;
-    }[]>('/sharing');
+    return this.request<
+      {
+        id: string;
+        media_id: string;
+        token: string;
+        has_password: boolean;
+        expires_at: string | null;
+        is_active: boolean;
+        allow_download: boolean;
+        view_count: number;
+        allowed_domains: string | null;
+        created_at: string;
+      }[]
+    >('/sharing');
   }
 
   async getEmbed(token: string) {
@@ -1545,17 +1718,19 @@ class ApiClient {
   }
 
   async listHistory() {
-    return this.request<{
-      id: string;
-      media_id: string;
-      operation: string;
-      status: string;
-      settings: string | null;
-      error: string | null;
-      started_at: string | null;
-      finished_at: string | null;
-      created_at: string;
-    }[]>('/history');
+    return this.request<
+      {
+        id: string;
+        media_id: string;
+        operation: string;
+        status: string;
+        settings: string | null;
+        error: string | null;
+        started_at: string | null;
+        finished_at: string | null;
+        created_at: string;
+      }[]
+    >('/history');
   }
 
   async createHistoryEntry(mediaId: string, operation: string, status: string) {
@@ -1569,9 +1744,12 @@ class ApiClient {
       started_at: string | null;
       finished_at: string | null;
       created_at: string;
-    }>(`/history?media_id=${mediaId}&operation=${encodeURIComponent(operation)}&status=${encodeURIComponent(status)}`, {
-      method: 'POST',
-    });
+    }>(
+      `/history?media_id=${mediaId}&operation=${encodeURIComponent(operation)}&status=${encodeURIComponent(status)}`,
+      {
+        method: 'POST',
+      },
+    );
   }
 
   async getStorageUsage() {
@@ -1583,11 +1761,15 @@ class ApiClient {
   }
 
   async getStorageByType() {
-    return this.request<{ media_type: string; total_size: number; count: number }[]>('/storage/usage/by-type');
+    return this.request<{ media_type: string; total_size: number; count: number }[]>(
+      '/storage/usage/by-type',
+    );
   }
 
   async getStorageByFolder() {
-    return this.request<{ folder: string; total_size: number; count: number }[]>('/storage/usage/by-folder');
+    return this.request<{ folder: string; total_size: number; count: number }[]>(
+      '/storage/usage/by-folder',
+    );
   }
 
   async searchMedia(params: {
@@ -1612,24 +1794,22 @@ class ApiClient {
     if (params.max_duration !== undefined) query.set('max_duration', String(params.max_duration));
     if (params.processing_status) query.set('processing_status', params.processing_status);
     const qs = query.toString();
-    return this.request<{
-      id: string;
-      original_filename: string;
-      media_type: string;
-      file_size: number;
-      duration: number | null;
-      processing_status: string;
-      folder: string | null;
-      tags: string | null;
-      created_at: string;
-    }[]>(`/search/media${qs ? `?${qs}` : ''}`);
+    return this.request<
+      {
+        id: string;
+        original_filename: string;
+        media_type: string;
+        file_size: number;
+        duration: number | null;
+        processing_status: string;
+        folder: string | null;
+        tags: string | null;
+        created_at: string;
+      }[]
+    >(`/search/media${qs ? `?${qs}` : ''}`);
   }
 
-  async listNotifications(params?: {
-    page?: number;
-    page_size?: number;
-    unread_only?: boolean;
-  }) {
+  async listNotifications(params?: { page?: number; page_size?: number; unread_only?: boolean }) {
     const query = new URLSearchParams();
     if (params?.page) query.set('page', String(params.page));
     if (params?.page_size) query.set('page_size', String(params.page_size));
@@ -1683,12 +1863,14 @@ class ApiClient {
   }
 
   async listPreferences() {
-    return this.request<{
-      id: string;
-      key: string;
-      value: string;
-      updated_at: string;
-    }[]>('/ui/preferences');
+    return this.request<
+      {
+        id: string;
+        key: string;
+        value: string;
+        updated_at: string;
+      }[]
+    >('/ui/preferences');
   }
 
   async setPreference(key: string, value: string) {
@@ -1704,12 +1886,14 @@ class ApiClient {
   }
 
   async listFavorites() {
-    return this.request<{
-      id: string;
-      media_id: string;
-      user_id: string | null;
-      created_at: string;
-    }[]>('/favorites');
+    return this.request<
+      {
+        id: string;
+        media_id: string;
+        user_id: string | null;
+        created_at: string;
+      }[]
+    >('/favorites');
   }
 
   async addFavorite(mediaId: string) {
@@ -1741,22 +1925,26 @@ class ApiClient {
       media_id: string;
       action_id: string;
       status: string;
-    }>(`/quick-actions/${mediaId}/execute?action_id=${encodeURIComponent(actionId)}`, { method: 'POST' });
+    }>(`/quick-actions/${mediaId}/execute?action_id=${encodeURIComponent(actionId)}`, {
+      method: 'POST',
+    });
   }
 
   async listJobs() {
-    return this.request<{
-      job_id: string;
-      status: string;
-      progress: number;
-      stage: string;
-      result: unknown;
-      error: string | null;
-      media_id: string | null;
-      created_at: string | null;
-      started_at: string | null;
-      finished_at: string | null;
-    }[]>('/jobs');
+    return this.request<
+      {
+        job_id: string;
+        status: string;
+        progress: number;
+        stage: string;
+        result: unknown;
+        error: string | null;
+        media_id: string | null;
+        created_at: string | null;
+        started_at: string | null;
+        finished_at: string | null;
+      }[]
+    >('/jobs');
   }
 
   async getJobStatus(jobId: string) {

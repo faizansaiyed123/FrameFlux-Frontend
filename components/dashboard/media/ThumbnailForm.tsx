@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { api } from '@/lib/api/client';
 import { Loader2 } from 'lucide-react';
 
@@ -47,7 +53,13 @@ export function ThumbnailForm({ mediaId }: Props) {
     <div className="space-y-4">
       <div className="space-y-2">
         <Label>Timestamp (seconds)</Label>
-        <Input type="number" value={timestamp} onChange={(e) => setTimestamp(e.target.value)} min="0" step="0.1" />
+        <Input
+          type="number"
+          value={timestamp}
+          onChange={(e) => setTimestamp(e.target.value)}
+          min="0"
+          step="0.1"
+        />
       </div>
       <div className="space-y-2">
         <Label>Format</Label>

@@ -9,11 +9,31 @@ import { Loader2, Zap, Play, CheckCircle2, XCircle, Clock, AlertCircle } from 'l
 import { cn } from '@/lib/utils';
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
-  queued: { icon: Clock, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', label: 'Queued' },
-  processing: { icon: Loader2, color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', label: 'Processing' },
-  completed: { icon: CheckCircle2, color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300', label: 'Completed' },
-  failed: { icon: XCircle, color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300', label: 'Failed' },
-  direct: { icon: Play, color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300', label: 'Direct API' },
+  queued: {
+    icon: Clock,
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    label: 'Queued',
+  },
+  processing: {
+    icon: Loader2,
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    label: 'Processing',
+  },
+  completed: {
+    icon: CheckCircle2,
+    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    label: 'Completed',
+  },
+  failed: {
+    icon: XCircle,
+    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    label: 'Failed',
+  },
+  direct: {
+    icon: Play,
+    color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+    label: 'Direct API',
+  },
 };
 
 export default function QuickActionsPage() {
@@ -25,7 +45,9 @@ export default function QuickActionsPage() {
   const [mediaId, setMediaId] = useState('');
   const [loading, setLoading] = useState(true);
   const [executing, setExecuting] = useState<string | null>(null);
-  const [executionStatus, setExecutionStatus] = useState<Record<string, { status: string; progress: number; error?: string }>>({});
+  const [executionStatus, setExecutionStatus] = useState<
+    Record<string, { status: string; progress: number; error?: string }>
+  >({});
 
   const fetchQuickActions = useCallback(async () => {
     try {
@@ -47,12 +69,22 @@ export default function QuickActionsPage() {
   const handleExecute = async (actionId: string) => {
     if (!mediaId) return;
     setExecuting(actionId);
-    setExecutionStatus(prev => ({ ...prev, [actionId]: { status: 'processing', progress: 0 } }));
+    setExecutionStatus((prev) => ({ ...prev, [actionId]: { status: 'processing', progress: 0 } }));
     try {
       const result = await api.executeQuickAction(mediaId, actionId);
-      setExecutionStatus(prev => ({ ...prev, [actionId]: { status: result.status, progress: 100 } }));
+      setExecutionStatus((prev) => ({
+        ...prev,
+        [actionId]: { status: result.status, progress: 100 },
+      }));
     } catch (err) {
-      setExecutionStatus(prev => ({ ...prev, [actionId]: { status: 'failed', progress: 0, error: err instanceof Error ? err.message : 'Failed' } }));
+      setExecutionStatus((prev) => ({
+        ...prev,
+        [actionId]: {
+          status: 'failed',
+          progress: 0,
+          error: err instanceof Error ? err.message : 'Failed',
+        },
+      }));
     } finally {
       setExecuting(null);
     }
@@ -64,8 +96,12 @@ export default function QuickActionsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Quick Actions</h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-1">Quickly apply common operations to your media</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Quick Actions
+          </h1>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+            Quickly apply common operations to your media
+          </p>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -79,8 +115,12 @@ export default function QuickActionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Quick Actions</h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Quickly apply common operations to your media</p>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Quick Actions
+        </h1>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          Quickly apply common operations to your media
+        </p>
       </div>
 
       <Card className="border-zinc-200 dark:border-zinc-800">
@@ -99,7 +139,9 @@ export default function QuickActionsPage() {
               onChange={(e) => setMediaId(e.target.value)}
               className="w-full sm:w-96 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Find Media IDs in the Media Library</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Find Media IDs in the Media Library
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -107,18 +149,26 @@ export default function QuickActionsPage() {
       {quickActions && (
         <div className="space-y-8">
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">Video Actions</h2>
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
+              Video Actions
+            </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {quickActions.video.map((action) => (
                 <Card key={action.id} className="border-zinc-200 dark:border-zinc-800">
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-zinc-900 dark:text-zinc-50">{action.label}</span>
-                        <Badge variant="secondary" className="text-xs">Video</Badge>
+                        <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                          {action.label}
+                        </span>
+                        <Badge variant="secondary" className="text-xs">
+                          Video
+                        </Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-zinc-500 dark:text-zinc-400 font-mono">{action.id}</span>
+                        <span className="text-sm text-zinc-500 dark:text-zinc-400 font-mono">
+                          {action.id}
+                        </span>
                       </div>
                       <Button
                         onClick={() => handleExecute(action.id)}
@@ -150,14 +200,16 @@ export default function QuickActionsPage() {
                                 executionStatus[action.id].status === 'failed'
                                   ? 'bg-red-500'
                                   : executionStatus[action.id].status === 'completed'
-                                  ? 'bg-green-500'
-                                  : 'bg-indigo-500'
+                                    ? 'bg-green-500'
+                                    : 'bg-indigo-500',
                               )}
                               style={{ width: `${executionStatus[action.id].progress}%` }}
                             />
                           </div>
                           {executionStatus[action.id].error && (
-                            <p className="text-xs text-red-600 dark:text-red-400">{executionStatus[action.id].error}</p>
+                            <p className="text-xs text-red-600 dark:text-red-400">
+                              {executionStatus[action.id].error}
+                            </p>
                           )}
                         </div>
                       )}
@@ -169,18 +221,26 @@ export default function QuickActionsPage() {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">Audio Actions</h2>
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
+              Audio Actions
+            </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {quickActions.audio.map((action) => (
                 <Card key={action.id} className="border-zinc-200 dark:border-zinc-800">
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium text-zinc-900 dark:text-zinc-50">{action.label}</span>
-                        <Badge variant="secondary" className="text-xs">Audio</Badge>
+                        <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                          {action.label}
+                        </span>
+                        <Badge variant="secondary" className="text-xs">
+                          Audio
+                        </Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-zinc-500 dark:text-zinc-400 font-mono">{action.id}</span>
+                        <span className="text-sm text-zinc-500 dark:text-zinc-400 font-mono">
+                          {action.id}
+                        </span>
                       </div>
                       <Button
                         onClick={() => handleExecute(action.id)}
@@ -212,14 +272,16 @@ export default function QuickActionsPage() {
                                 executionStatus[action.id].status === 'failed'
                                   ? 'bg-red-500'
                                   : executionStatus[action.id].status === 'completed'
-                                  ? 'bg-green-500'
-                                  : 'bg-indigo-500'
+                                    ? 'bg-green-500'
+                                    : 'bg-indigo-500',
                               )}
                               style={{ width: `${executionStatus[action.id].progress}%` }}
                             />
                           </div>
                           {executionStatus[action.id].error && (
-                            <p className="text-xs text-red-600 dark:text-red-400">{executionStatus[action.id].error}</p>
+                            <p className="text-xs text-red-600 dark:text-red-400">
+                              {executionStatus[action.id].error}
+                            </p>
                           )}
                         </div>
                       )}
@@ -232,18 +294,26 @@ export default function QuickActionsPage() {
 
           {quickActions.image && quickActions.image.length > 0 && (
             <div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">Image Actions</h2>
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
+                Image Actions
+              </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {quickActions.image.map((action) => (
                   <Card key={action.id} className="border-zinc-200 dark:border-zinc-800">
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="font-medium text-zinc-900 dark:text-zinc-50">{action.label}</span>
-                          <Badge variant="secondary" className="text-xs">Image</Badge>
+                          <span className="font-medium text-zinc-900 dark:text-zinc-50">
+                            {action.label}
+                          </span>
+                          <Badge variant="secondary" className="text-xs">
+                            Image
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-zinc-500 dark:text-zinc-400 font-mono">{action.id}</span>
+                          <span className="text-sm text-zinc-500 dark:text-zinc-400 font-mono">
+                            {action.id}
+                          </span>
                         </div>
                         <Button
                           onClick={() => handleExecute(action.id)}
@@ -275,14 +345,16 @@ export default function QuickActionsPage() {
                                   executionStatus[action.id].status === 'failed'
                                     ? 'bg-red-500'
                                     : executionStatus[action.id].status === 'completed'
-                                    ? 'bg-green-500'
-                                    : 'bg-indigo-500'
+                                      ? 'bg-green-500'
+                                      : 'bg-indigo-500',
                                 )}
                                 style={{ width: `${executionStatus[action.id].progress}%` }}
                               />
                             </div>
                             {executionStatus[action.id].error && (
-                              <p className="text-xs text-red-600 dark:text-red-400">{executionStatus[action.id].error}</p>
+                              <p className="text-xs text-red-600 dark:text-red-400">
+                                {executionStatus[action.id].error}
+                              </p>
                             )}
                           </div>
                         )}
@@ -300,8 +372,12 @@ export default function QuickActionsPage() {
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
             <Zap className="h-12 w-12 text-zinc-400 mb-4" />
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">No quick actions available</h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Check back later or contact support</p>
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
+              No quick actions available
+            </h3>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              Check back later or contact support
+            </p>
           </CardContent>
         </Card>
       )}
