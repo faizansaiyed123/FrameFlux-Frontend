@@ -11,8 +11,14 @@ function DashboardSkeleton() {
   return (
     <div className="space-y-7">
       <div>
-        <div className="h-8 w-36 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-        <div className="mt-2 h-4 w-72 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
+        <div className={`
+          h-8 w-36 animate-pulse rounded-lg bg-zinc-200
+          dark:bg-zinc-800
+        `} />
+        <div className={`
+          mt-2 h-4 w-72 animate-pulse rounded bg-zinc-200
+          dark:bg-zinc-800
+        `} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -27,9 +33,15 @@ function DashboardSkeleton() {
             <div className="flex justify-between">
               <div>
                 <div className="h-3 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-800" />
-                <div className="mt-4 h-9 w-16 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
+                <div className={`
+                  mt-4 h-9 w-16 animate-pulse rounded-lg bg-zinc-200
+                  dark:bg-zinc-800
+                `} />
               </div>
-              <div className="h-11 w-11 animate-pulse rounded-xl bg-zinc-200 dark:bg-zinc-800" />
+              <div className={`
+                h-11 w-11 animate-pulse rounded-xl bg-zinc-200
+                dark:bg-zinc-800
+              `} />
             </div>
           </div>
         ))}
@@ -49,7 +61,10 @@ function DashboardSkeleton() {
               {[1, 2, 3].map((j) => (
                 <div
                   key={j}
-                  className="h-14 w-full animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800/70"
+                  className={`
+                    h-14 w-full animate-pulse rounded-xl bg-zinc-100
+                    dark:bg-zinc-800/70
+                  `}
                 />
               ))}
             </div>
@@ -89,7 +104,10 @@ export default function DashboardPage() {
     return (
       <div className="space-y-7">
         <div>
-          <h1 className="text-3xl font-semibold tracking-[-0.04em] text-zinc-950 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-semibold tracking-[-0.04em] text-zinc-950
+            dark:text-zinc-50
+          `}>
             Dashboard
           </h1>
           <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
@@ -110,7 +128,10 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-7">
-      <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+      <header className={`
+        flex flex-col gap-2 sm:flex-row sm:items-end
+        sm:justify-between
+      `}>
         <div>
           <p className={`
             text-[11px] font-semibold uppercase tracking-[0.16em]
