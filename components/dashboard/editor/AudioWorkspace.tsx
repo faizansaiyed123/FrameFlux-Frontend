@@ -285,13 +285,19 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
+      <div className={`
+        flex items-center justify-between border-b border-zinc-200
+        dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2
+      `}>
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px] sm:max-w-[400px]">
+            <h1 className={`
+              text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate
+              max-w-[200px] sm:max-w-[400px]
+            `}>
               {media.original_filename}
             </h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">Audio Editor</p>
@@ -329,7 +335,11 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
           <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
             <div className="w-full max-w-2xl px-4">
               <div className="flex items-center gap-4 mb-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                <div className={`
+                  flex h-16 w-16 items-center justify-center rounded-full
+                  bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                  dark:text-indigo-400
+                `}>
                   <Music className="h-8 w-8" />
                 </div>
                 <div>
@@ -341,7 +351,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
               </div>
               <canvas
                 ref={waveformRef}
-                className="w-full h-24 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer"
+                className={`
+                  w-full h-24 rounded-lg border border-zinc-200
+                  dark:border-zinc-700 cursor-pointer
+                `}
                 onClick={(e) => {
                   const canvas = waveformRef.current;
                   if (!canvas || duration <= 0) return;
@@ -354,7 +367,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
             </div>
           </div>
 
-          <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
+          <div className={`
+            border-t border-zinc-200 dark:border-zinc-800 bg-white
+            dark:bg-zinc-900 px-4 py-2
+          `}>
             <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
@@ -409,9 +425,15 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
           </div>
         </div>
 
-        <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
+        <div className={`
+          w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white
+          dark:bg-zinc-900 overflow-y-auto
+        `}>
           <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+            <h2 className={`
+              text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase
+              tracking-wider mb-2
+            `}>
               Audio Tools
             </h2>
             <div className="grid grid-cols-3 gap-1.5">
@@ -429,7 +451,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                     onClick={() => setActiveTool(isActive ? null : tool.id)}
                     className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
                       isActive
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                        ? `
+                          border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                          text-indigo-700 dark:text-indigo-300
+                        `
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                     }`}
                   >
@@ -585,7 +610,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
       {error && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+          <Alert className={`
+            border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+            text-red-700 dark:text-red-300
+          `}>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -593,7 +621,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
       )}
       {success && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+          <Alert className={`
+            border-green-200 dark:border-green-900 bg-green-50
+            dark:bg-green-900/20 text-green-700 dark:text-green-300
+          `}>
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>
           </Alert>
