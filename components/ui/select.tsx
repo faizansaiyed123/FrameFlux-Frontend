@@ -183,7 +183,10 @@ function SelectSeparator({
     <SelectPrimitive.Separator
       data-slot="select-separator"
       className={cn(
-        'pointer-events-none -mx-0.5 my-1.5 h-px bg-zinc-100 dark:bg-zinc-800',
+        `
+          pointer-events-none -mx-0.5 my-1.5 h-px bg-zinc-100
+          dark:bg-zinc-800
+        `,
         className,
       )}
       {...props}
@@ -199,7 +202,10 @@ function SelectScrollUpButton({
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
       className={cn(
-        'flex cursor-default items-center justify-center py-1 text-zinc-400',
+        `
+          flex cursor-default items-center justify-center py-1
+          text-zinc-400
+        `,
         className,
       )}
       {...props}
@@ -217,7 +223,10 @@ function SelectScrollDownButton({
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
       className={cn(
-        'flex cursor-default items-center justify-center py-1 text-zinc-400',
+        `
+          flex cursor-default items-center justify-center py-1
+          text-zinc-400
+        `,
         className,
       )}
       {...props}
