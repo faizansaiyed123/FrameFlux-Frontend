@@ -60,7 +60,10 @@ export function MediaInfoSection({ mediaId }: Props) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">File</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+          <p className={`
+            text-sm font-medium text-zinc-900 dark:text-zinc-50
+            truncate
+          `}>
             {info.file_name}
           </p>
         </div>
