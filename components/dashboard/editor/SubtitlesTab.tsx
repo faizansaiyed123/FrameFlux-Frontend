@@ -215,7 +215,10 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
           className={`relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
             dragActive
               ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
-              : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
+              : `
+                border-zinc-300 dark:border-zinc-700 hover:border-zinc-400
+                dark:hover:border-zinc-600
+              `
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
