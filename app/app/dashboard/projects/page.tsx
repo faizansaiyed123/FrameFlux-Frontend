@@ -174,7 +174,10 @@ export default function ProjectsPage() {
       {projects.length === 0 ? (
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
+            <div className={`
+              flex h-16 w-16 items-center justify-center rounded-lg
+              bg-zinc-100 dark:bg-zinc-800 mb-4
+            `}>
               <FolderOpen className="h-8 w-8 text-zinc-400" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
@@ -194,12 +197,19 @@ export default function ProjectsPage() {
           {projects.map((project) => (
             <Card
               key={project.id}
-              className="border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+              className={`
+                border-zinc-200 dark:border-zinc-800 hover:border-zinc-300
+                dark:hover:border-zinc-700 transition-colors
+              `}
             >
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+                    <div className={`
+                      flex h-10 w-10 items-center justify-center rounded-lg
+                      bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                      dark:text-indigo-400
+                    `}>
                       <FolderOpen className="h-5 w-5" />
                     </div>
                     <div>
@@ -237,7 +247,10 @@ export default function ProjectsPage() {
               <CardContent>
                 <Link
                   href={`/app/dashboard/projects/${project.id}`}
-                  className="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className={`
+                    inline-flex items-center text-sm text-indigo-600
+                    dark:text-indigo-400 hover:underline
+                  `}
                 >
                   Open project
                   <MoreHorizontal className="ml-1 h-4 w-4 rotate-90" />
