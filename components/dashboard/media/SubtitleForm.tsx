@@ -378,7 +378,10 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
   return (
     <div className="space-y-4">
       {error && (
-        <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+        <Alert className={`
+          border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+          text-red-700 dark:text-red-300
+        `}>
           <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
@@ -446,7 +449,10 @@ export function SubtitleForm({ mediaId, onProcessed }: Props) {
             className={`relative border-2 border-dashed rounded-lg p-3 text-center cursor-pointer transition-colors ${
               dragActive
                 ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
-                : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600'
+                : `
+                  border-zinc-300 dark:border-zinc-700 hover:border-zinc-400
+                  dark:hover:border-zinc-600
+                `
             }`}
             onDragEnter={(e) => {
               e.preventDefault();
