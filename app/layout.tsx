@@ -18,8 +18,10 @@ export const metadata: Metadata = {
     default: 'FrameFlux — Video Processing API for Developers',
     template: '%s | FrameFlux',
   },
-  description:
-    'Professional video transcoding, editing, and processing REST API. Resumable uploads, real-time progress, composable operations. Start free.',
+  description: [
+    'Professional video transcoding, editing, and processing REST API.',
+    'Resumable uploads, real-time progress, composable operations. Start free.',
+  ].join(' '),
   keywords: [
     'video api',
     'transcoding',
