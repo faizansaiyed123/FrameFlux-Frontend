@@ -167,7 +167,10 @@ export default function ComparisonsPage() {
               <div className="space-y-2">
                 <Label>File A Details</Label>
                 {mediaAData ? (
-                  <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30 space-y-2">
+                  <div className={`
+                    p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
+                    bg-zinc-50 dark:bg-zinc-900/30 space-y-2
+                  `}>
                     <p className="text-sm font-medium truncate">{mediaAData.original_filename}</p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {formatFileSize(mediaAData.file_size)}
@@ -195,7 +198,11 @@ export default function ComparisonsPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30 text-center text-zinc-500 dark:text-zinc-400">
+                  <div className={`
+                    p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
+                    bg-zinc-50 dark:bg-zinc-900/30 text-center text-zinc-500
+                    dark:text-zinc-400
+                  `}>
                     Select a file
                   </div>
                 )}
@@ -206,7 +213,10 @@ export default function ComparisonsPage() {
               <div className="space-y-2">
                 <Label>File B Details</Label>
                 {mediaBData ? (
-                  <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30 space-y-2">
+                  <div className={`
+                    p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
+                    bg-zinc-50 dark:bg-zinc-900/30 space-y-2
+                  `}>
                     <p className="text-sm font-medium truncate">{mediaBData.original_filename}</p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {formatFileSize(mediaBData.file_size)}
@@ -234,7 +244,11 @@ export default function ComparisonsPage() {
                     )}
                   </div>
                 ) : (
-                  <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30 text-center text-zinc-500 dark:text-zinc-400">
+                  <div className={`
+                    p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
+                    bg-zinc-50 dark:bg-zinc-900/30 text-center text-zinc-500
+                    dark:text-zinc-400
+                  `}>
                     Select a file
                   </div>
                 )}
@@ -242,7 +256,10 @@ export default function ComparisonsPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
+          <div className={`
+            flex items-center justify-center gap-4 pt-4 border-t
+            border-zinc-200 dark:border-zinc-800
+          `}>
             <Button
               onClick={handleCompare}
               disabled={comparing || !mediaA || !mediaB || mediaA === mediaB}
@@ -372,13 +389,28 @@ function ComparisonCard({
   color: string;
 }) {
   const colorMap: Record<string, string> = {
-    red: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900 text-red-700 dark:text-red-300',
+    red: `
+      bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900
+      text-red-700 dark:text-red-300
+    `,
     green:
-      'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-900 text-green-700 dark:text-green-300',
-    blue: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-900 text-blue-700 dark:text-blue-300',
-    gray: 'bg-zinc-50 dark:bg-zinc-900/20 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300',
+      `
+        bg-green-50 dark:bg-green-900/20 border-green-200
+        dark:border-green-900 text-green-700 dark:text-green-300
+      `,
+    blue: `
+      bg-blue-50 dark:bg-blue-900/20 border-blue-200
+      dark:border-blue-900 text-blue-700 dark:text-blue-300
+    `,
+    gray: `
+      bg-zinc-50 dark:bg-zinc-900/20 border-zinc-200
+      dark:border-zinc-800 text-zinc-700 dark:text-zinc-300
+    `,
     indigo:
-      'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-900 text-indigo-700 dark:text-indigo-300',
+      `
+        bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200
+        dark:border-indigo-900 text-indigo-700 dark:text-indigo-300
+      `,
   };
 
   return (
@@ -400,7 +432,10 @@ function ComparisonRow({
   details: string;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 rounded-lg border border-zinc-200 dark:border-zinc-800">
+    <div className={`
+      flex items-center justify-between p-4 rounded-lg border
+      border-zinc-200 dark:border-zinc-800
+    `}>
       <div className="flex items-center gap-3">
         <div
           className={`flex h-8 w-8 items-center justify-center rounded-full ${match ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}
