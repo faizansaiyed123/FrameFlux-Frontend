@@ -22,27 +22,42 @@ import { cn } from '@/lib/utils';
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
   queued: {
     icon: Clock,
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    color: `
+      bg-blue-100 text-blue-700 dark:bg-blue-900/30
+      dark:text-blue-300
+    `,
     label: 'Queued',
   },
   started: {
     icon: Play,
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    color: `
+      bg-amber-100 text-amber-700 dark:bg-amber-900/30
+      dark:text-amber-300
+    `,
     label: 'Started',
   },
   running: {
     icon: Loader2,
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    color: `
+      bg-amber-100 text-amber-700 dark:bg-amber-900/30
+      dark:text-amber-300
+    `,
     label: 'Running',
   },
   complete: {
     icon: CheckCircle2,
-    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    color: `
+      bg-green-100 text-green-700 dark:bg-green-900/30
+      dark:text-green-300
+    `,
     label: 'Complete',
   },
   failed: {
     icon: XCircle,
-    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    color: `
+      bg-red-100 text-red-700 dark:bg-red-900/30
+      dark:text-red-300
+    `,
     label: 'Failed',
   },
 };
@@ -97,7 +112,10 @@ export default function JobsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Jobs
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -117,7 +135,10 @@ export default function JobsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Jobs
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -131,7 +152,10 @@ export default function JobsPage() {
       </div>
 
       {error && (
-        <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20">
+        <Card className={`
+          border-red-200 dark:border-red-900 bg-red-50
+          dark:bg-red-900/20
+        `}>
           <CardContent className="p-6">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -143,7 +167,10 @@ export default function JobsPage() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+          <Search className={`
+            absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+            text-zinc-400
+          `} />
           <Input
             placeholder="Search jobs..."
             value={search}
@@ -209,7 +236,10 @@ export default function JobsPage() {
                       </div>
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">{job.stage}</p>
                       <div className="w-64">
-                        <div className="h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                        <div className={`
+                          h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
+                          overflow-hidden
+                        `}>
                           <div
                             className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all"
                             style={{ width: `${job.progress}%` }}
