@@ -68,7 +68,10 @@ export function ToolPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
-        <h2 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+        <h2 className={`
+          text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase
+          tracking-wider mb-2
+        `}>
           Tools
         </h2>
         <div className="space-y-2">
@@ -83,7 +86,10 @@ export function ToolPanel({
                     onClick={() => onSelectTool(isActive ? tool.id : tool.id)}
                     className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
                       isActive
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                        ? `
+                          border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                          text-indigo-700 dark:text-indigo-300
+                        `
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                     }`}
                   >
@@ -105,7 +111,10 @@ export function ToolPanel({
                     onClick={() => onSelectTool(isActive ? tool.id : tool.id)}
                     className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
                       isActive
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                        ? `
+                          border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                          text-indigo-700 dark:text-indigo-300
+                        `
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                     }`}
                   >
