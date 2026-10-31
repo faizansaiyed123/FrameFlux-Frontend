@@ -112,9 +112,15 @@ export default function NotificationsPage() {
         </div>
       )}
 
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className={`
+        flex flex-col gap-4 md:flex-row md:items-center
+        md:justify-between
+      `}>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Notifications
           </h1>
           <p className="mt-1 text-zinc-600 dark:text-zinc-400">
