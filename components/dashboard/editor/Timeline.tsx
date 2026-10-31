@@ -117,7 +117,10 @@ export function Timeline({
       markers.push(
         <div
           key={i}
-          className="absolute top-0 h-full border-l border-zinc-200 dark:border-zinc-700"
+          className={`
+            absolute top-0 h-full border-l border-zinc-200
+            dark:border-zinc-700
+          `}
           style={{ left: `${(i / safeDuration) * 100}%` }}
         >
           <span className="absolute top-1 left-1 text-[10px] text-zinc-400 font-mono">
@@ -131,7 +134,10 @@ export function Timeline({
 
   if (duration <= 0 || isNaN(duration)) {
     return (
-      <div className="flex h-full items-center justify-center text-xs text-zinc-400">
+      <div className={`
+        flex h-full items-center justify-center text-xs
+        text-zinc-400
+      `}>
         Loading timeline...
       </div>
     );
@@ -153,7 +159,10 @@ export function Timeline({
 
       <div
         ref={timelineRef}
-        className="flex-1 relative overflow-x-auto overflow-y-hidden cursor-crosshair"
+        className={`
+          flex-1 relative overflow-x-auto overflow-y-hidden
+          cursor-crosshair
+        `}
         onClick={handleTimelineClick}
       >
         <div className="relative h-full min-w-full" style={{ width: timelineWidth }}>
@@ -185,8 +194,14 @@ export function Timeline({
                   }}
                   onMouseDown={(e) => handleClipMouseDown(e, clip)}
                 >
-                  <div className="px-2 py-1 h-full flex flex-col justify-between overflow-hidden">
-                    <span className="text-[10px] font-medium text-zinc-700 dark:text-zinc-200 truncate">
+                  <div className={`
+                    px-2 py-1 h-full flex flex-col justify-between
+                    overflow-hidden
+                  `}>
+                    <span className={`
+                      text-[10px] font-medium text-zinc-700 dark:text-zinc-200
+                      truncate
+                    `}>
                       {clip.name}
                     </span>
                     <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
@@ -212,10 +227,16 @@ export function Timeline({
             })}
 
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-20 pointer-events-none"
+              className={`
+                absolute top-0 bottom-0 w-0.5 bg-red-500 z-20
+                pointer-events-none
+              `}
               style={{ left: playheadPosition }}
             >
-              <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-500 rotate-45" />
+              <div className={`
+                absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3
+                bg-red-500 rotate-45
+              `} />
             </div>
           </div>
         </div>
