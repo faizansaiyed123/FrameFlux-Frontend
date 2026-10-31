@@ -10,8 +10,14 @@ import { cn } from '@/lib/utils';
 const statusColors: Record<string, string> = {
   pending: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300',
   queued: 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
-  processing: 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300',
-  completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300',
+  processing: `
+    bg-amber-50 text-amber-700 dark:bg-amber-950/50
+    dark:text-amber-300
+  `,
+  completed: `
+    bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50
+    dark:text-emerald-300
+  `,
   failed: 'bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300',
 };
 
@@ -39,10 +45,15 @@ export function RecentMedia({ media }: RecentMediaProps) {
         border-zinc-100 px-5 py-5 dark:border-zinc-800/80 sm:px-6
       `}>
         <div>
-          <CardTitle className="text-base font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+          <CardTitle className={`
+            text-base font-semibold tracking-tight text-zinc-950
+            dark:text-zinc-50
+          `}>
             Recent Media
           </CardTitle>
-          <p className="mt-1 text-xs text-zinc-400">Latest files in your workspace</p>
+          <p className={`
+            mt-1 text-xs text-zinc-400
+          `}>Latest files in your workspace</p>
         </div>
         <Link
           href="/app/dashboard/media"
@@ -76,7 +87,9 @@ export function RecentMedia({ media }: RecentMediaProps) {
             <p className="mt-1 max-w-xs text-xs leading-5 text-zinc-400">
               Upload a video, audio file, image, or subtitle to start working.
             </p>
-            <Button size="sm" className="mt-5 cursor-pointer rounded-lg" asChild>
+            <Button size="sm" className={`
+              mt-5 cursor-pointer rounded-lg
+            `} asChild>
               <Link href="/app/dashboard/media">
                 <Plus className="mr-2 h-4 w-4" />
                 Upload media
@@ -107,10 +120,15 @@ export function RecentMedia({ media }: RecentMediaProps) {
                     <Film className="h-[18px] w-[18px]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="max-w-[260px] truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    <p className={`
+                      max-w-[260px] truncate text-sm font-semibold text-zinc-900
+                      dark:text-zinc-50
+                    `}>
                       {item.original_filename}
                     </p>
-                    <p className="mt-0.5 truncate text-xs text-zinc-400 dark:text-zinc-500">
+                    <p className={`
+                      mt-0.5 truncate text-xs text-zinc-400 dark:text-zinc-500
+                    `}>
                       {formatFileSize(item.file_size)} <span className="px-1">•</span>{' '}
                       {item.mime_type}
                     </p>
