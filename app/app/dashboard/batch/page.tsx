@@ -175,7 +175,9 @@ export default function BatchPage() {
                             ? `${(media.file_size / 1024 / 1024).toFixed(1)} MB`
                             : 'Unknown size'}
                           {media.duration
-                            ? ` • ${Math.floor(media.duration / 60)}:${(media.duration % 60).toFixed(0).padStart(2, '0')}`
+                            ? ` • ${Math.floor(media.duration / 60)}:${(media.duration % 60)
+                                .toFixed(0)
+                                .padStart(2, '0')}`
                             : ''}
                         </p>
                       </div>
