@@ -68,7 +68,10 @@ export function StatsCards({ overview }: StatsCardsProps) {
                 `}>
                   {card.title}
                 </p>
-                <p className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-zinc-950 dark:text-zinc-50">
+                <p className={`
+                  mt-3 text-3xl font-semibold tracking-[-0.04em] text-zinc-950
+                  dark:text-zinc-50
+                `}>
                   {card.value}
                 </p>
               </div>
