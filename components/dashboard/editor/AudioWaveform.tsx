@@ -76,7 +76,10 @@ export function AudioWaveform({ duration, currentTime, onSeek }: AudioWaveformPr
   );
 
   return (
-    <div className="w-full h-16 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800">
+    <div className={`
+      w-full h-16 border-t border-zinc-200 dark:border-zinc-800
+      bg-zinc-50 dark:bg-zinc-800
+    `}>
       <canvas ref={canvasRef} className="w-full h-full cursor-pointer" onClick={handleClick} />
     </div>
   );
