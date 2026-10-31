@@ -181,7 +181,10 @@ export default function MediaPage() {
   }, [search, mediaType, folder, tag]);
 
   useEffect(() => {
-    fetchMedia();
+    const timer = window.setTimeout(() => {
+      void fetchMedia();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchMedia]);
 
   const handleUpload = async () => {
