@@ -481,7 +481,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
             `}>
               {media.original_filename}
             </h1>
-            <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-400">
+            <div className={`
+              flex items-center gap-2 text-[10px] text-zinc-500
+              dark:text-zinc-400
+            `}>
               <span>{media.mime_type}</span>
               {media.duration && <span>{formatTime(media.duration)}</span>}
               {media.width && media.height && (
@@ -534,9 +537,15 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       </div>
       <div className="flex flex-1 overflow-y-auto flex-col lg:flex-row">
         <div className="flex flex-1 flex-col min-w-0">
-          <div className="flex-1 bg-black flex items-center justify-center relative min-h-[120px]">
+          <div className={`
+            flex-1 bg-black flex items-center justify-center
+            relative min-h-[120px]
+          `}>
             {loadingVideo && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
+              <div className={`
+                absolute inset-0 flex items-center justify-center
+                bg-black/80 z-10
+              `}>
                 <div className="text-center">
                   <Loader2 className="h-8 w-8 animate-spin text-indigo-400 mx-auto mb-3" />
                   <p className="text-xs text-zinc-300">Loading video...</p>
@@ -556,7 +565,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               />
             )}
             {error && !loadingVideo && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+              <div className={`
+                absolute inset-0 flex items-center justify-center
+                bg-black/80
+              `}>
                 <div className="text-center p-6">
                   <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
                   <p className="text-sm text-red-300">{error}</p>
@@ -593,7 +605,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               >
                 <SkipForward className="h-4 w-4" />
               </Button>
-              <span className="text-[11px] text-zinc-500 dark:text-zinc-400 font-mono min-w-[90px]">
+              <span className={`
+                text-[11px] text-zinc-500 dark:text-zinc-400 font-mono
+                min-w-[90px]
+              `}>
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
               <div className="flex-1" />
@@ -663,7 +678,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
             border-t border-zinc-200 dark:border-zinc-800 bg-white
             dark:bg-zinc-900 flex-shrink-0
           `}>
-            <div className="flex overflow-x-auto border-b border-zinc-200 dark:border-zinc-800">
+            <div className={`
+              flex overflow-x-auto border-b border-zinc-200
+              dark:border-zinc-800
+            `}>
               {toolTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -677,7 +695,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
                         whitespace-nowrap transition-colors
                       `,
                       isActive
-                        ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500'
+                        ? `
+                          text-indigo-600 dark:text-indigo-400 border-b-2
+                          border-indigo-500
+                        `
                         : 'text-zinc-500 dark:text-zinc-400',
                     )}
                   >
@@ -1040,7 +1061,10 @@ function ResultOverlay({
   onDownload: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+    <div className={`
+      fixed inset-0 z-50 flex items-center justify-center
+      bg-black/70 p-4
+    `}>
       <div className={`
         bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6
         max-h-[90vh] overflow-y-auto
@@ -1056,7 +1080,10 @@ function ResultOverlay({
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <div className="bg-black rounded-lg overflow-hidden mb-4 flex items-center justify-center h-64">
+        <div className={`
+          bg-black rounded-lg overflow-hidden mb-4 flex
+          items-center justify-center h-64
+        `}>
           <video src={url} controls className="max-h-full max-w-full" />
         </div>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">{filename}</p>
