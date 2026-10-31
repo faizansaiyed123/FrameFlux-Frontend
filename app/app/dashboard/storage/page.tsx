@@ -61,7 +61,10 @@ export default function StoragePage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className={`
+          text-3xl font-bold tracking-tight text-zinc-900
+          dark:text-zinc-50
+        `}>
           Storage
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">Monitor your storage usage</p>
@@ -112,7 +115,10 @@ export default function StoragePage() {
                       <span className="text-sm text-zinc-500 dark:text-zinc-400">
                         {item.count} files
                       </span>
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24 text-right">
+                      <span className={`
+                        text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24
+                        text-right
+                      `}>
                         {formatBytes(item.total_size)}
                       </span>
                     </div>
@@ -123,7 +129,10 @@ export default function StoragePage() {
           </CardContent>
         </Card>
 
-        <Card className="border-zinc-200 dark:border-zinc-800 sm:col-span-2 lg:col-span-3">
+        <Card className={`
+          border-zinc-200 dark:border-zinc-800 sm:col-span-2
+          lg:col-span-3
+        `}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
@@ -142,7 +151,10 @@ export default function StoragePage() {
                       <span className="text-sm text-zinc-500 dark:text-zinc-400">
                         {item.count} files
                       </span>
-                      <span className="text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24 text-right">
+                      <span className={`
+                        text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24
+                        text-right
+                      `}>
                         {formatBytes(item.total_size)}
                       </span>
                     </div>
