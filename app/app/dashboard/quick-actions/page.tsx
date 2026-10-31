@@ -137,7 +137,12 @@ export default function QuickActionsPage() {
               placeholder="Enter Media ID"
               value={mediaId}
               onChange={(e) => setMediaId(e.target.value)}
-              className="w-full sm:w-96 px-3 py-2 border border-zinc-300 dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className={`
+                w-full sm:w-96 px-3 py-2 border border-zinc-300
+                dark:border-zinc-600 rounded-md bg-white dark:bg-zinc-900
+                text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2
+                focus:ring-indigo-500
+              `}
             />
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
               Find Media IDs in the Media Library
