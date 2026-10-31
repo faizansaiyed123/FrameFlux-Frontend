@@ -448,7 +448,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col">
       {fromUpload && (
-        <div className="flex items-center gap-3 rounded-b-lg border-b border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 px-4 py-2">
+        <div className={`
+          flex items-center gap-3 rounded-b-lg border-b border-green-200
+          dark:border-green-900 bg-green-50 dark:bg-green-900/20 px-4 py-2
+        `}>
           <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
           <p className="text-xs font-medium text-green-700 dark:text-green-300">
             Media uploaded successfully
@@ -463,13 +466,19 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
           </Button>
         </div>
       )}
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2">
+      <div className={`
+        flex items-center justify-between border-b border-zinc-200
+        dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2
+      `}>
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="min-w-0">
-            <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate max-w-[120px] sm:max-w-[260px]">
+            <h1 className={`
+              text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate
+              max-w-[120px] sm:max-w-[260px]
+            `}>
               {media.original_filename}
             </h1>
             <div className="flex items-center gap-2 text-[10px] text-zinc-500 dark:text-zinc-400">
@@ -555,7 +564,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               </div>
             )}
           </div>
-          <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-1.5">
+          <div className={`
+            border-t border-zinc-200 dark:border-zinc-800 bg-white
+            dark:bg-zinc-900 px-3 py-1.5
+          `}>
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -612,7 +624,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               </div>
             </div>
           </div>
-          <div className="h-44 sm:h-48 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex-shrink-0">
+          <div className={`
+            h-44 sm:h-48 border-t border-zinc-200 dark:border-zinc-800
+            bg-white dark:bg-zinc-900 flex-shrink-0
+          `}>
             <Timeline
               clips={clips}
               selectedClipId={selectedClipId}
@@ -630,15 +645,24 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
             />
           </div>
           {hasAudio && (
-            <div className="h-14 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex-shrink-0">
-              <div className="px-3 py-1 text-[10px] font-medium text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
+            <div className={`
+              h-14 border-t border-zinc-200 dark:border-zinc-800 bg-white
+              dark:bg-zinc-900 flex-shrink-0
+            `}>
+              <div className={`
+                px-3 py-1 text-[10px] font-medium text-zinc-500
+                dark:text-zinc-400 flex items-center gap-1
+              `}>
                 <Music className="h-3 w-3" />
                 Audio Track
               </div>
               <AudioTrack duration={duration} currentTime={currentTime} onSeek={handleSeek} />
             </div>
           )}
-          <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex-shrink-0">
+          <div className={`
+            border-t border-zinc-200 dark:border-zinc-800 bg-white
+            dark:bg-zinc-900 flex-shrink-0
+          `}>
             <div className="flex overflow-x-auto border-b border-zinc-200 dark:border-zinc-800">
               {toolTabs.map((tab) => {
                 const Icon = tab.icon;
@@ -648,7 +672,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
                     key={tab.id}
                     onClick={() => setActiveTab(isActive ? null : tab.id)}
                     className={cn(
-                      'flex items-center gap-1 px-3 py-2 text-[11px] font-medium whitespace-nowrap transition-colors',
+                      `
+                        flex items-center gap-1 px-3 py-2 text-[11px] font-medium
+                        whitespace-nowrap transition-colors
+                      `,
                       isActive
                         ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-500'
                         : 'text-zinc-500 dark:text-zinc-400',
@@ -693,7 +720,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       </div>
       {error && !success && (
         <div className="fixed bottom-4 right-4 z-50 max-w-sm">
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+          <Alert className={`
+            border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+            text-red-700 dark:text-red-300
+          `}>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -701,7 +731,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       )}
       {success && (
         <div className="fixed bottom-4 right-4 z-50 max-w-sm">
-          <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+          <Alert className={`
+            border-green-200 dark:border-green-900 bg-green-50
+            dark:bg-green-900/20 text-green-700 dark:text-green-300
+          `}>
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>
           </Alert>
@@ -1008,7 +1041,10 @@ function ResultOverlay({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+      <div className={`
+        bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6
+        max-h-[90vh] overflow-y-auto
+      `}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-green-600" />
