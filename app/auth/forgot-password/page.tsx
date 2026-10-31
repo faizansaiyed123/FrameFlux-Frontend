@@ -110,7 +110,10 @@ export default function ForgotPasswordPage() {
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                <Mail className={`
+                  absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+                  text-zinc-400
+                `} />
                 <Input
                   id="email"
                   type="email"
@@ -141,7 +144,10 @@ export default function ForgotPasswordPage() {
             Remember your password?{' '}
             <Link
               href="/auth/login"
-              className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+              className={`
+                text-indigo-600 dark:text-indigo-400 font-medium
+                hover:underline
+              `}
             >
               Sign in
             </Link>
