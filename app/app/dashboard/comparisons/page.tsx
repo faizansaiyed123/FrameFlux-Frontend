@@ -449,7 +449,10 @@ function ComparisonRow({
           ].join(' ')}
         >
           <span
-            className={`text-sm font-medium ${match ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}
+            className={[
+              'text-sm font-medium',
+              match ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300',
+            ].join(' ')}
           >
             {match ? '✓' : '✗'}
           </span>
