@@ -168,12 +168,18 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mb-4">
+              <Alert className={`
+                border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+                text-red-700 dark:text-red-300 mb-4
+              `}>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {success && (
-              <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4">
+              <Alert className={`
+                border-green-200 dark:border-green-900 bg-green-50
+                dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4
+              `}>
                 <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
@@ -219,12 +225,18 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mb-4">
+              <Alert className={`
+                border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+                text-red-700 dark:text-red-300 mb-4
+              `}>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {success && (
-              <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4">
+              <Alert className={`
+                border-green-200 dark:border-green-900 bg-green-50
+                dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4
+              `}>
                 <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
@@ -247,7 +259,10 @@ export default function SettingsPage() {
                   <button
                     type="button"
                     onClick={() => setShowPasswords(!showPasswords)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+                    className={`
+                      absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400
+                      hover:text-zinc-600 dark:hover:text-zinc-300
+                    `}
                     aria-label={showPasswords ? 'Hide password' : 'Show password'}
                   >
                     {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -315,12 +330,18 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 mb-4">
+              <Alert className={`
+                border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+                text-red-700 dark:text-red-300 mb-4
+              `}>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
             {success && (
-              <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4">
+              <Alert className={`
+                border-green-200 dark:border-green-900 bg-green-50
+                dark:bg-green-900/20 text-green-700 dark:text-green-300 mb-4
+              `}>
                 <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
