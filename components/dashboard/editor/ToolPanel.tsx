@@ -85,9 +85,15 @@ export function ToolPanel({
                     key={tool.id}
                     onClick={() => onSelectTool(isActive ? tool.id : tool.id)}
                     className={[
-                      'flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors',
+                      `
+                        flex flex-col items-center gap-1 rounded-md border p-1.5
+                        text-center transition-colors
+                      `,
                       isActive
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                        ? `
+                          border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                          text-indigo-700 dark:text-indigo-300
+                        `
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300',
                     ].join(' ')}
                   >
@@ -108,9 +114,15 @@ export function ToolPanel({
                     key={tool.id}
                     onClick={() => onSelectTool(isActive ? tool.id : tool.id)}
                     className={[
-                      'flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors',
+                      `
+                        flex flex-col items-center gap-1 rounded-md border p-1.5
+                        text-center transition-colors
+                      `,
                       isActive
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                        ? `
+                          border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                          text-indigo-700 dark:text-indigo-300
+                        `
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300',
                     ].join(' ')}
                   >
