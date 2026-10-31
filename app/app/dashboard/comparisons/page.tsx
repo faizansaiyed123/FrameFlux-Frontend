@@ -438,7 +438,12 @@ function ComparisonRow({
     `}>
       <div className="flex items-center gap-3">
         <div
-          className={`flex h-8 w-8 items-center justify-center rounded-full ${match ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}
+          className={[
+            'flex h-8 w-8 items-center justify-center rounded-full',
+            match
+              ? 'bg-green-100 dark:bg-green-900/30'
+              : 'bg-red-100 dark:bg-red-900/30',
+          ].join(' ')}
         >
           <span
             className={`text-sm font-medium ${match ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}`}
