@@ -154,7 +154,12 @@ export default function JobsPage() {
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30"
+          className={`
+            h-9 rounded-md border border-input bg-transparent px-3 py-1
+            text-sm shadow-xs transition-colors focus-visible:border-ring
+            focus-visible:ring-[3px] focus-visible:ring-ring/50
+            dark:bg-input/30
+          `}
         >
           <option value="all">All statuses</option>
           <option value="queued">Queued</option>
@@ -168,7 +173,10 @@ export default function JobsPage() {
       {filtered.length === 0 ? (
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
+            <div className={`
+              flex h-16 w-16 items-center justify-center rounded-lg
+              bg-zinc-100 dark:bg-zinc-800 mb-4
+            `}>
               <Clock className="h-8 w-8 text-zinc-400" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
@@ -214,7 +222,10 @@ export default function JobsPage() {
                     </div>
                   </div>
                   {job.error && (
-                    <div className="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900">
+                    <div className={`
+                      mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border
+                      border-red-200 dark:border-red-900
+                    `}>
                       <p className="text-sm text-red-700 dark:text-red-300">{job.error}</p>
                     </div>
                   )}
