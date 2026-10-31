@@ -101,13 +101,19 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
-      <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
+      <div className={`
+        flex items-center justify-between border-b border-zinc-200
+        dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2
+      `}>
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={onBack}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate max-w-[200px] sm:max-w-[400px]">
+            <h1 className={`
+              text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate
+              max-w-[200px] sm:max-w-[400px]
+            `}>
               {media.original_filename}
             </h1>
             <p className="text-xs text-zinc-500 dark:text-zinc-400">Image Editor</p>
@@ -155,7 +161,10 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
           )}
         </div>
 
-        <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
+        <div className={`
+          w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white
+          dark:bg-zinc-900 overflow-y-auto
+        `}>
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-3">
               Transform
@@ -246,7 +255,10 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
       {error && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+          <Alert className={`
+            border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+            text-red-700 dark:text-red-300
+          `}>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -254,7 +266,10 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
       )}
       {success && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+          <Alert className={`
+            border-green-200 dark:border-green-900 bg-green-50
+            dark:bg-green-900/20 text-green-700 dark:text-green-300
+          `}>
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>
           </Alert>
