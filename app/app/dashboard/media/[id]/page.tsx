@@ -174,7 +174,10 @@ export default function MediaDetailPage() {
   }, [fetchMedia, fetchVersions]);
 
   useEffect(() => {
-    fetchMedia();
+    const timer = window.setTimeout(() => {
+      void fetchMedia();
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [fetchMedia]);
 
   useEffect(() => {
