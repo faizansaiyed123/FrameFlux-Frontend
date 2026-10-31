@@ -204,7 +204,10 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
 
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-4">
-      <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+      <div className={`
+        flex items-center gap-2 text-xs text-zinc-500
+        dark:text-zinc-400
+      `}>
         <Type className="h-3.5 w-3.5" />
         <span>Subtitle Management</span>
       </div>
@@ -213,10 +216,16 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
         <Label className="text-[10px] text-zinc-500">Subtitle File</Label>
         <div
           className={[
-            'relative border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors',
+            `
+              relative border-2 border-dashed rounded-lg p-4
+              text-center cursor-pointer transition-colors
+            `,
             dragActive
               ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
-              : 'border-zinc-300 dark:border-zinc-700 hover:border-zinc-400 dark:hover:border-zinc-600',
+              : `
+                border-zinc-300 dark:border-zinc-700
+                hover:border-zinc-400 dark:hover:border-zinc-600
+              `,
           ].join(' ')}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -339,7 +348,10 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
         </div>
       </div>
 
-      <div className="border-t border-zinc-200 dark:border-zinc-800 pt-3 space-y-2">
+      <div className={`
+        border-t border-zinc-200 dark:border-zinc-800 pt-3
+        space-y-2
+      `}>
         <Label className="text-[10px] text-zinc-500 flex items-center gap-1">
           <SlidersHorizontal className="h-3 w-3" /> Sync Subtitles
         </Label>
@@ -389,7 +401,10 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
       </div>
 
       {syncPreviewUrl && (
-        <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+        <div className={`
+          rounded-lg border border-zinc-200 dark:border-zinc-800
+          overflow-hidden
+        `}>
           <video src={syncPreviewUrl} controls className="w-full max-h-48" />
         </div>
       )}
@@ -414,7 +429,10 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
           {tracks.map((t, i) => (
             <div
               key={i}
-              className="text-xs p-2 rounded border border-zinc-200 dark:border-zinc-800"
+              className={`
+                text-xs p-2 rounded border border-zinc-200
+                dark:border-zinc-800
+              `}
             >
               <p className="font-medium">
                 {t.language || 'Unknown'} {t.is_default ? '(Default)' : ''}{' '}
@@ -426,7 +444,10 @@ export function SubtitlesTab({ media, setError }: { media: Media; setError: (e: 
         </div>
       )}
       {tracks.length === 0 && !loading && (
-        <Alert className="border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
+        <Alert className={`
+          border-zinc-200 dark:border-zinc-800 bg-zinc-50
+          dark:bg-zinc-900/50
+        `}>
           <AlertDescription className="text-[10px]">
             No subtitle tracks detected. Upload a subtitle file via the path field above.
           </AlertDescription>
