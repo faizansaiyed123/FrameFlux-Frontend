@@ -14,7 +14,10 @@ export function NavBar() {
       bg-white/75 backdrop-blur-xl dark:border-zinc-800/70
       dark:bg-zinc-950/75
     `}>
-      <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8">
+      <div className={`
+        mx-auto flex h-[72px] max-w-7xl items-center justify-between
+        px-5 sm:px-8
+      `}>
         <Link
           href="/"
           className="group flex cursor-pointer items-center gap-2.5"
@@ -26,7 +29,10 @@ export function NavBar() {
           `}>
             <span className="h-2.5 w-2.5 rounded-[3px] bg-current" />
           </span>
-          <span className="text-[17px] font-semibold tracking-[-0.02em] text-zinc-950 dark:text-white">
+          <span className={`
+            text-[17px] font-semibold tracking-[-0.02em] text-zinc-950
+            dark:text-white
+          `}>
             FrameFlux
           </span>
         </Link>
@@ -42,7 +48,10 @@ export function NavBar() {
           </Link>
         </div>
         {loading ? (
-          <div className="h-9 w-28 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-900" />
+          <div className={`
+            h-9 w-28 animate-pulse rounded-lg bg-zinc-100
+            dark:bg-zinc-900
+          `} />
         ) : user ? (
           <Link
             href="/app/dashboard"
@@ -68,7 +77,9 @@ export function NavBar() {
             >
               Sign in
             </Link>
-            <Button asChild size="sm" className="h-9 cursor-pointer rounded-lg px-4 shadow-sm">
+            <Button asChild size="sm" className={`
+              h-9 cursor-pointer rounded-lg px-4 shadow-sm
+            `}>
               <Link href="/auth/signup" className="cursor-pointer">
                 Get started <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" />
               </Link>
