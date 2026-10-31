@@ -154,29 +154,54 @@ export function Hero() {
     <>
       <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
         <div className="absolute inset-0 ff-grid opacity-60 dark:opacity-30" />
-        <div className="absolute left-1/2 top-24 h-96 w-96 -translate-x-1/2 rounded-full bg-indigo-500/10 blur-3xl" />
+        <div className={`
+          absolute left-1/2 top-24 h-96 w-96 -translate-x-1/2 rounded-full
+          bg-indigo-500/10 blur-3xl
+        `} />
         <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-24 sm:px-8 lg:pb-28 lg:pt-28">
           <div className="mx-auto max-w-4xl text-center">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white/80 px-3.5 py-1.5 text-xs font-medium text-zinc-600 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-300">
+            <div className={`
+              mb-7 inline-flex items-center gap-2 rounded-full border
+              border-zinc-200 bg-white/80 px-3.5 py-1.5 text-xs font-medium
+              text-zinc-600 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80
+              dark:text-zinc-300
+            `}>
               <Sparkles className="h-3.5 w-3.5 text-indigo-500" /> Professional media processing,
               simplified
             </div>
-            <h1 className="text-5xl font-semibold tracking-[-0.055em] text-zinc-950 sm:text-6xl lg:text-7xl dark:text-white">
+            <h1 className={`
+              text-5xl font-semibold tracking-[-0.055em] text-zinc-950
+              sm:text-6xl lg:text-7xl dark:text-white
+            `}>
               Turn raw media into
               <br />
               <span className="text-indigo-600 dark:text-indigo-400">finished work.</span>
             </h1>
-            <p className="mx-auto mt-7 max-w-2xl text-base leading-7 text-zinc-500 sm:text-lg dark:text-zinc-400">
+            <p className={`
+              mx-auto mt-7 max-w-2xl text-base leading-7 text-zinc-500
+              sm:text-lg dark:text-zinc-400
+            `}>
               Upload video, audio, images, or subtitles. FrameFlux gives you the tools to process,
               transform, and export without the usual setup.
             </p>
           </div>
 
           <div className="mx-auto mt-12 max-w-4xl">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-2 shadow-[0_24px_70px_-35px_rgba(24,24,27,.35)] dark:border-zinc-800 dark:bg-zinc-900">
+            <div className={`
+              rounded-2xl border border-zinc-200 bg-white p-2
+              shadow-[0_24px_70px_-35px_rgba(24,24,27,.35)]
+              dark:border-zinc-800 dark:bg-zinc-900
+            `}>
               {uploading ? (
-                <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-6 py-14 text-center dark:border-zinc-800 dark:bg-zinc-950">
-                  <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400">
+                <div className={`
+                  rounded-xl border border-zinc-200 bg-zinc-50 px-6 py-14
+                  text-center dark:border-zinc-800 dark:bg-zinc-950
+                `}>
+                  <div className={`
+                    mx-auto mb-5 flex h-12 w-12 items-center justify-center
+                    rounded-full bg-indigo-100 text-indigo-600 dark:bg-indigo-950
+                    dark:text-indigo-400
+                  `}>
                     <Loader2 className="h-5 w-5 animate-spin" />
                   </div>
                   <h3 className="font-medium text-zinc-950 dark:text-white">
@@ -185,7 +210,10 @@ export function Hero() {
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     {progress}% complete
                   </p>
-                  <div className="mx-auto mt-6 h-2 max-w-md overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                  <div className={`
+                    mx-auto mt-6 h-2 max-w-md overflow-hidden rounded-full
+                    bg-zinc-200 dark:bg-zinc-800
+                  `}>
                     <div
                       className="h-full rounded-full bg-indigo-600 transition-all dark:bg-indigo-500"
                       style={{ width: `${progress}%` }}
@@ -223,10 +251,17 @@ export function Hero() {
                   </div>
                 </div>
               ) : file ? (
-                <div className="rounded-xl border border-indigo-200 bg-indigo-50/50 px-6 py-10 dark:border-indigo-900/60 dark:bg-indigo-950/20">
+                <div className={`
+                  rounded-xl border border-indigo-200 bg-indigo-50/50 px-6 py-10
+                  dark:border-indigo-900/60 dark:bg-indigo-950/20
+                `}>
                   <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:text-left">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-white text-indigo-600 shadow-sm dark:bg-zinc-900 dark:text-indigo-400">
+                      <div className={`
+                        flex h-14 w-14 shrink-0 items-center justify-center rounded-xl
+                        bg-white text-indigo-600 shadow-sm dark:bg-zinc-900
+                        dark:text-indigo-400
+                      `}>
                         <file.icon className="h-7 w-7" />
                       </div>
                       <div>
@@ -259,7 +294,10 @@ export function Hero() {
                 </div>
               ) : (
                 <div
-                  className={`rounded-xl border-2 border-dashed px-6 py-14 text-center transition-all sm:py-16 ${dragOver ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/20' : 'border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700'}`}
+                  className={`rounded-xl border-2 border-dashed px-6 py-14 text-center transition-all sm:py-16 ${dragOver ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/20' : `
+                    border-zinc-200 hover:border-zinc-300 dark:border-zinc-800
+                    dark:hover:border-zinc-700
+                  `}`}
                   onDrop={(e) => {
                     e.preventDefault();
                     setDragOver(false);
@@ -271,7 +309,11 @@ export function Hero() {
                   }}
                   onDragLeave={() => setDragOver(false)}
                 >
-                  <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200">
+                  <div className={`
+                    mx-auto mb-5 flex h-14 w-14 items-center justify-center
+                    rounded-2xl bg-zinc-100 text-zinc-700 dark:bg-zinc-800
+                    dark:text-zinc-200
+                  `}>
                     <Upload className="h-6 w-6" />
                   </div>
                   <h2 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">
@@ -300,7 +342,10 @@ export function Hero() {
               )}
             </div>
             {error && (
-              <Alert className="mt-4 border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+              <Alert className={`
+                mt-4 border-red-200 bg-red-50 text-red-700 dark:border-red-900
+                dark:bg-red-950/30 dark:text-red-300
+              `}>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -308,11 +353,18 @@ export function Hero() {
 
           <div
             id="features"
-            className="mx-auto mt-12 grid max-w-4xl gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-800 md:grid-cols-3"
+            className={`
+              mx-auto mt-12 grid max-w-4xl gap-px overflow-hidden rounded-xl
+              border border-zinc-200 bg-zinc-200 dark:border-zinc-800
+              dark:bg-zinc-800 md:grid-cols-3
+            `}
           >
             {FEATURES.map(([title, description]) => (
               <div key={title} className="bg-white px-6 py-5 dark:bg-zinc-950">
-                <div className="mb-3 flex h-7 w-7 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900">
+                <div className={`
+                  mb-3 flex h-7 w-7 items-center justify-center rounded-full
+                  bg-zinc-100 dark:bg-zinc-900
+                `}>
                   <Check className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <h3 className="text-sm font-semibold text-zinc-950 dark:text-white">{title}</h3>
@@ -337,14 +389,23 @@ export function Hero() {
 
       {authOpen && (
         <div
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-zinc-950/60 px-4 backdrop-blur-sm"
+          className={`
+            fixed inset-0 z-[60] flex items-center justify-center
+            bg-zinc-950/60 px-4 backdrop-blur-sm
+          `}
           role="dialog"
           aria-modal="true"
         >
-          <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-7 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+          <div className={`
+            w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-7
+            shadow-2xl dark:border-zinc-800 dark:bg-zinc-900
+          `}>
             <div className="flex items-start justify-between">
               <div>
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
+                <div className={`
+                  mb-4 flex h-10 w-10 items-center justify-center rounded-xl
+                  bg-zinc-950 text-white dark:bg-white dark:text-zinc-950
+                `}>
                   <LockKeyhole className="h-4 w-4" />
                 </div>
                 <h2 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">
@@ -361,7 +422,10 @@ export function Hero() {
               </button>
             </div>
             {authError && (
-              <Alert className="mt-5 border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300">
+              <Alert className={`
+                mt-5 border-red-200 bg-red-50 text-red-700 dark:border-red-900
+                dark:bg-red-950/30 dark:text-red-300
+              `}>
                 <AlertDescription>{authError}</AlertDescription>
               </Alert>
             )}
