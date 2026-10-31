@@ -145,7 +145,10 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center p-8">
+        <div className={`
+          flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center
+          justify-center p-8
+        `}>
           {imageUrl ? (
             <img
               src={imageUrl}
