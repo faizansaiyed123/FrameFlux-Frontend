@@ -42,12 +42,18 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 py-16">
+      <div className={`
+        min-h-screen flex items-center justify-center bg-zinc-50
+        dark:bg-zinc-950 px-4 py-16
+      `}>
         <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-800">
           <CardHeader className="text-center">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4"
+              className={`
+                inline-flex items-center gap-2 text-xl font-semibold
+                text-zinc-900 dark:text-zinc-50 mb-4
+              `}
             >
               FrameFlux
             </Link>
@@ -72,12 +78,18 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 py-16">
+    <div className={`
+      min-h-screen flex items-center justify-center bg-zinc-50
+      dark:bg-zinc-950 px-4 py-16
+    `}>
       <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-800">
         <CardHeader className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4"
+            className={`
+              inline-flex items-center gap-2 text-xl font-semibold
+              text-zinc-900 dark:text-zinc-50 mb-4
+            `}
           >
             FrameFlux
           </Link>
@@ -86,7 +98,10 @@ export default function ForgotPasswordPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
-            <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+            <Alert className={`
+              border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+              text-red-700 dark:text-red-300
+            `}>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
