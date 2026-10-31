@@ -49,7 +49,10 @@ export default function FavoritesPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className={`
+          text-3xl font-bold tracking-tight text-zinc-900
+          dark:text-zinc-50
+        `}>
           Favorites
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">Your favorite media files</p>
@@ -58,7 +61,10 @@ export default function FavoritesPage() {
       {favorites.length === 0 ? (
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
+            <div className={`
+              flex h-16 w-16 items-center justify-center rounded-lg
+              bg-zinc-100 dark:bg-zinc-800 mb-4
+            `}>
               <Heart className="h-8 w-8 text-zinc-400" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
