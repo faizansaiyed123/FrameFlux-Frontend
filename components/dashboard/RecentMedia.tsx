@@ -29,8 +29,15 @@ interface RecentMediaProps {
 
 export function RecentMedia({ media }: RecentMediaProps) {
   return (
-    <Card className="rounded-2xl border-zinc-200/80 bg-white/90 shadow-[0_10px_35px_-28px_rgba(24,24,27,.5)] dark:border-zinc-800/80 dark:bg-zinc-900/80">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-100 px-5 py-5 dark:border-zinc-800/80 sm:px-6">
+    <Card className={`
+      rounded-2xl border-zinc-200/80 bg-white/90
+      shadow-[0_10px_35px_-28px_rgba(24,24,27,.5)]
+      dark:border-zinc-800/80 dark:bg-zinc-900/80
+    `}>
+      <CardHeader className={`
+        flex flex-row items-center justify-between border-b
+        border-zinc-100 px-5 py-5 dark:border-zinc-800/80 sm:px-6
+      `}>
         <div>
           <CardTitle className="text-base font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
             Recent Media
@@ -39,15 +46,28 @@ export function RecentMedia({ media }: RecentMediaProps) {
         </div>
         <Link
           href="/app/dashboard/media"
-          className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-white"
+          className={`
+            inline-flex cursor-pointer items-center gap-1 rounded-lg px-2
+            py-1.5 text-xs font-medium text-zinc-500 transition
+            hover:bg-zinc-100 hover:text-zinc-950 dark:hover:bg-zinc-800
+            dark:hover:text-white
+          `}
         >
           View all <ArrowUpRight className="h-3.5 w-3.5" />
         </Link>
       </CardHeader>
       <CardContent className="p-4 sm:p-5">
         {media.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-200 bg-zinc-50/70 px-6 py-12 text-center dark:border-zinc-800 dark:bg-zinc-950/60">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white text-zinc-400 shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+          <div className={`
+            flex flex-col items-center justify-center rounded-xl border
+            border-dashed border-zinc-200 bg-zinc-50/70 px-6 py-12
+            text-center dark:border-zinc-800 dark:bg-zinc-950/60
+          `}>
+            <div className={`
+              mb-4 flex h-12 w-12 items-center justify-center rounded-xl
+              bg-white text-zinc-400 shadow-sm ring-1 ring-zinc-200
+              dark:bg-zinc-900 dark:ring-zinc-800
+            `}>
               <Film className="h-5 w-5" />
             </div>
             <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
@@ -69,10 +89,21 @@ export function RecentMedia({ media }: RecentMediaProps) {
               <Link
                 key={item.id}
                 href={`/app/dashboard/media/${item.id}`}
-                className="group flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-transparent px-3 py-3.5 outline-none transition-all hover:border-zinc-200 hover:bg-zinc-50 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:border-zinc-800 dark:hover:bg-zinc-950"
+                className={`
+                  group flex cursor-pointer items-center justify-between gap-4
+                  rounded-xl border border-transparent px-3 py-3.5 outline-none
+                  transition-all hover:border-zinc-200 hover:bg-zinc-50
+                  focus-visible:ring-2 focus-visible:ring-indigo-500
+                  dark:hover:border-zinc-800 dark:hover:bg-zinc-950
+                `}
               >
                 <div className="flex min-w-0 items-center gap-3.5">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 ring-1 ring-violet-100 dark:bg-violet-950/50 dark:text-violet-400 dark:ring-violet-900/60">
+                  <div className={`
+                    flex h-10 w-10 shrink-0 items-center justify-center rounded-xl
+                    bg-violet-50 text-violet-600 ring-1 ring-violet-100
+                    dark:bg-violet-950/50 dark:text-violet-400
+                    dark:ring-violet-900/60
+                  `}>
                     <Film className="h-[18px] w-[18px]" />
                   </div>
                   <div className="min-w-0">
@@ -87,7 +118,11 @@ export function RecentMedia({ media }: RecentMediaProps) {
                 </div>
                 <span
                   className={cn(
-                    'inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ring-1 ring-inset ring-black/5 dark:ring-white/5',
+                    `
+                      inline-flex shrink-0 items-center rounded-full px-2.5 py-1
+                      text-[10px] font-semibold capitalize ring-1 ring-inset
+                      ring-black/5 dark:ring-white/5
+                    `,
                     statusColors[item.processing_status] || statusColors.pending,
                   )}
                 >
