@@ -332,7 +332,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
       <div className="flex flex-1 overflow-hidden">
         <div className="flex flex-1 flex-col">
-          <div className="flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+          <div className={`
+            flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center
+            justify-center
+          `}>
             <div className="w-full max-w-2xl px-4">
               <div className="flex items-center gap-4 mb-4">
                 <div className={`
@@ -389,7 +392,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
               >
                 <SkipForward className="h-4 w-4" />
               </Button>
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono min-w-[100px]">
+              <span className={`
+                text-xs text-zinc-500 dark:text-zinc-400 font-mono
+                min-w-[100px]
+              `}>
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
               <div className="flex-1" />
@@ -410,7 +416,10 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
             </div>
           </div>
 
-          <div className="h-48 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
+          <div className={`
+            h-48 border-t border-zinc-200 dark:border-zinc-800
+            bg-white dark:bg-zinc-900
+          `}>
             <Timeline
               clips={clips}
               selectedClipId={selectedClipId}
@@ -450,9 +459,15 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                     key={tool.id}
                     onClick={() => setActiveTool(isActive ? null : tool.id)}
                     className={[
-                      'flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors',
+                      `
+                        flex flex-col items-center gap-1 rounded-md border p-1.5
+                        text-center transition-colors
+                      `,
                       isActive
-                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                        ? `
+                          border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                          text-indigo-700 dark:text-indigo-300
+                        `
                         : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300',
                     ].join(' ')}
                   >
