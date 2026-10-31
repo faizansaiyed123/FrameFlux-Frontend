@@ -132,7 +132,10 @@ export default function SettingsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Settings
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -150,7 +153,10 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className={`
+          text-3xl font-bold tracking-tight text-zinc-900
+          dark:text-zinc-50
+        `}>
           Settings
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -245,7 +251,10 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label htmlFor="currentPassword">Current Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                  <Lock className={`
+                    absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+                    text-zinc-400
+                  `} />
                   <Input
                     id="currentPassword"
                     type={showPasswords ? 'text' : 'password'}
@@ -273,7 +282,10 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                  <Lock className={`
+                    absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+                    text-zinc-400
+                  `} />
                   <Input
                     id="newPassword"
                     type={showPasswords ? 'text' : 'password'}
@@ -292,7 +304,10 @@ export default function SettingsPage() {
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm New Password</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+                  <Lock className={`
+                    absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+                    text-zinc-400
+                  `} />
                   <Input
                     id="confirmPassword"
                     type={showPasswords ? 'text' : 'password'}
@@ -322,7 +337,10 @@ export default function SettingsPage() {
 
         <Card className="border-zinc-200 dark:border-zinc-800 lg:col-span-2">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
+            <CardTitle className={`
+              text-lg font-semibold text-zinc-900 dark:text-zinc-50
+              flex items-center gap-2
+            `}>
               <Palette className="h-4 w-4" />
               Preferences
             </CardTitle>
