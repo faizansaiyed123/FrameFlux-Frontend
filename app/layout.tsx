@@ -40,8 +40,10 @@ export const metadata: Metadata = {
     url: 'https://frameflux.io',
     siteName: 'FrameFlux',
     title: 'FrameFlux — Video Processing API for Developers',
-    description:
-      'Professional video transcoding, editing, and processing REST API. Resumable uploads, real-time progress, composable operations.',
+    description: [
+      'Professional video transcoding, editing, and processing REST API.',
+      'Resumable uploads, real-time progress, composable operations.',
+    ].join(' '),
     images: [
       {
         url: '/og-image.png',
