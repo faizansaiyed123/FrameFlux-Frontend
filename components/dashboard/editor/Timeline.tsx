@@ -139,7 +139,10 @@ export function Timeline({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between px-4 py-1 border-b border-zinc-200 dark:border-zinc-800">
+      <div className={`
+        flex items-center justify-between px-4 py-1 border-b
+        border-zinc-200 dark:border-zinc-800
+      `}>
         <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Timeline</span>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-zinc-400">
@@ -154,7 +157,10 @@ export function Timeline({
         onClick={handleTimelineClick}
       >
         <div className="relative h-full min-w-full" style={{ width: timelineWidth }}>
-          <div className="absolute top-0 left-0 right-0 h-6 border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
+          <div className={`
+            absolute top-0 left-0 right-0 h-6 border-b border-zinc-200
+            dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50
+          `}>
             {generateTimeMarkers()}
           </div>
 
@@ -188,11 +194,17 @@ export function Timeline({
                     </span>
                   </div>
                   <div
-                    className="absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black/10 rounded-l-md"
+                    className={`
+                      absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize
+                      hover:bg-black/10 rounded-l-md
+                    `}
                     onMouseDown={(e) => handleEdgeMouseDown(e, clip, 'left')}
                   />
                   <div
-                    className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-black/10 rounded-r-md"
+                    className={`
+                      absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize
+                      hover:bg-black/10 rounded-r-md
+                    `}
                     onMouseDown={(e) => handleEdgeMouseDown(e, clip, 'right')}
                   />
                 </div>
