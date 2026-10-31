@@ -131,17 +131,24 @@ export default function ProjectsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className={`
+          <h1
+            className={`
             text-3xl font-bold tracking-tight text-zinc-900
             dark:text-zinc-50
-          `}>
+          `}
+          >
             Projects
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your video projects</p>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+            Manage your video projects
+          </p>
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded-xl" />
+            <div
+              key={i}
+              className="h-40 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded-xl"
+            />
           ))}
         </div>
       </div>
@@ -152,13 +159,17 @@ export default function ProjectsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={`
+          <h1
+            className={`
             text-3xl font-bold tracking-tight text-zinc-900
             dark:text-zinc-50
-          `}>
+          `}
+          >
             Projects
           </h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your video projects</p>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+            Manage your video projects
+          </p>
         </div>
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -167,10 +178,12 @@ export default function ProjectsPage() {
       </div>
 
       {error && (
-        <Card className={`
+        <Card
+          className={`
           border-red-200 dark:border-red-900 bg-red-50
           dark:bg-red-900/20
-        `}>
+        `}
+        >
           <CardContent className="p-6">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -183,17 +196,20 @@ export default function ProjectsPage() {
       {projects.length === 0 ? (
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className={`
+            <div
+              className={`
               flex h-16 w-16 items-center justify-center rounded-lg
               bg-zinc-100 dark:bg-zinc-800 mb-4
-            `}>
+            `}
+            >
               <FolderOpen className="h-8 w-8 text-zinc-400" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
               No projects yet
             </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4 max-w-sm">
-              Create your first project to start organizing and processing your media files.
+              Create your first project to start organizing and processing your
+              media files.
             </p>
             <Button onClick={() => setCreateOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
@@ -214,11 +230,13 @@ export default function ProjectsPage() {
               <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`
+                    <div
+                      className={`
                       flex h-10 w-10 items-center justify-center rounded-lg
                       bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
                       dark:text-indigo-400
-                    `}>
+                    `}
+                    >
                       <FolderOpen className="h-5 w-5" />
                     </div>
                     <div>
@@ -232,7 +250,11 @@ export default function ProjectsPage() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                      >
                         <MoreHorizontal className="h-4 w-4" />
                         <span className="sr-only">More options</span>
                       </Button>
@@ -270,7 +292,10 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <Dialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Project</DialogTitle>
@@ -284,7 +309,9 @@ export default function ProjectsPage() {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="My Project"
                 disabled={submitting}
               />
@@ -294,17 +321,26 @@ export default function ProjectsPage() {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Project description..."
                 disabled={submitting}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={() => setCreateOpen(false)}
+              disabled={submitting}
+            >
               Cancel
             </Button>
-            <Button onClick={handleCreate} disabled={submitting || !formData.name.trim()}>
+            <Button
+              onClick={handleCreate}
+              disabled={submitting || !formData.name.trim()}
+            >
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -318,7 +354,10 @@ export default function ProjectsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+      <Dialog
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Project</DialogTitle>
@@ -330,7 +369,9 @@ export default function ProjectsPage() {
               <Input
                 id="edit-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 disabled={submitting}
               />
             </div>
@@ -339,16 +380,25 @@ export default function ProjectsPage() {
               <Textarea
                 id="edit-description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 disabled={submitting}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditOpen(false)} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={() => setEditOpen(false)}
+              disabled={submitting}
+            >
               Cancel
             </Button>
-            <Button onClick={handleUpdate} disabled={submitting || !formData.name.trim()}>
+            <Button
+              onClick={handleUpdate}
+              disabled={submitting || !formData.name.trim()}
+            >
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -362,20 +412,31 @@ export default function ProjectsPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+      <Dialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Project</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete &quot;{selectedProject?.name}&quot;? This action
-              cannot be undone.
+              Are you sure you want to delete &quot;{selectedProject?.name}
+              &quot;? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)} disabled={submitting}>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteOpen(false)}
+              disabled={submitting}
+            >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={submitting}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={submitting}
+            >
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

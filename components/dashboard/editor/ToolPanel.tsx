@@ -1,7 +1,13 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -39,16 +45,41 @@ interface ToolPanelProps {
 
 const clipTools = [
   { id: 'trim', label: 'Trim', icon: Scissors, description: 'Trim clip edges' },
-  { id: 'split', label: 'Split', icon: Split, description: 'Split at playhead' },
+  {
+    id: 'split',
+    label: 'Split',
+    icon: Split,
+    description: 'Split at playhead',
+  },
   { id: 'speed', label: 'Speed', icon: Gauge, description: 'Adjust speed' },
-  { id: 'transform', label: 'Transform', icon: RefreshCw, description: 'Scale/rotate' },
-  { id: 'overlay', label: 'Overlay', icon: Image, description: 'Text/watermark' },
-  { id: 'freeze', label: 'Freeze', icon: Snowflake, description: 'Freeze frame' },
+  {
+    id: 'transform',
+    label: 'Transform',
+    icon: RefreshCw,
+    description: 'Scale/rotate',
+  },
+  {
+    id: 'overlay',
+    label: 'Overlay',
+    icon: Image,
+    description: 'Text/watermark',
+  },
+  {
+    id: 'freeze',
+    label: 'Freeze',
+    icon: Snowflake,
+    description: 'Freeze frame',
+  },
 ] as const;
 
 const multiClipTools = [
   { id: 'merge', label: 'Merge', icon: Merge, description: 'Merge clips' },
-  { id: 'clips', label: 'Clips', icon: ClipboardList, description: 'Clip operations' },
+  {
+    id: 'clips',
+    label: 'Clips',
+    icon: ClipboardList,
+    description: 'Clip operations',
+  },
 ] as const;
 
 export function ToolPanel({
@@ -68,10 +99,12 @@ export function ToolPanel({
   return (
     <div className="flex h-full flex-col">
       <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
-        <h2 className={`
+        <h2
+          className={`
           text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase
           tracking-wider mb-2
-        `}>
+        `}
+        >
           Tools
         </h2>
         <div className="space-y-2">
@@ -98,7 +131,9 @@ export function ToolPanel({
                     ].join(' ')}
                   >
                     <Icon className="h-3.5 w-3.5" />
-                    <span className="text-[9px] font-medium leading-tight">{tool.label}</span>
+                    <span className="text-[9px] font-medium leading-tight">
+                      {tool.label}
+                    </span>
                   </button>
                 );
               })}
@@ -127,14 +162,18 @@ export function ToolPanel({
                     ].join(' ')}
                   >
                     <Icon className="h-3.5 w-3.5" />
-                    <span className="text-[9px] font-medium leading-tight">{tool.label}</span>
+                    <span className="text-[9px] font-medium leading-tight">
+                      {tool.label}
+                    </span>
                   </button>
                 );
               })}
             </div>
           )}
           {!hasSelection && (
-            <p className="text-[10px] text-zinc-400 text-center py-2">Select a clip to see tools</p>
+            <p className="text-[10px] text-zinc-400 text-center py-2">
+              Select a clip to see tools
+            </p>
           )}
         </div>
       </div>
@@ -143,7 +182,9 @@ export function ToolPanel({
         {activeTool === 'split' && hasSelection && (
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs font-semibold">Split Clip</CardTitle>
+              <CardTitle className="text-xs font-semibold">
+                Split Clip
+              </CardTitle>
               <CardDescription className="text-[10px]">
                 Split at the current playhead position.
               </CardDescription>
@@ -190,7 +231,12 @@ export function ToolPanel({
                   </p>
                 </div>
               </div>
-              <Button onClick={onDelete} variant="destructive" size="sm" className="w-full">
+              <Button
+                onClick={onDelete}
+                variant="destructive"
+                size="sm"
+                className="w-full"
+              >
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" />
                 Delete
               </Button>
@@ -202,7 +248,9 @@ export function ToolPanel({
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Speed</CardTitle>
-              <CardDescription className="text-[10px]">Adjust playback speed.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Adjust playback speed.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <SpeedSelector />
@@ -214,7 +262,9 @@ export function ToolPanel({
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Transform</CardTitle>
-              <CardDescription className="text-[10px]">Scale, rotate, or crop.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Scale, rotate, or crop.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <TransformControls />
@@ -226,7 +276,9 @@ export function ToolPanel({
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
               <CardTitle className="text-xs font-semibold">Overlay</CardTitle>
-              <CardDescription className="text-[10px]">Add text or watermark.</CardDescription>
+              <CardDescription className="text-[10px]">
+                Add text or watermark.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <OverlayControls />
@@ -237,18 +289,34 @@ export function ToolPanel({
         {activeTool === 'freeze' && hasSelection && (
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs font-semibold">Freeze Frame</CardTitle>
+              <CardTitle className="text-xs font-semibold">
+                Freeze Frame
+              </CardTitle>
               <CardDescription className="text-[10px]">
                 Create a freeze frame at the playhead.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
               <div>
-                <Label className="text-[10px] text-zinc-500">Duration (seconds)</Label>
-                <Input type="number" step="0.1" placeholder="2" className="text-xs mt-1" />
+                <Label className="text-[10px] text-zinc-500">
+                  Duration (seconds)
+                </Label>
+                <Input
+                  type="number"
+                  step="0.1"
+                  placeholder="2"
+                  className="text-xs mt-1"
+                />
               </div>
-              <Button onClick={onApply} disabled={processing} size="sm" className="w-full">
-                {processing && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+              <Button
+                onClick={onApply}
+                disabled={processing}
+                size="sm"
+                className="w-full"
+              >
+                {processing && (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                )}
                 Apply Freeze
               </Button>
             </CardContent>
@@ -258,7 +326,9 @@ export function ToolPanel({
         {activeTool === 'merge' && hasMultipleClips && (
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs font-semibold">Merge Clips</CardTitle>
+              <CardTitle className="text-xs font-semibold">
+                Merge Clips
+              </CardTitle>
               <CardDescription className="text-[10px]">
                 Merge selected clips into one.
               </CardDescription>
@@ -267,8 +337,15 @@ export function ToolPanel({
               <div className="text-[10px] text-zinc-500 dark:text-zinc-400">
                 {clips.length} clips selected
               </div>
-              <Button onClick={onApply} disabled={processing} size="sm" className="w-full">
-                {processing && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+              <Button
+                onClick={onApply}
+                disabled={processing}
+                size="sm"
+                className="w-full"
+              >
+                {processing && (
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                )}
                 Merge
               </Button>
             </CardContent>
@@ -278,13 +355,18 @@ export function ToolPanel({
         {activeTool === 'clips' && hasSelection && (
           <Card className="border-zinc-200 dark:border-zinc-800">
             <CardHeader className="pb-2 pt-3">
-              <CardTitle className="text-xs font-semibold">Clip Operations</CardTitle>
+              <CardTitle className="text-xs font-semibold">
+                Clip Operations
+              </CardTitle>
               <CardDescription className="text-[10px]">
                 Keep, delete, reorder, or append.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <ClipOperations selectedClipId={selectedClip.id} onDelete={onDelete} />
+              <ClipOperations
+                selectedClipId={selectedClip.id}
+                onDelete={onDelete}
+              />
             </CardContent>
           </Card>
         )}
@@ -300,7 +382,12 @@ function SpeedSelector() {
       <Label className="text-[10px] text-zinc-500">Speed</Label>
       <div className="grid grid-cols-4 gap-1.5">
         {speeds.map((speed) => (
-          <Button key={speed} variant="outline" size="sm" className="text-xs h-7">
+          <Button
+            key={speed}
+            variant="outline"
+            size="sm"
+            className="text-xs h-7"
+          >
             {speed}x
           </Button>
         ))}
@@ -328,11 +415,19 @@ function TransformControls() {
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
           <Label className="text-[10px] text-zinc-500">Width</Label>
-          <Input type="number" placeholder="1280" className="text-xs h-7" />
+          <Input
+            type="number"
+            placeholder="1280"
+            className="text-xs h-7"
+          />
         </div>
         <div className="space-y-1">
           <Label className="text-[10px] text-zinc-500">Height</Label>
-          <Input type="number" placeholder="720" className="text-xs h-7" />
+          <Input
+            type="number"
+            placeholder="720"
+            className="text-xs h-7"
+          />
         </div>
       </div>
     </div>
@@ -356,23 +451,39 @@ function OverlayControls() {
       </div>
       <div className="space-y-1">
         <Label className="text-[10px] text-zinc-500">Text</Label>
-        <Input placeholder="Live Broadcast" className="text-xs h-7" />
+        <Input
+          placeholder="Live Broadcast"
+          className="text-xs h-7"
+        />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div className="space-y-1">
           <Label className="text-[10px] text-zinc-500">X</Label>
-          <Input type="number" value={40} className="text-xs h-7" />
+          <Input
+            type="number"
+            value={40}
+            className="text-xs h-7"
+          />
         </div>
         <div className="space-y-1">
           <Label className="text-[10px] text-zinc-500">Y</Label>
-          <Input type="number" value={40} className="text-xs h-7" />
+          <Input
+            type="number"
+            value={40}
+            className="text-xs h-7"
+          />
         </div>
       </div>
     </div>
   );
 }
 
-function ClipOperations({ onDelete }: { selectedClipId: string; onDelete: () => void }) {
+function ClipOperations({
+  onDelete,
+}: {
+  selectedClipId: string;
+  onDelete: () => void;
+}) {
   return (
     <div className="space-y-2">
       <div className="space-y-1">
@@ -389,7 +500,12 @@ function ClipOperations({ onDelete }: { selectedClipId: string; onDelete: () => 
           </SelectContent>
         </Select>
       </div>
-      <Button onClick={onDelete} variant="destructive" size="sm" className="w-full">
+      <Button
+        onClick={onDelete}
+        variant="destructive"
+        size="sm"
+        className="w-full"
+      >
         <Trash2 className="mr-1.5 h-3.5 w-3.5" />
         Delete
       </Button>

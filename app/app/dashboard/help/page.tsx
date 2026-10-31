@@ -31,7 +31,9 @@ export default function HelpPage() {
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           Help & Support
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Get help with FrameFlux</p>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          Get help with FrameFlux
+        </p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -46,17 +48,21 @@ export default function HelpPage() {
               transition-colors
             `}
           >
-            <div className={`
+            <div
+              className={`
               flex h-12 w-12 items-center justify-center rounded-lg
               bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
               dark:text-indigo-400 mb-4
-            `}>
+            `}
+            >
               <resource.icon className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-1">
               {resource.title}
             </h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">{resource.description}</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              {resource.description}
+            </p>
             <div className="mt-4 flex items-center text-sm text-indigo-600 dark:text-indigo-400">
               Visit
               <ExternalLink className="ml-1 h-4 w-4" />

@@ -9,7 +9,11 @@ interface AudioWaveformProps {
   onSeek: (time: number) => void;
 }
 
-export function AudioWaveform({ duration, currentTime, onSeek }: AudioWaveformProps) {
+export function AudioWaveform({
+  duration,
+  currentTime,
+  onSeek,
+}: AudioWaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const drawWaveform = useCallback(async () => {
@@ -41,7 +45,8 @@ export function AudioWaveform({ duration, currentTime, onSeek }: AudioWaveformPr
     for (let i = 0; i < bars; i++) {
       const x = i * barWidth;
       const normalizedPosition = i / bars;
-      const amplitude = Math.sin(normalizedPosition * Math.PI * 8) * 0.5 + Math.random() * 0.3;
+      const amplitude =
+        Math.sin(normalizedPosition * Math.PI * 8) * 0.5 + Math.random() * 0.3;
       const barHeight = Math.max(2, amplitude * height * 0.8);
 
       ctx.moveTo(x, centerY - barHeight / 2);
@@ -76,11 +81,17 @@ export function AudioWaveform({ duration, currentTime, onSeek }: AudioWaveformPr
   );
 
   return (
-    <div className={`
+    <div
+      className={`
       w-full h-16 border-t border-zinc-200 dark:border-zinc-800
       bg-zinc-50 dark:bg-zinc-800
-    `}>
-      <canvas ref={canvasRef} className="w-full h-full cursor-pointer" onClick={handleClick} />
+    `}
+    >
+      <canvas
+        ref={canvasRef}
+        className="w-full h-full cursor-pointer"
+        onClick={handleClick}
+      />
     </div>
   );
 }

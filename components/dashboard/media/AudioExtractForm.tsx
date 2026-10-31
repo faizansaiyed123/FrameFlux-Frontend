@@ -60,16 +60,21 @@ export function AudioExtractForm({ mediaId }: Props) {
   return (
     <div className="space-y-4">
       {error && (
-        <Alert className={`
+        <Alert
+          className={`
           border-red-200 bg-red-50 text-red-700 dark:border-red-900/60
           dark:bg-red-950/20 dark:text-red-300
-        `}>
+        `}
+        >
           <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
       <div className="space-y-2">
         <Label>Format</Label>
-        <Select value={format} onValueChange={setFormat}>
+        <Select
+          value={format}
+          onValueChange={setFormat}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select format" />
           </SelectTrigger>
@@ -87,7 +92,10 @@ export function AudioExtractForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Bitrate</Label>
-        <Select value={bitrate} onValueChange={setBitrate}>
+        <Select
+          value={bitrate}
+          onValueChange={setBitrate}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select bitrate" />
           </SelectTrigger>
@@ -113,7 +121,10 @@ export function AudioExtractForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Channels</Label>
-        <Select value={channels} onValueChange={setChannels}>
+        <Select
+          value={channels}
+          onValueChange={setChannels}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select channels" />
           </SelectTrigger>
@@ -125,7 +136,10 @@ export function AudioExtractForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Quality</Label>
-        <Select value={quality} onValueChange={setQuality}>
+        <Select
+          value={quality}
+          onValueChange={setQuality}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select quality" />
           </SelectTrigger>
@@ -158,7 +172,11 @@ export function AudioExtractForm({ mediaId }: Props) {
           />
         </div>
       </div>
-      <Button onClick={handleExtract} disabled={loading} className="w-full">
+      <Button
+        onClick={handleExtract}
+        disabled={loading}
+        className="w-full"
+      >
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

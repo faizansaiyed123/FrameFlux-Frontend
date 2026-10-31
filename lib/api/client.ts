@@ -29,7 +29,10 @@ class ApiClient {
     }
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {},
+  ): Promise<T> {
     const headers: HeadersInit = {
       ...options.headers,
     };
@@ -39,7 +42,8 @@ class ApiClient {
     }
 
     if (this.token) {
-      (headers as Record<string, string>)['Authorization'] = `Bearer ${this.token}`;
+      (headers as Record<string, string>)['Authorization'] =
+        `Bearer ${this.token}`;
     }
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
@@ -50,7 +54,9 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Request failed' }));
+      const error = await response
+        .json()
+        .catch(() => ({ detail: 'Request failed' }));
       throw new Error(error.detail || `HTTP error ${response.status}`);
     }
 
@@ -62,23 +68,25 @@ class ApiClient {
   }
 
   async signup(data: { email: string; password: string; full_name?: string }) {
-    return this.request<{ access_token: string; token_type: string; expires_in: number }>(
-      '/auth/signup',
-      {
-        method: 'POST',
-        body: JSON.stringify(data),
-      },
-    );
+    return this.request<{
+      access_token: string;
+      token_type: string;
+      expires_in: number;
+    }>('/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 
   async login(data: { email: string; password: string }) {
-    return this.request<{ access_token: string; token_type: string; expires_in: number }>(
-      '/auth/login',
-      {
-        method: 'POST',
-        body: JSON.stringify(data),
-      },
-    );
+    return this.request<{
+      access_token: string;
+      token_type: string;
+      expires_in: number;
+    }>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   }
 
   async logout() {
@@ -115,11 +123,18 @@ class ApiClient {
   async changePassword(currentPassword: string, newPassword: string) {
     return this.request<{ detail: string }>('/auth/change-password', {
       method: 'POST',
-      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+      body: JSON.stringify({
+        current_password: currentPassword,
+        new_password: newPassword,
+      }),
     });
   }
 
-  async updateProfile(data: { full_name?: string; avatar_url?: string; preferences?: string }) {
+  async updateProfile(data: {
+    full_name?: string;
+    avatar_url?: string;
+    preferences?: string;
+  }) {
     return this.request<{
       id: string;
       email: string;
@@ -173,7 +188,10 @@ class ApiClient {
     }>(`/projects/${id}`);
   }
 
-  async updateProject(id: string, data: { name?: string; description?: string }) {
+  async updateProject(
+    id: string,
+    data: { name?: string; description?: string },
+  ) {
     return this.request<{
       id: string;
       user_id: string | null;
@@ -246,7 +264,11 @@ class ApiClient {
     >(`/projects/${projectId}/folders`);
   }
 
-  async createProjectFolder(projectId: string, name: string, parentId?: string) {
+  async createProjectFolder(
+    projectId: string,
+    name: string,
+    parentId?: string,
+  ) {
     return this.request<{ id: string; name: string; parent_id: string | null }>(
       `/projects/${projectId}/folders?name=${encodeURIComponent(name)}${parentId ? `&parent_id=${parentId}` : ''}`,
       { method: 'POST' },
@@ -254,7 +276,9 @@ class ApiClient {
   }
 
   async listProjectWorkflows(projectId: string) {
-    return this.request<{ id: string; name: string }[]>(`/projects/${projectId}/workflows`);
+    return this.request<{ id: string; name: string }[]>(
+      `/projects/${projectId}/workflows`,
+    );
   }
 
   async listProjectHistory(projectId: string) {
@@ -309,7 +333,9 @@ class ApiClient {
   }
 
   async getDashboardRecentProcessing(limit?: number) {
-    return this.request<unknown[]>(`/dashboard/recent-processing${limit ? `?limit=${limit}` : ''}`);
+    return this.request<unknown[]>(
+      `/dashboard/recent-processing${limit ? `?limit=${limit}` : ''}`,
+    );
   }
 
   async uploadMedia(file: File) {
@@ -436,9 +462,12 @@ class ApiClient {
   }
 
   async getMediaFile(id: string) {
-    const response = await fetch(`${this.baseUrl}/media/${id}/download?download_type=original`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/media/${id}/download?download_type=original`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to fetch media file');
     return response.blob();
   }
@@ -760,7 +789,11 @@ class ApiClient {
 
   async batchDownload(mediaIds: string[]) {
     return this.request<{
-      jobs: { media_id: string; original_filename: string; file_size: number }[];
+      jobs: {
+        media_id: string;
+        original_filename: string;
+        file_size: number;
+      }[];
       total: number;
     }>('/media/batch-download', {
       method: 'POST',
@@ -782,36 +815,50 @@ class ApiClient {
   async uploadChunk(uploadId: string, index: number, chunk: Blob) {
     const formData = new FormData();
     formData.append('file', chunk);
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/chunk/${index}`, {
-      method: 'POST',
-      body: formData,
-    });
+    return this.request<{ detail: string }>(
+      `/media/resumable/${uploadId}/chunk/${index}`,
+      {
+        method: 'POST',
+        body: formData,
+      },
+    );
   }
 
   async pauseResumableUpload(uploadId: string) {
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/pause`, {
-      method: 'POST',
-    });
+    return this.request<{ detail: string }>(
+      `/media/resumable/${uploadId}/pause`,
+      {
+        method: 'POST',
+      },
+    );
   }
 
   async resumeResumableUpload(uploadId: string) {
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/resume`, {
-      method: 'POST',
-    });
+    return this.request<{ detail: string }>(
+      `/media/resumable/${uploadId}/resume`,
+      {
+        method: 'POST',
+      },
+    );
   }
 
   async retryChunk(uploadId: string, index: number, chunk: Blob) {
     const formData = new FormData();
     formData.append('file', chunk);
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}/retry?index=${index}`, {
-      method: 'POST',
-      headers: {},
-      body: formData,
-    });
+    return this.request<{ detail: string }>(
+      `/media/resumable/${uploadId}/retry?index=${index}`,
+      {
+        method: 'POST',
+        headers: {},
+        body: formData,
+      },
+    );
   }
 
   async cancelResumableUpload(uploadId: string) {
-    return this.request<{ detail: string }>(`/media/resumable/${uploadId}`, { method: 'DELETE' });
+    return this.request<{ detail: string }>(`/media/resumable/${uploadId}`, {
+      method: 'DELETE',
+    });
   }
 
   async finalizeResumableUpload(uploadId: string) {
@@ -857,7 +904,10 @@ class ApiClient {
     });
   }
 
-  async filterVideo(id: string, data: { operation: string; intensity?: number }) {
+  async filterVideo(
+    id: string,
+    data: { operation: string; intensity?: number },
+  ) {
     return this.request<{
       output_filename: string;
       operation: string;
@@ -868,7 +918,10 @@ class ApiClient {
     });
   }
 
-  async fadeVideo(id: string, data: { fade_type: string; duration: number; start_time?: number }) {
+  async fadeVideo(
+    id: string,
+    data: { fade_type: string; duration: number; start_time?: number },
+  ) {
     return this.request<{
       output_filename: string;
       operation: string;
@@ -911,21 +964,37 @@ class ApiClient {
     if (data.channels) query.set('channels', String(data.channels));
     if (data.quality_preset) query.set('quality_preset', data.quality_preset);
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/extract${qs ? `?${qs}` : ''}`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/audio/${mediaId}/extract${qs ? `?${qs}` : ''}`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to extract audio');
     return response.blob();
   }
 
-  async adjustVolume(mediaId: string, volume: number, fadeIn?: number, fadeOut?: number) {
-    return this.request<{ output_filename: string }>(`/audio/${mediaId}/volume`, {
-      method: 'POST',
-      body: JSON.stringify({ volume, fade_in: fadeIn, fade_out: fadeOut }),
-    });
+  async adjustVolume(
+    mediaId: string,
+    volume: number,
+    fadeIn?: number,
+    fadeOut?: number,
+  ) {
+    return this.request<{ output_filename: string }>(
+      `/audio/${mediaId}/volume`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ volume, fade_in: fadeIn, fade_out: fadeOut }),
+      },
+    );
   }
 
-  async replaceAudio(mediaId: string, audioPath: string, fadeIn?: number, fadeOut?: number) {
+  async replaceAudio(
+    mediaId: string,
+    audioPath: string,
+    fadeIn?: number,
+    fadeOut?: number,
+  ) {
     const query = new URLSearchParams({ audio_path: audioPath });
     if (fadeIn !== undefined) query.set('fade_in', String(fadeIn));
     if (fadeOut !== undefined) query.set('fade_out', String(fadeOut));
@@ -1014,14 +1083,17 @@ class ApiClient {
     if (data.channels) query.set('channels', String(data.channels));
     if (data.quality) query.set('quality', data.quality);
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/convert${qs ? `?${qs}` : ''}`, {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json',
-        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+    const response = await fetch(
+      `${this.baseUrl}/audio/${mediaId}/convert${qs ? `?${qs}` : ''}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+          ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+        },
       },
-    });
+    );
     if (!response.ok) throw new Error('Failed to convert audio');
     return response.blob();
   }
@@ -1087,14 +1159,22 @@ class ApiClient {
     if (height !== undefined) query.set('height', String(height));
     if (fmt) query.set('fmt', fmt);
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/thumbnails/${mediaId}${qs ? `?${qs}` : ''}`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/thumbnails/${mediaId}${qs ? `?${qs}` : ''}`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to fetch thumbnail');
     return response.blob();
   }
 
-  async getThumbnailSet(mediaId: string, interval?: number, width?: number, fmt?: string) {
+  async getThumbnailSet(
+    mediaId: string,
+    interval?: number,
+    width?: number,
+    fmt?: string,
+  ) {
     const query = new URLSearchParams();
     if (interval !== undefined) query.set('interval', String(interval));
     if (width !== undefined) query.set('width', String(width));
@@ -1142,18 +1222,22 @@ class ApiClient {
     query.set('subtitle_path', subtitlePath);
     if (data.font_size) query.set('font_size', String(data.font_size));
     if (data.font_color) query.set('font_color', data.font_color);
-    if (data.background_color) query.set('background_color', data.background_color);
+    if (data.background_color)
+      query.set('background_color', data.background_color);
     if (data.position) query.set('position', data.position);
     if (data.font) query.set('font', data.font);
     if (data.alignment) query.set('alignment', data.alignment);
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/burn?${qs}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+    const response = await fetch(
+      `${this.baseUrl}/subtitles/${mediaId}/burn?${qs}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
+        },
       },
-    });
+    );
     if (!response.ok) throw new Error('Failed to burn subtitles');
     return response.json();
   }
@@ -1180,13 +1264,18 @@ class ApiClient {
     const query = new URLSearchParams();
     query.set('subtitle_path', subtitlePath);
     if (data.language) query.set('language', data.language);
-    if (data.is_default !== undefined) query.set('is_default', String(data.is_default));
-    if (data.is_forced !== undefined) query.set('is_forced', String(data.is_forced));
+    if (data.is_default !== undefined)
+      query.set('is_default', String(data.is_default));
+    if (data.is_forced !== undefined)
+      query.set('is_forced', String(data.is_forced));
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/mux?${qs}`, {
-      method: 'POST',
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/subtitles/${mediaId}/mux?${qs}`,
+      {
+        method: 'POST',
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to mux subtitles');
     return response.blob();
   }
@@ -1221,16 +1310,21 @@ class ApiClient {
       end?: number;
     },
   ) {
-    const response = await fetch(this.baseUrl + '/subtitles/' + mediaId + '/edit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}),
+    const response = await fetch(
+      this.baseUrl + '/subtitles/' + mediaId + '/edit',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}),
+        },
+        body: JSON.stringify(data),
       },
-      body: JSON.stringify(data),
-    });
+    );
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Failed to edit subtitles' }));
+      const error = await response
+        .json()
+        .catch(() => ({ detail: 'Failed to edit subtitles' }));
       throw new Error(error.detail || 'Failed to edit subtitles');
     }
     return response.blob();
@@ -1253,7 +1347,9 @@ class ApiClient {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ detail: 'Failed to sync subtitles' }));
+      const error = await response
+        .json()
+        .catch(() => ({ detail: 'Failed to sync subtitles' }));
       throw new Error(error.detail || 'Failed to sync subtitles');
     }
     const contentType = response.headers.get('content-type') || '';
@@ -1278,9 +1374,12 @@ class ApiClient {
     if (data.width) query.set('width', String(data.width));
     if (data.fps) query.set('fps', String(data.fps));
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/preview/${mediaId}/video${qs ? `?${qs}` : ''}`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/preview/${mediaId}/video${qs ? `?${qs}` : ''}`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to generate video preview');
     return response.blob();
   }
@@ -1302,9 +1401,12 @@ class ApiClient {
     if (data.fps) query.set('fps', String(data.fps));
     if (data.quality) query.set('quality', String(data.quality));
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/preview/${mediaId}/gif${qs ? `?${qs}` : ''}`, {
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/preview/${mediaId}/gif${qs ? `?${qs}` : ''}`,
+      {
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to generate GIF preview');
     return response.blob();
   }
@@ -1319,7 +1421,8 @@ class ApiClient {
     },
   ) {
     const query = new URLSearchParams();
-    if (data.timestamp !== undefined) query.set('timestamp', String(data.timestamp));
+    if (data.timestamp !== undefined)
+      query.set('timestamp', String(data.timestamp));
     if (data.width !== undefined) query.set('width', String(data.width));
     if (data.height !== undefined) query.set('height', String(data.height));
     if (data.fmt) query.set('fmt', data.fmt);
@@ -1348,15 +1451,19 @@ class ApiClient {
     const query = new URLSearchParams();
     if (data.start !== undefined) query.set('start', String(data.start));
     if (data.end !== undefined) query.set('end', String(data.end));
-    if (data.duration !== undefined) query.set('duration', String(data.duration));
+    if (data.duration !== undefined)
+      query.set('duration', String(data.duration));
     if (data.width !== undefined) query.set('width', String(data.width));
     if (data.fps) query.set('fps', String(data.fps));
     if (data.quality !== undefined) query.set('quality', String(data.quality));
     const qs = query.toString();
-    const response = await fetch(`${this.baseUrl}/gif/${mediaId}/generate${qs ? `?${qs}` : ''}`, {
-      method: 'POST',
-      headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
-    });
+    const response = await fetch(
+      `${this.baseUrl}/gif/${mediaId}/generate${qs ? `?${qs}` : ''}`,
+      {
+        method: 'POST',
+        headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
+      },
+    );
     if (!response.ok) throw new Error('Failed to generate GIF');
     return response.blob();
   }
@@ -1383,13 +1490,21 @@ class ApiClient {
   }
 
   async batchUpload(files: string[]) {
-    return this.request<{ job_id: string; total_files: number; status: string }>('/batch/upload', {
+    return this.request<{
+      job_id: string;
+      total_files: number;
+      status: string;
+    }>('/batch/upload', {
       method: 'POST',
       body: JSON.stringify({ files }),
     });
   }
 
-  async batchProcess(mediaIds: string[], operation: string, options?: Record<string, unknown>) {
+  async batchProcess(
+    mediaIds: string[],
+    operation: string,
+    options?: Record<string, unknown>,
+  ) {
     return this.request<{
       job_id: string;
       total_items: number;
@@ -1457,7 +1572,11 @@ class ApiClient {
 
   async updatePreset(
     presetId: string,
-    data: { name?: string; description?: string; settings?: Record<string, unknown> },
+    data: {
+      name?: string;
+      description?: string;
+      settings?: Record<string, unknown>;
+    },
   ) {
     return this.request<{
       id: string;
@@ -1598,7 +1717,9 @@ class ApiClient {
   }
 
   async deleteMediaVersion(mediaId: string, versionId: string) {
-    return this.request<void>(`/media/${mediaId}/versions/${versionId}`, { method: 'DELETE' });
+    return this.request<void>(`/media/${mediaId}/versions/${versionId}`, {
+      method: 'DELETE',
+    });
   }
 
   async restoreMediaVersion(mediaId: string, versionId: string) {
@@ -1761,15 +1882,15 @@ class ApiClient {
   }
 
   async getStorageByType() {
-    return this.request<{ media_type: string; total_size: number; count: number }[]>(
-      '/storage/usage/by-type',
-    );
+    return this.request<
+      { media_type: string; total_size: number; count: number }[]
+    >('/storage/usage/by-type');
   }
 
   async getStorageByFolder() {
-    return this.request<{ folder: string; total_size: number; count: number }[]>(
-      '/storage/usage/by-folder',
-    );
+    return this.request<
+      { folder: string; total_size: number; count: number }[]
+    >('/storage/usage/by-folder');
   }
 
   async searchMedia(params: {
@@ -1788,11 +1909,16 @@ class ApiClient {
     if (params.media_type) query.set('media_type', params.media_type);
     if (params.folder) query.set('folder', params.folder);
     if (params.tag) query.set('tag', params.tag);
-    if (params.min_size !== undefined) query.set('min_size', String(params.min_size));
-    if (params.max_size !== undefined) query.set('max_size', String(params.max_size));
-    if (params.min_duration !== undefined) query.set('min_duration', String(params.min_duration));
-    if (params.max_duration !== undefined) query.set('max_duration', String(params.max_duration));
-    if (params.processing_status) query.set('processing_status', params.processing_status);
+    if (params.min_size !== undefined)
+      query.set('min_size', String(params.min_size));
+    if (params.max_size !== undefined)
+      query.set('max_size', String(params.max_size));
+    if (params.min_duration !== undefined)
+      query.set('min_duration', String(params.min_duration));
+    if (params.max_duration !== undefined)
+      query.set('max_duration', String(params.max_duration));
+    if (params.processing_status)
+      query.set('processing_status', params.processing_status);
     const qs = query.toString();
     return this.request<
       {
@@ -1809,7 +1935,11 @@ class ApiClient {
     >(`/search/media${qs ? `?${qs}` : ''}`);
   }
 
-  async listNotifications(params?: { page?: number; page_size?: number; unread_only?: boolean }) {
+  async listNotifications(params?: {
+    page?: number;
+    page_size?: number;
+    unread_only?: boolean;
+  }) {
     const query = new URLSearchParams();
     if (params?.page) query.set('page', String(params.page));
     if (params?.page_size) query.set('page_size', String(params.page_size));
@@ -1832,7 +1962,9 @@ class ApiClient {
   }
 
   async getUnreadNotificationCount() {
-    return this.request<{ unread_count: number }>('/notifications/unread-count');
+    return this.request<{ unread_count: number }>(
+      '/notifications/unread-count',
+    );
   }
 
   async markAllNotificationsRead() {
@@ -1925,9 +2057,12 @@ class ApiClient {
       media_id: string;
       action_id: string;
       status: string;
-    }>(`/quick-actions/${mediaId}/execute?action_id=${encodeURIComponent(actionId)}`, {
-      method: 'POST',
-    });
+    }>(
+      `/quick-actions/${mediaId}/execute?action_id=${encodeURIComponent(actionId)}`,
+      {
+        method: 'POST',
+      },
+    );
   }
 
   async listJobs() {

@@ -5,10 +5,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { api } from '@/lib/api/client';
-import { Loader2, Zap, Play, CheckCircle2, XCircle, Clock, AlertCircle } from 'lucide-react';
+import {
+  Loader2,
+  Zap,
+  Play,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  AlertCircle,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
+const statusConfig: Record<
+  string,
+  { icon: typeof Clock; color: string; label: string }
+> = {
   queued: {
     icon: Clock,
     color: `
@@ -84,7 +95,10 @@ export default function QuickActionsPage() {
   const handleExecute = async (actionId: string) => {
     if (!mediaId) return;
     setExecuting(actionId);
-    setExecutionStatus((prev) => ({ ...prev, [actionId]: { status: 'processing', progress: 0 } }));
+    setExecutionStatus((prev) => ({
+      ...prev,
+      [actionId]: { status: 'processing', progress: 0 },
+    }));
     try {
       const result = await api.executeQuickAction(mediaId, actionId);
       setExecutionStatus((prev) => ({
@@ -105,16 +119,19 @@ export default function QuickActionsPage() {
     }
   };
 
-  const getStatusInfo = (status: string) => statusConfig[status] || statusConfig.queued;
+  const getStatusInfo = (status: string) =>
+    statusConfig[status] || statusConfig.queued;
 
   if (loading) {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className={`
+          <h1
+            className={`
             text-3xl font-bold tracking-tight text-zinc-900
             dark:text-zinc-50
-          `}>
+          `}
+          >
             Quick Actions
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -123,7 +140,10 @@ export default function QuickActionsPage() {
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="h-48 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded-xl" />
+            <div
+              key={i}
+              className="h-48 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded-xl"
+            />
           ))}
         </div>
       </div>
@@ -133,10 +153,12 @@ export default function QuickActionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className={`
+        <h1
+          className={`
           text-3xl font-bold tracking-tight text-zinc-900
           dark:text-zinc-50
-        `}>
+        `}
+        >
           Quick Actions
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -180,14 +202,20 @@ export default function QuickActionsPage() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {quickActions.video.map((action) => (
-                <Card key={action.id} className="border-zinc-200 dark:border-zinc-800">
+                <Card
+                  key={action.id}
+                  className="border-zinc-200 dark:border-zinc-800"
+                >
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-zinc-900 dark:text-zinc-50">
                           {action.label}
                         </span>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs"
+                        >
                           Video
                         </Badge>
                       </div>
@@ -219,20 +247,25 @@ export default function QuickActionsPage() {
                             <span>{executionStatus[action.id].status}</span>
                             <span>{executionStatus[action.id].progress}%</span>
                           </div>
-                          <div className={`
+                          <div
+                            className={`
                             h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
                             overflow-hidden
-                          `}>
+                          `}
+                          >
                             <div
                               className={cn(
                                 'h-full transition-all',
                                 executionStatus[action.id].status === 'failed'
                                   ? 'bg-red-500'
-                                  : executionStatus[action.id].status === 'completed'
+                                  : executionStatus[action.id].status ===
+                                      'completed'
                                     ? 'bg-green-500'
                                     : 'bg-indigo-500',
                               )}
-                              style={{ width: `${executionStatus[action.id].progress}%` }}
+                              style={{
+                                width: `${executionStatus[action.id].progress}%`,
+                              }}
                             />
                           </div>
                           {executionStatus[action.id].error && (
@@ -255,14 +288,20 @@ export default function QuickActionsPage() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {quickActions.audio.map((action) => (
-                <Card key={action.id} className="border-zinc-200 dark:border-zinc-800">
+                <Card
+                  key={action.id}
+                  className="border-zinc-200 dark:border-zinc-800"
+                >
                   <CardContent className="p-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-zinc-900 dark:text-zinc-50">
                           {action.label}
                         </span>
-                        <Badge variant="secondary" className="text-xs">
+                        <Badge
+                          variant="secondary"
+                          className="text-xs"
+                        >
                           Audio
                         </Badge>
                       </div>
@@ -294,20 +333,25 @@ export default function QuickActionsPage() {
                             <span>{executionStatus[action.id].status}</span>
                             <span>{executionStatus[action.id].progress}%</span>
                           </div>
-                          <div className={`
+                          <div
+                            className={`
                             h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
                             overflow-hidden
-                          `}>
+                          `}
+                          >
                             <div
                               className={cn(
                                 'h-full transition-all',
                                 executionStatus[action.id].status === 'failed'
                                   ? 'bg-red-500'
-                                  : executionStatus[action.id].status === 'completed'
+                                  : executionStatus[action.id].status ===
+                                      'completed'
                                     ? 'bg-green-500'
                                     : 'bg-indigo-500',
                               )}
-                              style={{ width: `${executionStatus[action.id].progress}%` }}
+                              style={{
+                                width: `${executionStatus[action.id].progress}%`,
+                              }}
                             />
                           </div>
                           {executionStatus[action.id].error && (
@@ -331,14 +375,20 @@ export default function QuickActionsPage() {
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {quickActions.image.map((action) => (
-                  <Card key={action.id} className="border-zinc-200 dark:border-zinc-800">
+                  <Card
+                    key={action.id}
+                    className="border-zinc-200 dark:border-zinc-800"
+                  >
                     <CardContent className="p-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <span className="font-medium text-zinc-900 dark:text-zinc-50">
                             {action.label}
                           </span>
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             Image
                           </Badge>
                         </div>
@@ -368,22 +418,29 @@ export default function QuickActionsPage() {
                           <div className="space-y-1">
                             <div className="flex items-center justify-between text-xs">
                               <span>{executionStatus[action.id].status}</span>
-                              <span>{executionStatus[action.id].progress}%</span>
+                              <span>
+                                {executionStatus[action.id].progress}%
+                              </span>
                             </div>
-                            <div className={`
+                            <div
+                              className={`
                               h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
                               overflow-hidden
-                            `}>
+                            `}
+                            >
                               <div
                                 className={cn(
                                   'h-full transition-all',
                                   executionStatus[action.id].status === 'failed'
                                     ? 'bg-red-500'
-                                    : executionStatus[action.id].status === 'completed'
+                                    : executionStatus[action.id].status ===
+                                        'completed'
                                       ? 'bg-green-500'
                                       : 'bg-indigo-500',
                                 )}
-                                style={{ width: `${executionStatus[action.id].progress}%` }}
+                                style={{
+                                  width: `${executionStatus[action.id].progress}%`,
+                                }}
                               />
                             </div>
                             {executionStatus[action.id].error && (

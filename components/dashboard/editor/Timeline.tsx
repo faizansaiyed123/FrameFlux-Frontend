@@ -60,7 +60,10 @@ export function Timeline({
       const handleMouseMove = (moveEvent: MouseEvent) => {
         const deltaX = moveEvent.clientX - startX;
         const deltaTime = deltaX / pixelsPerSecond;
-        const newStart = Math.max(0, Math.min(originalStart + deltaTime, duration - clipDuration));
+        const newStart = Math.max(
+          0,
+          Math.min(originalStart + deltaTime, duration - clipDuration),
+        );
         const newEnd = newStart + clipDuration;
         onClipChange(clip, { start: newStart, end: newEnd });
       };
@@ -88,10 +91,16 @@ export function Timeline({
         const deltaX = moveEvent.clientX - startX;
         const deltaTime = deltaX / pixelsPerSecond;
         if (edge === 'left') {
-          const newStart = Math.max(0, Math.min(originalValue + deltaTime, clip.end - 0.1));
+          const newStart = Math.max(
+            0,
+            Math.min(originalValue + deltaTime, clip.end - 0.1),
+          );
           onClipChange(clip, { start: newStart });
         } else {
-          const newEnd = Math.min(duration, Math.max(originalValue + deltaTime, clip.start + 0.1));
+          const newEnd = Math.min(
+            duration,
+            Math.max(originalValue + deltaTime, clip.start + 0.1),
+          );
           onClipChange(clip, { end: newEnd });
         }
       };
@@ -107,7 +116,8 @@ export function Timeline({
     [pixelsPerSecond, duration, onSelectClip, onClipChange],
   );
 
-  const playheadPosition = duration > 0 ? (currentTime / duration) * timelineWidth : 0;
+  const playheadPosition =
+    duration > 0 ? (currentTime / duration) * timelineWidth : 0;
 
   const generateTimeMarkers = () => {
     const markers = [];
@@ -134,10 +144,12 @@ export function Timeline({
 
   if (duration <= 0 || isNaN(duration)) {
     return (
-      <div className={`
+      <div
+        className={`
         flex h-full items-center justify-center text-xs
         text-zinc-400
-      `}>
+      `}
+      >
         Loading timeline...
       </div>
     );
@@ -145,11 +157,15 @@ export function Timeline({
 
   return (
     <div className="flex h-full flex-col">
-      <div className={`
+      <div
+        className={`
         flex items-center justify-between px-4 py-1 border-b
         border-zinc-200 dark:border-zinc-800
-      `}>
-        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Timeline</span>
+      `}
+      >
+        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+          Timeline
+        </span>
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-zinc-400">
             {clips.length} clip{clips.length !== 1 ? 's' : ''}
@@ -165,18 +181,26 @@ export function Timeline({
         `}
         onClick={handleTimelineClick}
       >
-        <div className="relative h-full min-w-full" style={{ width: timelineWidth }}>
-          <div className={`
+        <div
+          className="relative h-full min-w-full"
+          style={{ width: timelineWidth }}
+        >
+          <div
+            className={`
             absolute top-0 left-0 right-0 h-6 border-b border-zinc-200
             dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50
-          `}>
+          `}
+          >
             {generateTimeMarkers()}
           </div>
 
           <div className="absolute top-6 left-0 right-0 bottom-0">
             {clips.map((clip) => {
               const left = (clip.start / duration) * timelineWidth;
-              const width = Math.max(((clip.end - clip.start) / duration) * timelineWidth, 20);
+              const width = Math.max(
+                ((clip.end - clip.start) / duration) * timelineWidth,
+                20,
+              );
               const isSelected = clip.id === selectedClipId;
 
               return (
@@ -194,14 +218,18 @@ export function Timeline({
                   }}
                   onMouseDown={(e) => handleClipMouseDown(e, clip)}
                 >
-                  <div className={`
+                  <div
+                    className={`
                     px-2 py-1 h-full flex flex-col justify-between
                     overflow-hidden
-                  `}>
-                    <span className={`
+                  `}
+                  >
+                    <span
+                      className={`
                       text-[10px] font-medium text-zinc-700 dark:text-zinc-200
                       truncate
-                    `}>
+                    `}
+                    >
                       {clip.name}
                     </span>
                     <span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-mono">
@@ -233,10 +261,12 @@ export function Timeline({
               `}
               style={{ left: playheadPosition }}
             >
-              <div className={`
+              <div
+                className={`
                 absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3
                 bg-red-500 rotate-45
-              `} />
+              `}
+              />
             </div>
           </div>
         </div>

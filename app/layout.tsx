@@ -13,7 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://frameflux.io'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://frameflux.io',
+  ),
   title: {
     default: 'FrameFlux — Video Processing API for Developers',
     template: '%s | FrameFlux',
@@ -56,7 +58,8 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'FrameFlux — Video Processing API for Developers',
-    description: 'Professional video transcoding, editing, and processing REST API.',
+    description:
+      'Professional video transcoding, editing, and processing REST API.',
     images: ['/og-image.png'],
     creator: '@frameflux',
   },
@@ -78,7 +81,11 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
@@ -86,13 +93,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://api.frameflux.io" />
-        <link rel="dns-prefetch" href="https://api.frameflux.io" />
+        <link
+          rel="preconnect"
+          href="https://api.frameflux.io"
+        />
+        <link
+          rel="dns-prefetch"
+          href="https://api.frameflux.io"
+        />
       </head>
-      <body className={`
+      <body
+        className={`
         min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900
         dark:text-zinc-50
-      `}>
+      `}
+      >
         {children}
       </body>
     </html>

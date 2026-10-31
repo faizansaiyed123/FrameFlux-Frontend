@@ -34,7 +34,13 @@ export function ThumbnailForm({ mediaId }: Props) {
         width = w;
         height = h;
       }
-      const blob = await api.getThumbnail(mediaId, parseFloat(timestamp), width, height, fmt);
+      const blob = await api.getThumbnail(
+        mediaId,
+        parseFloat(timestamp),
+        width,
+        height,
+        fmt,
+      );
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -63,7 +69,10 @@ export function ThumbnailForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Format</Label>
-        <Select value={fmt} onValueChange={setFmt}>
+        <Select
+          value={fmt}
+          onValueChange={setFmt}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select format" />
           </SelectTrigger>
@@ -81,7 +90,10 @@ export function ThumbnailForm({ mediaId }: Props) {
       </div>
       <div className="space-y-2">
         <Label>Resolution</Label>
-        <Select value={resolution} onValueChange={setResolution}>
+        <Select
+          value={resolution}
+          onValueChange={setResolution}
+        >
           <SelectTrigger>
             <SelectValue placeholder="Select resolution" />
           </SelectTrigger>
@@ -95,7 +107,11 @@ export function ThumbnailForm({ mediaId }: Props) {
           </SelectContent>
         </Select>
       </div>
-      <Button onClick={handleGenerate} disabled={loading} className="w-full">
+      <Button
+        onClick={handleGenerate}
+        disabled={loading}
+        className="w-full"
+      >
         {loading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -19,35 +19,30 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default:
-          `
+        default: `
             border-transparent bg-primary text-primary-foreground shadow-sm
             shadow-indigo-500/20 hover:bg-primary/90 hover:shadow-md
             hover:shadow-indigo-500/20
           `,
-        destructive:
-          `
+        destructive: `
             border-transparent bg-destructive text-white shadow-sm
             shadow-red-500/15 hover:bg-destructive/90 hover:shadow-md
             hover:shadow-red-500/15 focus-visible:ring-destructive/20
             dark:bg-destructive/80 dark:hover:bg-destructive/70
           `,
-        outline:
-          `
+        outline: `
             border-border bg-background text-foreground shadow-xs
             hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700
             dark:hover:border-indigo-700 dark:hover:bg-indigo-950/40
             dark:hover:text-indigo-200
           `,
-        secondary:
-          `
+        secondary: `
             border-indigo-100 bg-secondary text-secondary-foreground
             shadow-xs hover:border-indigo-200 hover:bg-indigo-100
             dark:border-indigo-900/60 dark:hover:border-indigo-800
             dark:hover:bg-indigo-950/70
           `,
-        ghost:
-          `
+        ghost: `
             border-transparent bg-transparent shadow-none
             hover:border-indigo-100 hover:bg-accent
             hover:text-accent-foreground dark:hover:border-indigo-900/60

@@ -34,7 +34,9 @@ export default function ForgotPasswordPage() {
       await api.forgotPassword(email);
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send reset email');
+      setError(
+        err instanceof Error ? err.message : 'Failed to send reset email',
+      );
     } finally {
       setLoading(false);
     }
@@ -42,10 +44,12 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className={`
+      <div
+        className={`
         min-h-screen flex items-center justify-center bg-zinc-50
         dark:bg-zinc-950 px-4 py-16
-      `}>
+      `}
+      >
         <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-800">
           <CardHeader className="text-center">
             <Link
@@ -59,7 +63,8 @@ export default function ForgotPasswordPage() {
             </Link>
             <CardTitle className="text-2xl">Check your email</CardTitle>
             <CardDescription>
-              If an account with that email exists, we sent password reset instructions.
+              If an account with that email exists, we sent password reset
+              instructions.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -68,7 +73,11 @@ export default function ForgotPasswordPage() {
             </p>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button variant="outline" className="w-full" onClick={() => router.push('/auth/login')}>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => router.push('/auth/login')}
+            >
               Back to login
             </Button>
           </CardFooter>
@@ -78,10 +87,12 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className={`
+    <div
+      className={`
       min-h-screen flex items-center justify-center bg-zinc-50
       dark:bg-zinc-950 px-4 py-16
-    `}>
+    `}
+    >
       <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-800">
         <CardHeader className="text-center">
           <Link
@@ -94,26 +105,35 @@ export default function ForgotPasswordPage() {
             FrameFlux
           </Link>
           <CardTitle className="text-2xl">Reset your password</CardTitle>
-          <CardDescription>Enter your email and we will send you a reset link</CardDescription>
+          <CardDescription>
+            Enter your email and we will send you a reset link
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
-            <Alert className={`
+            <Alert
+              className={`
               border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
               text-red-700 dark:text-red-300
-            `}>
+            `}
+            >
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
-                <Mail className={`
+                <Mail
+                  className={`
                   absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
                   text-zinc-400
-                `} />
+                `}
+                />
                 <Input
                   id="email"
                   type="email"
@@ -127,7 +147,11 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

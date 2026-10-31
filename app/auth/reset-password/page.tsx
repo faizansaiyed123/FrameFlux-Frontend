@@ -62,7 +62,10 @@ function ResetPasswordForm() {
         <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center mb-4">
           This password reset link is missing or invalid.
         </p>
-        <Button className="w-full" onClick={() => router.push('/auth/forgot-password')}>
+        <Button
+          className="w-full"
+          onClick={() => router.push('/auth/forgot-password')}
+        >
           Request a new link
         </Button>
       </CardContent>
@@ -75,7 +78,10 @@ function ResetPasswordForm() {
         <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center mb-4">
           Your password has been reset successfully.
         </p>
-        <Button className="w-full" onClick={() => router.push('/auth/login')}>
+        <Button
+          className="w-full"
+          onClick={() => router.push('/auth/login')}
+        >
           Sign in with new password
         </Button>
       </CardContent>
@@ -85,22 +91,29 @@ function ResetPasswordForm() {
   return (
     <CardContent className="space-y-4">
       {error && (
-        <Alert className={`
+        <Alert
+          className={`
           border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
           text-red-700 dark:text-red-300
-        `}>
+        `}
+        >
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4"
+      >
         <div className="space-y-2">
           <Label htmlFor="password">New Password</Label>
           <div className="relative">
-            <Lock className={`
+            <Lock
+              className={`
               absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
               text-zinc-400
-            `} />
+            `}
+            />
             <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
@@ -121,19 +134,27 @@ function ResetPasswordForm() {
               `}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
           </div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-500">At least 8 characters</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-500">
+            At least 8 characters
+          </p>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">Confirm New Password</Label>
           <div className="relative">
-            <Lock className={`
+            <Lock
+              className={`
               absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
               text-zinc-400
-            `} />
+            `}
+            />
             <Input
               id="confirmPassword"
               type={showPassword ? 'text' : 'password'}
@@ -147,7 +168,11 @@ function ResetPasswordForm() {
           </div>
         </div>
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={loading}
+        >
           {loading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -164,10 +189,12 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className={`
+    <div
+      className={`
       min-h-screen flex items-center justify-center bg-zinc-50
       dark:bg-zinc-950 px-4 py-16
-    `}>
+    `}
+    >
       <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-800">
         <CardHeader className="text-center">
           <Link
@@ -180,7 +207,9 @@ export default function ResetPasswordPage() {
             FrameFlux
           </Link>
           <CardTitle className="text-2xl">Set a new password</CardTitle>
-          <CardDescription>Create a strong password for your account</CardDescription>
+          <CardDescription>
+            Create a strong password for your account
+          </CardDescription>
         </CardHeader>
         <Suspense
           fallback={

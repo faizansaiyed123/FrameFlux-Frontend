@@ -73,7 +73,9 @@ export default function BatchPage() {
   }, [fetchAvailableMedia]);
 
   const toggleMediaSelection = (id: string) => {
-    setMediaIds((prev) => (prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]));
+    setMediaIds((prev) =>
+      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id],
+    );
   };
 
   const handleBatch = async () => {
@@ -87,7 +89,11 @@ export default function BatchPage() {
         total: result.total_items,
         completed: 0,
         failed: 0,
-        results: result.results.map((r) => ({ ...r, status: 'queued', progress: 0 })),
+        results: result.results.map((r) => ({
+          ...r,
+          status: 'queued',
+          progress: 0,
+        })),
       });
       setMediaIds([]);
     } catch {
@@ -117,10 +123,12 @@ export default function BatchPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className={`
+        <h1
+          className={`
           text-3xl font-bold tracking-tight text-zinc-900
           dark:text-zinc-50
-        `}>
+        `}
+        >
           Batch Processing
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -136,10 +144,12 @@ export default function BatchPage() {
           <div className="space-y-2">
             <Label>Select Media Files</Label>
             <div className="relative">
-              <Search className={`
+              <Search
+                className={`
                 absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
                 text-zinc-400
-              `} />
+              `}
+              />
               <Input
                 placeholder="Search media files..."
                 value={mediaSearch}
@@ -147,12 +157,16 @@ export default function BatchPage() {
                 className="pl-10"
               />
             </div>
-            <div className={`
+            <div
+              className={`
               max-h-64 overflow-y-auto border border-zinc-200
               dark:border-zinc-700 rounded-lg p-2
-            `}>
+            `}
+            >
               {mediaLoading ? (
-                <div className="text-center py-4 text-zinc-500 dark:text-zinc-400">Loading...</div>
+                <div className="text-center py-4 text-zinc-500 dark:text-zinc-400">
+                  Loading...
+                </div>
               ) : availableMedia.length === 0 ? (
                 <div className="text-center py-4 text-zinc-500 dark:text-zinc-400">
                   No media files found
@@ -172,10 +186,12 @@ export default function BatchPage() {
                         onCheckedChange={() => toggleMediaSelection(media.id)}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className={`
+                        <p
+                          className={`
                           text-sm font-medium text-zinc-900 dark:text-zinc-50
                           truncate
-                        `}>
+                        `}
+                        >
                           {media.original_filename}
                         </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
@@ -184,7 +200,9 @@ export default function BatchPage() {
                             ? `${(media.file_size / 1024 / 1024).toFixed(1)} MB`
                             : 'Unknown size'}
                           {media.duration
-                            ? ` • ${Math.floor(media.duration / 60)}:${(media.duration % 60)
+                            ? ` • ${Math.floor(media.duration / 60)}:${(
+                                media.duration % 60
+                              )
                                 .toFixed(0)
                                 .padStart(2, '0')}`
                             : ''}
@@ -201,7 +219,10 @@ export default function BatchPage() {
           </div>
           <div className="space-y-2">
             <Label>Operation</Label>
-            <Select value={operation} onValueChange={setOperation}>
+            <Select
+              value={operation}
+              onValueChange={setOperation}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select operation" />
               </SelectTrigger>
@@ -209,8 +230,12 @@ export default function BatchPage() {
                 <SelectItem value="convert">Convert</SelectItem>
                 <SelectItem value="compress">Compress</SelectItem>
                 <SelectItem value="extract_audio">Extract Audio</SelectItem>
-                <SelectItem value="generate_thumbnail">Generate Thumbnail</SelectItem>
-                <SelectItem value="generate_preview">Generate Preview</SelectItem>
+                <SelectItem value="generate_thumbnail">
+                  Generate Thumbnail
+                </SelectItem>
+                <SelectItem value="generate_preview">
+                  Generate Preview
+                </SelectItem>
                 <SelectItem value="trim">Trim</SelectItem>
                 <SelectItem value="cut">Cut</SelectItem>
                 <SelectItem value="crop">Crop</SelectItem>
@@ -255,7 +280,8 @@ export default function BatchPage() {
                   Job ID: {job.job_id}
                 </p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {job.total} total • {job.completed} completed • {job.failed} failed
+                  {job.total} total • {job.completed} completed • {job.failed}{' '}
+                  failed
                 </p>
               </div>
               <Badge
@@ -270,13 +296,17 @@ export default function BatchPage() {
                 {job.status}
               </Badge>
             </div>
-            <div className={`
+            <div
+              className={`
               h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
               overflow-hidden
-            `}>
+            `}
+            >
               <div
                 className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all"
-                style={{ width: `${job.total > 0 ? (job.completed / job.total) * 100 : 0}%` }}
+                style={{
+                  width: `${job.total > 0 ? (job.completed / job.total) * 100 : 0}%`,
+                }}
               />
             </div>
             <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -292,9 +322,13 @@ export default function BatchPage() {
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                       {result.filename}
                     </p>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">{result.media_id}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {result.media_id}
+                    </p>
                     {result.error && (
-                      <p className="text-xs text-red-600 dark:text-red-400">{result.error}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400">
+                        {result.error}
+                      </p>
                     )}
                   </div>
                   <div className="flex items-center gap-3">
@@ -312,10 +346,12 @@ export default function BatchPage() {
                       {result.status}
                     </Badge>
                     {result.status === 'processing' && (
-                      <div className={`
+                      <div
+                        className={`
                         w-24 h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full
                         overflow-hidden
-                      `}>
+                      `}
+                      >
                         <div
                           className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all"
                           style={{ width: `${result.progress}%` }}
@@ -326,8 +362,14 @@ export default function BatchPage() {
                 </div>
               ))}
             </div>
-            <Button variant="outline" onClick={fetchJobStatus} disabled={jobLoading}>
-              {jobLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            <Button
+              variant="outline"
+              onClick={fetchJobStatus}
+              disabled={jobLoading}
+            >
+              {jobLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
               Refresh Status
             </Button>
           </CardContent>

@@ -19,7 +19,10 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
+const statusConfig: Record<
+  string,
+  { icon: typeof Clock; color: string; label: string }
+> = {
   queued: {
     icon: Clock,
     color: `
@@ -91,7 +94,10 @@ export default function JobsPage() {
 
   useEffect(() => {
     const hasActiveJobs = jobs.some(
-      (job) => job.status === 'queued' || job.status === 'processing' || job.status === 'running',
+      (job) =>
+        job.status === 'queued' ||
+        job.status === 'processing' ||
+        job.status === 'running',
     );
     if (!hasActiveJobs) return;
 
@@ -104,7 +110,8 @@ export default function JobsPage() {
 
   const filtered = jobs.filter((job) => {
     if (filter !== 'all' && job.status !== filter) return false;
-    if (search && !job.job_id.toLowerCase().includes(search.toLowerCase())) return false;
+    if (search && !job.job_id.toLowerCase().includes(search.toLowerCase()))
+      return false;
     return true;
   });
 
@@ -112,10 +119,12 @@ export default function JobsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className={`
+          <h1
+            className={`
             text-3xl font-bold tracking-tight text-zinc-900
             dark:text-zinc-50
-          `}>
+          `}
+          >
             Jobs
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -124,7 +133,10 @@ export default function JobsPage() {
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-24 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded-xl" />
+            <div
+              key={i}
+              className="h-24 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded-xl"
+            />
           ))}
         </div>
       </div>
@@ -135,27 +147,34 @@ export default function JobsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={`
+          <h1
+            className={`
             text-3xl font-bold tracking-tight text-zinc-900
             dark:text-zinc-50
-          `}>
+          `}
+          >
             Jobs
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
             Monitor background processing jobs
           </p>
         </div>
-        <Button variant="outline" onClick={fetchJobs}>
+        <Button
+          variant="outline"
+          onClick={fetchJobs}
+        >
           <RefreshCw className="mr-2 h-4 w-4" />
           Refresh
         </Button>
       </div>
 
       {error && (
-        <Card className={`
+        <Card
+          className={`
           border-red-200 dark:border-red-900 bg-red-50
           dark:bg-red-900/20
-        `}>
+        `}
+        >
           <CardContent className="p-6">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -167,10 +186,12 @@ export default function JobsPage() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className={`
+          <Search
+            className={`
             absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
             text-zinc-400
-          `} />
+          `}
+          />
           <Input
             placeholder="Search jobs..."
             value={search}
@@ -200,10 +221,12 @@ export default function JobsPage() {
       {filtered.length === 0 ? (
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className={`
+            <div
+              className={`
               flex h-16 w-16 items-center justify-center rounded-lg
               bg-zinc-100 dark:bg-zinc-800 mb-4
-            `}>
+            `}
+            >
               <Clock className="h-8 w-8 text-zinc-400" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
@@ -222,24 +245,34 @@ export default function JobsPage() {
             const statusInfo = statusConfig[job.status] || statusConfig.queued;
 
             return (
-              <Card key={job.job_id} className="border-zinc-200 dark:border-zinc-800">
+              <Card
+                key={job.job_id}
+                className="border-zinc-200 dark:border-zinc-800"
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <Badge variant="secondary" className={cn('capitalize', statusInfo.color)}>
+                        <Badge
+                          variant="secondary"
+                          className={cn('capitalize', statusInfo.color)}
+                        >
                           {statusInfo.label}
                         </Badge>
                         <span className="text-sm font-mono text-zinc-500 dark:text-zinc-400">
                           {job.job_id}
                         </span>
                       </div>
-                      <p className="text-sm text-zinc-600 dark:text-zinc-400">{job.stage}</p>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                        {job.stage}
+                      </p>
                       <div className="w-64">
-                        <div className={`
+                        <div
+                          className={`
                           h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
                           overflow-hidden
-                        `}>
+                        `}
+                        >
                           <div
                             className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all"
                             style={{ width: `${job.progress}%` }}
@@ -252,11 +285,15 @@ export default function JobsPage() {
                     </div>
                   </div>
                   {job.error && (
-                    <div className={`
+                    <div
+                      className={`
                       mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border
                       border-red-200 dark:border-red-900
-                    `}>
-                      <p className="text-sm text-red-700 dark:text-red-300">{job.error}</p>
+                    `}
+                    >
+                      <p className="text-sm text-red-700 dark:text-red-300">
+                        {job.error}
+                      </p>
                     </div>
                   )}
                 </CardContent>

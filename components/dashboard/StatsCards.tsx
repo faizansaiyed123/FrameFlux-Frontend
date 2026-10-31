@@ -11,7 +11,8 @@ interface StatsCardsProps {
 
 export function StatsCards({ overview }: StatsCardsProps) {
   const processing =
-    overview.processing_status_counts.processing + overview.processing_status_counts.queued;
+    overview.processing_status_counts.processing +
+    overview.processing_status_counts.queued;
   const completed = overview.processing_status_counts.completed;
 
   const cards = [
@@ -62,16 +63,20 @@ export function StatsCards({ overview }: StatsCardsProps) {
           <CardContent className="p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className={`
+                <p
+                  className={`
                   text-[11px] font-semibold uppercase tracking-[0.12em]
                   text-zinc-400 dark:text-zinc-500
-                `}>
+                `}
+                >
                   {card.title}
                 </p>
-                <p className={`
+                <p
+                  className={`
                   mt-3 text-3xl font-semibold tracking-[-0.04em] text-zinc-950
                   dark:text-zinc-50
-                `}>
+                `}
+                >
                   {card.value}
                 </p>
               </div>

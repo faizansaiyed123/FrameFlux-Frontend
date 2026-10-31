@@ -49,22 +49,28 @@ export default function FavoritesPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className={`
+        <h1
+          className={`
           text-3xl font-bold tracking-tight text-zinc-900
           dark:text-zinc-50
-        `}>
+        `}
+        >
           Favorites
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Your favorite media files</p>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          Your favorite media files
+        </p>
       </div>
 
       {favorites.length === 0 ? (
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-            <div className={`
+            <div
+              className={`
               flex h-16 w-16 items-center justify-center rounded-lg
               bg-zinc-100 dark:bg-zinc-800 mb-4
-            `}>
+            `}
+            >
               <Heart className="h-8 w-8 text-zinc-400" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
@@ -78,17 +84,27 @@ export default function FavoritesPage() {
       ) : (
         <div className="grid gap-4">
           {favorites.map((fav) => (
-            <Card key={fav.id} className="border-zinc-200 dark:border-zinc-800">
+            <Card
+              key={fav.id}
+              className="border-zinc-200 dark:border-zinc-800"
+            >
               <CardContent className="p-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
                     Media ID: {fav.media_id}
                   </p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    Added {formatDistanceToNow(new Date(fav.created_at), { addSuffix: true })}
+                    Added{' '}
+                    {formatDistanceToNow(new Date(fav.created_at), {
+                      addSuffix: true,
+                    })}
                   </p>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => handleRemove(fav.media_id)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleRemove(fav.media_id)}
+                >
                   Remove
                 </Button>
               </CardContent>

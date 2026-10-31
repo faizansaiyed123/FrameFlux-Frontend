@@ -17,10 +17,12 @@ export function Footer() {
   };
 
   return (
-    <footer className={`
+    <footer
+      className={`
       border-t border-zinc-200 bg-white dark:border-zinc-800
       dark:bg-zinc-950
-    `}>
+    `}
+    >
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:py-16">
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
           <div className="max-w-sm">
@@ -29,10 +31,12 @@ export function Footer() {
               className="flex cursor-pointer items-center gap-2.5"
               aria-label="FrameFlux home"
             >
-              <span className={`
+              <span
+                className={`
                 flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950
                 text-white dark:bg-white dark:text-zinc-950
-              `}>
+              `}
+              >
                 <span className="h-2.5 w-2.5 rounded-[3px] bg-current" />
               </span>
               <span className="font-semibold tracking-tight text-zinc-950 dark:text-white">
@@ -40,7 +44,8 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-4 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-              A focused workspace for processing, transforming, and managing your media.
+              A focused workspace for processing, transforming, and managing
+              your media.
             </p>
             <a
               href="mailto:hello@frameflux.io"
@@ -56,10 +61,12 @@ export function Footer() {
           <div className="grid grid-cols-3 gap-12 sm:gap-20">
             {Object.entries(groups).map(([name, links]) => (
               <div key={name}>
-                <h3 className={`
+                <h3
+                  className={`
                   text-xs font-semibold uppercase tracking-wider
                   text-zinc-950 dark:text-white
-                `}>
+                `}
+                >
                   {name}
                 </h3>
                 <ul className="mt-4 space-y-3">

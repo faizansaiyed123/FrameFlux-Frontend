@@ -79,10 +79,12 @@ export function Sidebar({ className }: SidebarProps) {
         className,
       )}
     >
-      <div className={`
+      <div
+        className={`
         flex h-[72px] items-center border-b border-zinc-200/80 px-5
         dark:border-zinc-800/80
-      `}>
+      `}
+      >
         <Link
           href="/app/dashboard"
           className={`
@@ -93,24 +95,30 @@ export function Sidebar({ className }: SidebarProps) {
           `}
           aria-label="FrameFlux dashboard"
         >
-          <span className={`
+          <span
+            className={`
             flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-950
             text-white shadow-sm transition-transform
             group-hover:scale-[1.02] dark:bg-white dark:text-zinc-950
-          `}>
+          `}
+          >
             <span className="h-3 w-3 rounded-[3px] bg-current" />
           </span>
           <div className="leading-none">
-            <span className={`
+            <span
+              className={`
               block text-[15px] font-semibold tracking-[-0.02em] text-zinc-950
               dark:text-white
-            `}>
+            `}
+            >
               FrameFlux
             </span>
-            <span className={`
+            <span
+              className={`
               mt-1 block text-[10px] font-medium uppercase
               tracking-[0.14em] text-zinc-400
-            `}>
+            `}
+            >
               Workspace
             </span>
           </div>
@@ -118,11 +126,15 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
 
       <ScrollArea className="flex-1 py-5">
-        <nav className="space-y-1 px-3" aria-label="Dashboard navigation">
+        <nav
+          className="space-y-1 px-3"
+          aria-label="Dashboard navigation"
+        >
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (item.href !== '/app/dashboard' && pathname.startsWith(item.href));
+              (item.href !== '/app/dashboard' &&
+                pathname.startsWith(item.href));
             return (
               <Link
                 key={item.name}
@@ -174,40 +186,60 @@ export function Sidebar({ className }: SidebarProps) {
                 px-2.5 py-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-900
               `}
             >
-              <Avatar className={`
+              <Avatar
+                className={`
                 h-9 w-9 shrink-0 ring-1 ring-zinc-200 dark:ring-zinc-800
-              `}>
-                <AvatarImage src="" alt={user?.full_name || user?.email || ''} />
-                <AvatarFallback className={`
+              `}
+              >
+                <AvatarImage
+                  src=""
+                  alt={user?.full_name || user?.email || ''}
+                />
+                <AvatarFallback
+                  className={`
                   bg-zinc-100 text-xs font-semibold text-zinc-700 dark:bg-zinc-900
                   dark:text-zinc-200
-                `}>
+                `}
+                >
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1 text-left">
-                <span className={`
+                <span
+                  className={`
                   block truncate text-[13px] font-semibold text-zinc-900
                   dark:text-zinc-50
-                `}>
+                `}
+                >
                   {user?.full_name || 'User'}
                 </span>
-                <span className={`
+                <span
+                  className={`
                   mt-0.5 block truncate text-[11px] text-zinc-500
                   dark:text-zinc-400
-                `}>
+                `}
+                >
                   {user?.email}
                 </span>
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 rounded-xl p-1.5">
+          <DropdownMenuContent
+            align="end"
+            className="w-56 rounded-xl p-1.5"
+          >
             <DropdownMenuLabel className="px-2.5 py-2 text-xs text-zinc-500">
               My Account
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="cursor-pointer rounded-lg">
-              <Link href="/app/dashboard/settings" className="text-zinc-700 dark:text-zinc-300">
+            <DropdownMenuItem
+              asChild
+              className="cursor-pointer rounded-lg"
+            >
+              <Link
+                href="/app/dashboard/settings"
+                className="text-zinc-700 dark:text-zinc-300"
+              >
                 <User className="mr-2 h-4 w-4" />
                 Profile
               </Link>

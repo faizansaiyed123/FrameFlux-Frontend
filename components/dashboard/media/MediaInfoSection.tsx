@@ -52,7 +52,11 @@ export function MediaInfoSection({ mediaId }: Props) {
   }
 
   if (!info) {
-    return <p className="text-sm text-zinc-500 dark:text-zinc-400">No media info available.</p>;
+    return (
+      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        No media info available.
+      </p>
+    );
   }
 
   return (
@@ -60,10 +64,12 @@ export function MediaInfoSection({ mediaId }: Props) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">File</p>
-          <p className={`
+          <p
+            className={`
             text-sm font-medium text-zinc-900 dark:text-zinc-50
             truncate
-          `}>
+          `}
+          >
             {info.file_name}
           </p>
         </div>
@@ -88,23 +94,31 @@ export function MediaInfoSection({ mediaId }: Props) {
           </p>
         </div>
         <div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Video Codec</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Video Codec
+          </p>
           <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
             {info.video_codec || 'N/A'}
           </p>
         </div>
         <div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Audio Codec</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Audio Codec
+          </p>
           <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
             {info.audio_codec || 'N/A'}
           </p>
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Frame Rate</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{info.fps || 'N/A'}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {info.fps || 'N/A'}
+          </p>
         </div>
         <div>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Audio Channels</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Audio Channels
+          </p>
           <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
             {info.audio_channels || 'N/A'}
           </p>

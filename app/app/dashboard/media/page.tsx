@@ -51,7 +51,10 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
+const statusConfig: Record<
+  string,
+  { icon: typeof Clock; color: string; label: string }
+> = {
   pending: {
     icon: Clock,
     color: `
@@ -141,10 +144,14 @@ export default function MediaPage() {
     if (incoming.length === 0) return;
 
     const validTypes = ['video/', 'audio/', 'image/'];
-    const invalid = incoming.find((item) => !validTypes.some((type) => item.type.startsWith(type)));
+    const invalid = incoming.find(
+      (item) => !validTypes.some((type) => item.type.startsWith(type)),
+    );
 
     if (invalid) {
-      setError('Invalid file type. Please select only video, audio, or image files.');
+      setError(
+        'Invalid file type. Please select only video, audio, or image files.',
+      );
       return;
     }
 
@@ -296,13 +303,23 @@ export default function MediaPage() {
 
   const filtered = [...media]
     .filter((item) => {
-      if (statusFilter !== 'all' && item.processing_status !== statusFilter) return false;
-      if (search && !item.original_filename.toLowerCase().includes(search.toLowerCase()))
+      if (statusFilter !== 'all' && item.processing_status !== statusFilter)
         return false;
-      if (folder && !(item.folder || '').toLowerCase().includes(folder.toLowerCase())) return false;
+      if (
+        search &&
+        !item.original_filename.toLowerCase().includes(search.toLowerCase())
+      )
+        return false;
+      if (
+        folder &&
+        !(item.folder || '').toLowerCase().includes(folder.toLowerCase())
+      )
+        return false;
       if (
         tag &&
-        !(item.tags || []).some((value) => value.toLowerCase().includes(tag.toLowerCase()))
+        !(item.tags || []).some((value) =>
+          value.toLowerCase().includes(tag.toLowerCase()),
+        )
       )
         return false;
       const duration = item.duration ?? 0;
@@ -311,29 +328,41 @@ export default function MediaPage() {
       const sizeMb = item.file_size / (1024 * 1024);
       if (minSizeMb && sizeMb < Number(minSizeMb)) return false;
       if (maxSizeMb && sizeMb > Number(maxSizeMb)) return false;
-      if (resolution !== 'all' && `${item.width ?? ''}x${item.height ?? ''}` !== resolution)
+      if (
+        resolution !== 'all' &&
+        `${item.width ?? ''}x${item.height ?? ''}` !== resolution
+      )
         return false;
       const created = new Date(item.created_at);
-      if (uploadedAfter && created < new Date(`${uploadedAfter}T00:00:00`)) return false;
-      if (uploadedBefore && created > new Date(`${uploadedBefore}T23:59:59`)) return false;
+      if (uploadedAfter && created < new Date(`${uploadedAfter}T00:00:00`))
+        return false;
+      if (uploadedBefore && created > new Date(`${uploadedBefore}T23:59:59`))
+        return false;
       return true;
     })
     .sort((a, b) => {
-      if (sortBy === 'name_asc') return a.original_filename.localeCompare(b.original_filename);
-      if (sortBy === 'name_desc') return b.original_filename.localeCompare(a.original_filename);
+      if (sortBy === 'name_asc')
+        return a.original_filename.localeCompare(b.original_filename);
+      if (sortBy === 'name_desc')
+        return b.original_filename.localeCompare(a.original_filename);
       if (sortBy === 'size_desc') return b.file_size - a.file_size;
-      if (sortBy === 'duration_desc') return (b.duration ?? 0) - (a.duration ?? 0);
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      if (sortBy === 'duration_desc')
+        return (b.duration ?? 0) - (a.duration ?? 0);
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     });
 
   if (loading) {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className={`
+          <h1
+            className={`
             text-3xl font-bold tracking-tight text-zinc-900
             dark:text-zinc-50
-          `}>
+          `}
+          >
             Media Library
           </h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -342,7 +371,10 @@ export default function MediaPage() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-48 animate-pulse rounded-2xl bg-zinc-200 dark:bg-zinc-800" />
+            <div
+              key={i}
+              className="h-48 animate-pulse rounded-2xl bg-zinc-200 dark:bg-zinc-800"
+            />
           ))}
         </div>
       </div>
@@ -351,21 +383,27 @@ export default function MediaPage() {
 
   return (
     <div className="space-y-7">
-      <div className={`
+      <div
+        className={`
         flex flex-col gap-4 sm:flex-row sm:items-end
         sm:justify-between
-      `}>
+      `}
+      >
         <div>
-          <p className={`
+          <p
+            className={`
             text-xs font-semibold uppercase tracking-[0.16em]
             text-indigo-600 dark:text-indigo-400
-          `}>
+          `}
+          >
             Library
           </p>
-          <h1 className={`
+          <h1
+            className={`
             mt-1 text-3xl font-semibold tracking-[-0.03em]
             text-zinc-950 dark:text-white
-          `}>
+          `}
+          >
             Media
           </h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -383,23 +421,29 @@ export default function MediaPage() {
       </div>
 
       {error && (
-        <Card className={`
+        <Card
+          className={`
           border-red-200 bg-red-50/80 dark:border-red-900/70
           dark:bg-red-950/20
-        `}>
+        `}
+        >
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
-              <p className="text-sm leading-5 text-red-700 dark:text-red-300">{error}</p>
+              <p className="text-sm leading-5 text-red-700 dark:text-red-300">
+                {error}
+              </p>
             </div>
           </CardContent>
         </Card>
       )}
 
-      <div className={`
+      <div
+        className={`
         rounded-2xl border border-zinc-200/80 bg-white/70 p-3 shadow-sm
         dark:border-zinc-800/80 dark:bg-zinc-900/50
-      `}>
+      `}
+      >
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <Input
             aria-label="Search media"
@@ -413,7 +457,10 @@ export default function MediaPage() {
           />
           <div>
             <Label>Sort</Label>
-            <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+            <Select
+              value={sortBy}
+              onValueChange={(v) => setSortBy(v as typeof sortBy)}
+            >
               <SelectTrigger className="h-10">
                 <SelectValue />
               </SelectTrigger>
@@ -428,7 +475,10 @@ export default function MediaPage() {
           </div>
           <div>
             <Label>Processing Status</Label>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+            >
               <SelectTrigger className="h-10">
                 <SelectValue />
               </SelectTrigger>
@@ -444,7 +494,10 @@ export default function MediaPage() {
           </div>
           <div>
             <Label>Media Type</Label>
-            <Select value={mediaType} onValueChange={setMediaType}>
+            <Select
+              value={mediaType}
+              onValueChange={setMediaType}
+            >
               <SelectTrigger className="h-10">
                 <SelectValue />
               </SelectTrigger>
@@ -478,7 +531,10 @@ export default function MediaPage() {
           </div>
           <div>
             <Label>Resolution</Label>
-            <Select value={resolution} onValueChange={setResolution}>
+            <Select
+              value={resolution}
+              onValueChange={setResolution}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -562,22 +618,28 @@ export default function MediaPage() {
       {filtered.length === 0 ? (
         <Card className="border-zinc-200/80 dark:border-zinc-800/80">
           <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className={`
+            <div
+              className={`
               mb-5 flex h-14 w-14 items-center justify-center rounded-2xl
               bg-zinc-100 dark:bg-zinc-900
-            `}>
+            `}
+            >
               <Film className="h-7 w-7 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <h3 className={`
+            <h3
+              className={`
               text-lg font-semibold tracking-tight text-zinc-950
               dark:text-white
-            `}>
+            `}
+            >
               No media files
             </h3>
-            <p className={`
+            <p
+              className={`
               mt-2 max-w-sm text-sm leading-6 text-zinc-500
               dark:text-zinc-400
-            `}>
+            `}
+            >
               {search ||
               statusFilter !== 'all' ||
               mediaType !== 'all' ||
@@ -599,7 +661,8 @@ export default function MediaPage() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((item) => {
             const MediaIcon = getMediaIcon(item.mime_type);
-            const statusInfo = statusConfig[item.processing_status] || statusConfig.pending;
+            const statusInfo =
+              statusConfig[item.processing_status] || statusConfig.pending;
 
             return (
               <Card
@@ -613,11 +676,13 @@ export default function MediaPage() {
               >
                 <CardContent className="p-4">
                   <div className="mb-4 flex items-start justify-between">
-                    <div className={`
+                    <div
+                      className={`
                       flex h-10 w-10 items-center justify-center rounded-xl
                       bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50
                       dark:text-indigo-400
-                    `}>
+                    `}
+                    >
                       <MediaIcon className="h-5 w-5" />
                     </div>
                     <DropdownMenu>
@@ -660,10 +725,12 @@ export default function MediaPage() {
                     >
                       {item.original_filename}
                     </p>
-                    <div className={`
+                    <div
+                      className={`
                       flex items-center justify-between gap-3 text-xs text-zinc-500
                       dark:text-zinc-400
-                    `}>
+                    `}
+                    >
                       <span>{formatFileSize(item.file_size)}</span>
                       <span className="truncate">{item.mime_type}</span>
                     </div>
@@ -680,7 +747,9 @@ export default function MediaPage() {
                         {statusInfo.label}
                       </span>
                       <span className="text-[11px] text-zinc-400">
-                        {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(item.created_at), {
+                          addSuffix: true,
+                        })}
                       </span>
                     </div>
                   </div>
@@ -691,21 +760,30 @@ export default function MediaPage() {
         </div>
       )}
 
-      <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-        <DialogContent className={`
+      <Dialog
+        open={uploadOpen}
+        onOpenChange={setUploadOpen}
+      >
+        <DialogContent
+          className={`
           w-[calc(100%-2rem)] max-h-[90vh] max-w-lg overflow-y-auto
           rounded-2xl border-zinc-200 bg-white p-0 shadow-2xl
           dark:border-zinc-800 dark:bg-zinc-950 sm:w-full
-        `}>
-          <div className={`
+        `}
+        >
+          <div
+            className={`
             border-b border-zinc-200/80 px-5 py-5
             dark:border-zinc-800/80 sm:px-6
-          `}>
+          `}
+          >
             <DialogHeader>
-              <DialogTitle className={`
+              <DialogTitle
+                className={`
                 text-xl font-semibold tracking-tight text-zinc-950
                 dark:text-white
-              `}>
+              `}
+              >
                 Upload media
               </DialogTitle>
               <DialogDescription className="mt-1 text-sm leading-5 text-zinc-500 dark:text-zinc-400">
@@ -716,16 +794,20 @@ export default function MediaPage() {
 
           <div className="px-5 py-5 sm:px-6">
             {uploading ? (
-              <div className={`
+              <div
+                className={`
                 rounded-xl border border-zinc-200 bg-zinc-50 p-5
                 dark:border-zinc-800 dark:bg-zinc-900
-              `}>
+              `}
+              >
                 <div className="mb-4 flex items-center gap-3">
-                  <div className={`
+                  <div
+                    className={`
                     flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
                     bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50
                     dark:text-indigo-400
-                  `}>
+                  `}
+                  >
                     <Loader2 className="h-4 w-4 animate-spin" />
                   </div>
                   <div className="min-w-0">
@@ -737,10 +819,12 @@ export default function MediaPage() {
                     </p>
                   </div>
                 </div>
-                <div className={`
+                <div
+                  className={`
                   h-2 w-full overflow-hidden rounded-full bg-zinc-200
                   dark:bg-zinc-800
-                `}>
+                `}
+                >
                   <div
                     className={`
                       h-full rounded-full bg-indigo-600 transition-all duration-300
@@ -841,28 +925,34 @@ export default function MediaPage() {
                   className="block cursor-pointer"
                   onClick={() => document.getElementById('file')?.click()}
                 >
-                  <div className={`
+                  <div
+                    className={`
                     mx-auto mb-4 flex h-12 w-12 items-center justify-center
                     rounded-xl bg-white text-zinc-700 shadow-sm dark:bg-zinc-900
                     dark:text-zinc-200
-                  `}>
+                  `}
+                  >
                     <Upload className="h-5 w-5" />
                   </div>
-                  <p className={`
+                  <p
+                    className={`
                     text-base font-semibold tracking-tight text-zinc-950
                     dark:text-white
-                  `}>
+                  `}
+                  >
                     Drag & drop files here
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     or click to browse your computer
                   </p>
-                  <span className={`
+                  <span
+                    className={`
                     mt-4 inline-flex h-9 items-center rounded-lg border
                     border-zinc-200 bg-white px-3.5 text-xs font-medium
                     text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-950
                     dark:text-zinc-200
-                  `}>
+                  `}
+                  >
                     Choose file(s)
                   </span>
                   <p className="mt-4 text-[11px] text-zinc-400">
@@ -871,20 +961,25 @@ export default function MediaPage() {
                 </label>
 
                 {selectedFiles.length > 0 && (
-                  <div className={`
+                  <div
+                    className={`
                     mt-5 rounded-xl border border-indigo-200/80 bg-white p-3
                     text-left shadow-sm dark:border-indigo-900/60 dark:bg-zinc-950
-                  `}>
-                    <div className={`
+                  `}
+                  >
+                    <div
+                      className={`
                       flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
                       bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50
                       dark:text-indigo-400
-                    `}>
+                    `}
+                    >
                       <Film className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-zinc-950 dark:text-white">
-                        {selectedFiles.length} file{selectedFiles.length === 1 ? '' : 's'} selected
+                        {selectedFiles.length} file
+                        {selectedFiles.length === 1 ? '' : 's'} selected
                       </p>
                       <div className="mt-2 space-y-1">
                         {selectedFiles.map((selectedFile) => (
@@ -903,10 +998,12 @@ export default function MediaPage() {
             )}
           </div>
 
-          <DialogFooter className={`
+          <DialogFooter
+            className={`
             flex flex-col-reverse gap-2 border-t border-zinc-200/80 px-5
             py-4 dark:border-zinc-800/80 sm:flex-row sm:justify-end sm:px-6
-          `}>
+          `}
+          >
             <Button
               variant="outline"
               onClick={() => {
@@ -944,16 +1041,24 @@ export default function MediaPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className={`
+      <Dialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+      >
+        <DialogContent
+          className={`
           w-[calc(100%-2rem)] max-w-md rounded-2xl border-zinc-200
           dark:border-zinc-800 sm:w-full
-        `}>
+        `}
+        >
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold tracking-tight">Delete media</DialogTitle>
+            <DialogTitle className="text-lg font-semibold tracking-tight">
+              Delete media
+            </DialogTitle>
             <DialogDescription className="leading-6">
-              Are you sure you want to delete &quot;{selectedMedia?.original_filename}&quot;? This
-              action cannot be undone.
+              Are you sure you want to delete &quot;
+              {selectedMedia?.original_filename}&quot;? This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">

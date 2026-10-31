@@ -14,7 +14,14 @@ import {
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '@/lib/api/client';
 import type { Media } from '@/types/api';
-import { ArrowLeft, RefreshCw, Loader2, AlertCircle, CheckCircle2, Download } from 'lucide-react';
+import {
+  ArrowLeft,
+  RefreshCw,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  Download,
+} from 'lucide-react';
 
 interface ImageWorkspaceProps {
   media: Media;
@@ -22,7 +29,11 @@ interface ImageWorkspaceProps {
   onProcessed: () => void;
 }
 
-export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspaceProps) {
+export function ImageWorkspace({
+  media,
+  onBack,
+  onProcessed,
+}: ImageWorkspaceProps) {
   const [operation, setOperation] = useState('scale');
   const [width, setWidth] = useState('');
   const [height, setHeight] = useState('');
@@ -73,7 +84,10 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
         data.angle = Number(angle);
       }
 
-      await api.transformMedia(media.id, data as Parameters<typeof api.transformMedia>[1]);
+      await api.transformMedia(
+        media.id,
+        data as Parameters<typeof api.transformMedia>[1],
+      );
       setSuccess('Image transformation started.');
       onProcessed();
     } catch (err) {
@@ -101,26 +115,39 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col">
-      <div className={`
+      <div
+        className={`
         flex items-center justify-between border-b border-zinc-200
         dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2
-      `}>
+      `}
+      >
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={onBack}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className={`
+            <h1
+              className={`
               text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate
               max-w-[200px] sm:max-w-[400px]
-            `}>
+            `}
+            >
               {media.original_filename}
             </h1>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Image Editor</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              Image Editor
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={handleDownload}>
+          <Button
+            variant="outline"
+            onClick={handleDownload}
+          >
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>
@@ -145,10 +172,12 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
       </div>
 
       <div className="flex flex-1 overflow-hidden">
-        <div className={`
+        <div
+          className={`
           flex-1 bg-zinc-100 dark:bg-zinc-800 flex items-center
           justify-center p-8
-        `}>
+        `}
+        >
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -164,10 +193,12 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
           )}
         </div>
 
-        <div className={`
+        <div
+          className={`
           w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white
           dark:bg-zinc-900 overflow-y-auto
-        `}>
+        `}
+        >
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-3">
               Transform
@@ -175,7 +206,10 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Operation</Label>
-                <Select value={operation} onValueChange={setOperation}>
+                <Select
+                  value={operation}
+                  onValueChange={setOperation}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -236,17 +270,27 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
             </h3>
             <div className="space-y-2">
               <div>
-                <Label className="text-xs text-zinc-500 dark:text-zinc-400">Dimensions</Label>
+                <Label className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Dimensions
+                </Label>
                 <p className="text-sm text-zinc-900 dark:text-zinc-50">
-                  {media.width && media.height ? `${media.width} x ${media.height}` : 'Unknown'}
+                  {media.width && media.height
+                    ? `${media.width} x ${media.height}`
+                    : 'Unknown'}
                 </p>
               </div>
               <div>
-                <Label className="text-xs text-zinc-500 dark:text-zinc-400">Type</Label>
-                <p className="text-sm text-zinc-900 dark:text-zinc-50">{media.mime_type}</p>
+                <Label className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Type
+                </Label>
+                <p className="text-sm text-zinc-900 dark:text-zinc-50">
+                  {media.mime_type}
+                </p>
               </div>
               <div>
-                <Label className="text-xs text-zinc-500 dark:text-zinc-400">Size</Label>
+                <Label className="text-xs text-zinc-500 dark:text-zinc-400">
+                  Size
+                </Label>
                 <p className="text-sm text-zinc-900 dark:text-zinc-50">
                   {(media.file_size / 1024 / 1024).toFixed(2)} MB
                 </p>
@@ -258,10 +302,12 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
       {error && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className={`
+          <Alert
+            className={`
             border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
             text-red-700 dark:text-red-300
-          `}>
+          `}
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -269,10 +315,12 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
       )}
       {success && (
         <div className="fixed bottom-4 right-4 z-50">
-          <Alert className={`
+          <Alert
+            className={`
             border-green-200 dark:border-green-900 bg-green-50
             dark:bg-green-900/20 text-green-700 dark:text-green-300
-          `}>
+          `}
+          >
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>
           </Alert>

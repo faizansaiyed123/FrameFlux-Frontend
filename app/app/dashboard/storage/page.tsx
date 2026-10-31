@@ -61,23 +61,29 @@ export default function StoragePage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className={`
+        <h1
+          className={`
           text-3xl font-bold tracking-tight text-zinc-900
           dark:text-zinc-50
-        `}>
+        `}
+        >
           Storage
         </h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Monitor your storage usage</p>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          Monitor your storage usage
+        </p>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="border-zinc-200 dark:border-zinc-800">
           <CardHeader className="flex flex-row items-center gap-4">
-            <div className={`
+            <div
+              className={`
               flex h-10 w-10 items-center justify-center rounded-lg
               bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
               dark:text-indigo-400
-            `}>
+            `}
+            >
               <HardDrive className="h-5 w-5" />
             </div>
             <div>
@@ -103,11 +109,16 @@ export default function StoragePage() {
           </CardHeader>
           <CardContent>
             {byType.length === 0 ? (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">No media yet.</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                No media yet.
+              </p>
             ) : (
               <div className="space-y-3">
                 {byType.map((item) => (
-                  <div key={item.media_type} className="flex items-center justify-between">
+                  <div
+                    key={item.media_type}
+                    className="flex items-center justify-between"
+                  >
                     <span className="text-sm text-zinc-700 dark:text-zinc-300 capitalize">
                       {item.media_type}
                     </span>
@@ -115,10 +126,12 @@ export default function StoragePage() {
                       <span className="text-sm text-zinc-500 dark:text-zinc-400">
                         {item.count} files
                       </span>
-                      <span className={`
+                      <span
+                        className={`
                         text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24
                         text-right
-                      `}>
+                      `}
+                      >
                         {formatBytes(item.total_size)}
                       </span>
                     </div>
@@ -129,10 +142,12 @@ export default function StoragePage() {
           </CardContent>
         </Card>
 
-        <Card className={`
+        <Card
+          className={`
           border-zinc-200 dark:border-zinc-800 sm:col-span-2
           lg:col-span-3
-        `}>
+        `}
+        >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
@@ -141,20 +156,29 @@ export default function StoragePage() {
           </CardHeader>
           <CardContent>
             {byFolder.length === 0 ? (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">No folders yet.</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                No folders yet.
+              </p>
             ) : (
               <div className="space-y-3">
                 {byFolder.map((item) => (
-                  <div key={item.folder} className="flex items-center justify-between">
-                    <span className="text-sm text-zinc-700 dark:text-zinc-300">{item.folder}</span>
+                  <div
+                    key={item.folder}
+                    className="flex items-center justify-between"
+                  >
+                    <span className="text-sm text-zinc-700 dark:text-zinc-300">
+                      {item.folder}
+                    </span>
                     <div className="flex items-center gap-4">
                       <span className="text-sm text-zinc-500 dark:text-zinc-400">
                         {item.count} files
                       </span>
-                      <span className={`
+                      <span
+                        className={`
                         text-sm font-medium text-zinc-900 dark:text-zinc-50 w-24
                         text-right
-                      `}>
+                      `}
+                      >
                         {formatBytes(item.total_size)}
                       </span>
                     </div>

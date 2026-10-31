@@ -86,7 +86,11 @@ function formatTime(seconds: number): string {
   return mins + ':' + secs.toString().padStart(2, '0');
 }
 
-export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceProps) {
+export function EditorWorkspace({
+  media,
+  onBack,
+  onProcessed,
+}: EditorWorkspaceProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -128,7 +132,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
     bitrate: 'auto',
     audioCodec: 'keep',
   });
-  const [exportResult, setExportResult] = useState<{ blob: Blob; filename: string } | null>(null);
+  const [exportResult, setExportResult] = useState<{
+    blob: Blob;
+    filename: string;
+  } | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [transformSpeed, setTransformSpeed] = useState(1);
 
@@ -227,7 +234,9 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
     const d = videoRef.current.duration || media.duration || 0;
     setDuration(d);
     if (clips.length === 1 && clips[0].duration !== d) {
-      setClips((p) => p.map((c) => (c.id === media.id ? { ...c, end: d, duration: d } : c)));
+      setClips((p) =>
+        p.map((c) => (c.id === media.id ? { ...c, end: d, duration: d } : c)),
+      );
     }
   }, [media.duration, media.id, clips]);
   const handleVideoError = useCallback(() => {
@@ -238,7 +247,8 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
     if (!selectedClipId || currentTime <= 0) return;
     setClips((prev) => {
       const clip = prev.find((c) => c.id === selectedClipId);
-      if (!clip || currentTime <= clip.start || currentTime >= clip.end) return prev;
+      if (!clip || currentTime <= clip.start || currentTime >= clip.end)
+        return prev;
       const left = { ...clip, end: currentTime };
       const right = {
         id: clip.id + '-split-' + Date.now(),
@@ -249,7 +259,9 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
         duration: clip.end - currentTime,
         color: clip.color,
       };
-      const next = prev.map((c) => (c.id === selectedClipId ? [left, right] : c)).flat();
+      const next = prev
+        .map((c) => (c.id === selectedClipId ? [left, right] : c))
+        .flat();
       pushHistory(next);
       setSelectedClipId(null);
       return next;
@@ -282,7 +294,10 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
           end: selectedClip.end,
         });
       } else if (activeTool === 'transform') {
-        await api.transformMedia(media.id, { operation: 'speed', speed: transformSpeed });
+        await api.transformMedia(media.id, {
+          operation: 'speed',
+          speed: transformSpeed,
+        });
       } else if (activeTool === 'freeze') {
         await api.freezeFrame(media.id, currentTime, 2);
       } else if (activeTool === 'overlay') {
@@ -341,7 +356,8 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
         width: res.w,
         height: res.h,
         fps: exportConfig.fps || undefined,
-        video_bitrate: exportConfig.bitrate === 'auto' ? undefined : exportConfig.bitrate,
+        video_bitrate:
+          exportConfig.bitrate === 'auto' ? undefined : exportConfig.bitrate,
         video_codec: exportConfig.videoCodec,
         audio_codec:
           exportConfig.audioCodec === 'keep'
@@ -360,7 +376,11 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       });
       let status = await api.getMediaStatus(media.id);
       let attempts = 60;
-      while (status.status !== 'completed' && status.status !== 'failed' && attempts > 0) {
+      while (
+        status.status !== 'completed' &&
+        status.status !== 'failed' &&
+        attempts > 0
+      ) {
         await new Promise((r) => setTimeout(r, 2000));
         status = await api.getMediaStatus(media.id);
         attempts--;
@@ -372,7 +392,9 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
         setExportResult({
           blob,
           filename:
-            media.original_filename.replace(/\.[^/.]+$/, '') + '_export.' + exportConfig.format,
+            media.original_filename.replace(/\.[^/.]+$/, '') +
+            '_export.' +
+            exportConfig.format,
         });
         setExportOpen(false);
       } else {
@@ -422,7 +444,9 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
 
   const handleDownloadResult = useCallback(() => {
     if (!exportResult) return;
-    const createdUrl = resultUrl ? null : URL.createObjectURL(exportResult.blob);
+    const createdUrl = resultUrl
+      ? null
+      : URL.createObjectURL(exportResult.blob);
     const url = resultUrl || createdUrl!;
     const a = document.createElement('a');
     a.href = url;
@@ -448,10 +472,12 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
   return (
     <div className="flex min-h-[calc(100vh-4rem)] flex-col">
       {fromUpload && (
-        <div className={`
+        <div
+          className={`
           flex items-center gap-3 rounded-b-lg border-b border-green-200
           dark:border-green-900 bg-green-50 dark:bg-green-900/20 px-4 py-2
-        `}>
+        `}
+        >
           <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400 shrink-0" />
           <p className="text-xs font-medium text-green-700 dark:text-green-300">
             Media uploaded successfully
@@ -466,25 +492,36 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
           </Button>
         </div>
       )}
-      <div className={`
+      <div
+        className={`
         flex items-center justify-between border-b border-zinc-200
         dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 py-2
-      `}>
+      `}
+      >
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="h-8 w-8"
+          >
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="min-w-0">
-            <h1 className={`
+            <h1
+              className={`
               text-sm font-semibold text-zinc-900 dark:text-zinc-50 truncate
               max-w-[120px] sm:max-w-[260px]
-            `}>
+            `}
+            >
               {media.original_filename}
             </h1>
-            <div className={`
+            <div
+              className={`
               flex items-center gap-2 text-[10px] text-zinc-500
               dark:text-zinc-400
-            `}>
+            `}
+            >
               <span>{media.mime_type}</span>
               {media.duration && <span>{formatTime(media.duration)}</span>}
               {media.width && media.height && (
@@ -492,7 +529,9 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
                   {media.width}x{media.height}
                 </span>
               )}
-              {media.file_size && <span>{(media.file_size / 1024 / 1024).toFixed(1)}MB</span>}
+              {media.file_size && (
+                <span>{(media.file_size / 1024 / 1024).toFixed(1)}MB</span>
+              )}
             </div>
           </div>
         </div>
@@ -537,15 +576,19 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       </div>
       <div className="flex flex-1 overflow-y-auto flex-col lg:flex-row">
         <div className="flex flex-1 flex-col min-w-0">
-          <div className={`
+          <div
+            className={`
             flex-1 bg-black flex items-center justify-center
             relative min-h-[120px]
-          `}>
+          `}
+          >
             {loadingVideo && (
-              <div className={`
+              <div
+                className={`
                 absolute inset-0 flex items-center justify-center
                 bg-black/80 z-10
-              `}>
+              `}
+              >
                 <div className="text-center">
                   <Loader2 className="h-8 w-8 animate-spin text-indigo-400 mx-auto mb-3" />
                   <p className="text-xs text-zinc-300">Loading video...</p>
@@ -565,10 +608,12 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               />
             )}
             {error && !loadingVideo && (
-              <div className={`
+              <div
+                className={`
                 absolute inset-0 flex items-center justify-center
                 bg-black/80
-              `}>
+              `}
+              >
                 <div className="text-center p-6">
                   <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
                   <p className="text-sm text-red-300">{error}</p>
@@ -576,10 +621,12 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               </div>
             )}
           </div>
-          <div className={`
+          <div
+            className={`
             border-t border-zinc-200 dark:border-zinc-800 bg-white
             dark:bg-zinc-900 px-3 py-1.5
-          `}>
+          `}
+          >
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
@@ -595,7 +642,11 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
                 onClick={handlePlayPause}
                 title={isPlaying ? 'Pause' : 'Play'}
               >
-                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+                {isPlaying ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5" />
+                )}
               </Button>
               <Button
                 variant="ghost"
@@ -605,10 +656,12 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               >
                 <SkipForward className="h-4 w-4" />
               </Button>
-              <span className={`
+              <span
+                className={`
                 text-[11px] text-zinc-500 dark:text-zinc-400 font-mono
                 min-w-[90px]
-              `}>
+              `}
+              >
                 {formatTime(currentTime)} / {formatTime(duration)}
               </span>
               <div className="flex-1" />
@@ -639,10 +692,12 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               </div>
             </div>
           </div>
-          <div className={`
+          <div
+            className={`
             h-44 sm:h-48 border-t border-zinc-200 dark:border-zinc-800
             bg-white dark:bg-zinc-900 flex-shrink-0
-          `}>
+          `}
+          >
             <Timeline
               clips={clips}
               selectedClipId={selectedClipId}
@@ -652,7 +707,9 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               onSeek={handleSeek}
               onClipChange={(clip, changes) => {
                 setClips((prev) => {
-                  const next = prev.map((c) => (c.id === clip.id ? { ...c, ...changes } : c));
+                  const next = prev.map((c) =>
+                    c.id === clip.id ? { ...c, ...changes } : c,
+                  );
                   pushHistory(next);
                   return next;
                 });
@@ -660,28 +717,40 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
             />
           </div>
           {hasAudio && (
-            <div className={`
+            <div
+              className={`
               h-14 border-t border-zinc-200 dark:border-zinc-800 bg-white
               dark:bg-zinc-900 flex-shrink-0
-            `}>
-              <div className={`
+            `}
+            >
+              <div
+                className={`
                 px-3 py-1 text-[10px] font-medium text-zinc-500
                 dark:text-zinc-400 flex items-center gap-1
-              `}>
+              `}
+              >
                 <Music className="h-3 w-3" />
                 Audio Track
               </div>
-              <AudioTrack duration={duration} currentTime={currentTime} onSeek={handleSeek} />
+              <AudioTrack
+                duration={duration}
+                currentTime={currentTime}
+                onSeek={handleSeek}
+              />
             </div>
           )}
-          <div className={`
+          <div
+            className={`
             border-t border-zinc-200 dark:border-zinc-800 bg-white
             dark:bg-zinc-900 flex-shrink-0
-          `}>
-            <div className={`
+          `}
+          >
+            <div
+              className={`
               flex overflow-x-auto border-b border-zinc-200
               dark:border-zinc-800
-            `}>
+            `}
+            >
               {toolTabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -722,9 +791,18 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               />
             )}
             {activeTab === 'audio' && (
-              <AudioTab media={media} setError={setError} onProcessed={onProcessed} />
+              <AudioTab
+                media={media}
+                setError={setError}
+                onProcessed={onProcessed}
+              />
             )}
-            {activeTab === 'subtitles' && <SubtitlesTab media={media} setError={setError} />}
+            {activeTab === 'subtitles' && (
+              <SubtitlesTab
+                media={media}
+                setError={setError}
+              />
+            )}
             {activeTab === 'transform' && (
               <TransformTab
                 media={media}
@@ -734,17 +812,23 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
               />
             )}
             {activeTab === 'overlay' && (
-              <OverlayTab media={media} onOverlay={handleProcess} setError={setError} />
+              <OverlayTab
+                media={media}
+                onOverlay={handleProcess}
+                setError={setError}
+              />
             )}
           </div>
         </div>
       </div>
       {error && !success && (
         <div className="fixed bottom-4 right-4 z-50 max-w-sm">
-          <Alert className={`
+          <Alert
+            className={`
             border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
             text-red-700 dark:text-red-300
-          `}>
+          `}
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -752,10 +836,12 @@ export function EditorWorkspace({ media, onBack, onProcessed }: EditorWorkspaceP
       )}
       {success && (
         <div className="fixed bottom-4 right-4 z-50 max-w-sm">
-          <Alert className={`
+          <Alert
+            className={`
             border-green-200 dark:border-green-900 bg-green-50
             dark:bg-green-900/20 text-green-700 dark:text-green-300
-          `}>
+          `}
+          >
             <CheckCircle2 className="h-4 w-4" />
             <AlertDescription>{success}</AlertDescription>
           </Alert>
@@ -798,7 +884,8 @@ function ExportModal({
   exporting: boolean;
   onClose: () => void;
 }) {
-  const update = (patch: Partial<ExportConfig>) => onChange({ ...config, ...patch });
+  const update = (patch: Partial<ExportConfig>) =>
+    onChange({ ...config, ...patch });
   const applyQuality = (q: 'low' | 'balanced' | 'high') => {
     const p =
       q === 'low'
@@ -854,17 +941,24 @@ function ExportModal({
     { value: 'mp3', label: 'MP3' },
     { value: 'no_audio', label: 'No Audio' },
   ];
-  const selectedRes = resolutions.find((r) => r.value === config.resolution) || resolutions[0];
+  const selectedRes =
+    resolutions.find((r) => r.value === config.resolution) || resolutions[0];
   const selectedFps =
-    fpsOptions.find((f) => f.value === (config.fps === null ? 'null' : String(config.fps))) ||
-    fpsOptions[0];
-  const selectedCodec = codecs.find((c) => c.value === config.videoCodec) || codecs[0];
-  const selectedBitrate = bitrates.find((b) => b.value === config.bitrate) || bitrates[0];
+    fpsOptions.find(
+      (f) => f.value === (config.fps === null ? 'null' : String(config.fps)),
+    ) || fpsOptions[0];
+  const selectedCodec =
+    codecs.find((c) => c.value === config.videoCodec) || codecs[0];
+  const selectedBitrate =
+    bitrates.find((b) => b.value === config.bitrate) || bitrates[0];
   const selectedAudioCodec =
     audioCodecs.find((a) => a.value === config.audioCodec) || audioCodecs[0];
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
+    <Dialog
+      open={true}
+      onOpenChange={onClose}
+    >
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Export Settings</DialogTitle>
@@ -877,7 +971,9 @@ function ExportModal({
               onValueChange={(v) =>
                 update({
                   format: v,
-                  ...(v === 'webm' ? { videoCodec: 'vp9', audioCodec: 'keep' } : {}),
+                  ...(v === 'webm'
+                    ? { videoCodec: 'vp9', audioCodec: 'keep' }
+                    : {}),
                 })
               }
             >
@@ -886,7 +982,10 @@ function ExportModal({
               </SelectTrigger>
               <SelectContent>
                 {formats.map((f) => (
-                  <SelectItem key={f.value} value={f.value}>
+                  <SelectItem
+                    key={f.value}
+                    value={f.value}
+                  >
                     {f.label}
                   </SelectItem>
                 ))}
@@ -908,7 +1007,10 @@ function ExportModal({
               </SelectTrigger>
               <SelectContent>
                 {resolutions.map((r) => (
-                  <SelectItem key={r.value} value={r.value}>
+                  <SelectItem
+                    key={r.value}
+                    value={r.value}
+                  >
                     {r.label}
                   </SelectItem>
                 ))}
@@ -919,7 +1021,9 @@ function ExportModal({
             <Label>Frame Rate</Label>
             <Select
               value={config.fps === null ? 'null' : String(config.fps)}
-              onValueChange={(v) => update({ fps: v === 'null' ? null : Number(v) })}
+              onValueChange={(v) =>
+                update({ fps: v === 'null' ? null : Number(v) })
+              }
             >
               <SelectTrigger>
                 <SelectValue />
@@ -927,7 +1031,10 @@ function ExportModal({
               </SelectTrigger>
               <SelectContent>
                 {fpsOptions.map((f) => (
-                  <SelectItem key={f.value} value={f.value}>
+                  <SelectItem
+                    key={f.value}
+                    value={f.value}
+                  >
                     {f.label}
                   </SelectItem>
                 ))}
@@ -941,7 +1048,9 @@ function ExportModal({
                 variant={config.quality === 'low' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => applyQuality('low')}
-                className={cn(config.quality === 'low' && 'bg-amber-600 hover:bg-amber-700')}
+                className={cn(
+                  config.quality === 'low' && 'bg-amber-600 hover:bg-amber-700',
+                )}
               >
                 Low
               </Button>
@@ -949,7 +1058,10 @@ function ExportModal({
                 variant={config.quality === 'balanced' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => applyQuality('balanced')}
-                className={cn(config.quality === 'balanced' && 'bg-green-600 hover:bg-green-700')}
+                className={cn(
+                  config.quality === 'balanced' &&
+                    'bg-green-600 hover:bg-green-700',
+                )}
               >
                 Balanced
               </Button>
@@ -957,7 +1069,10 @@ function ExportModal({
                 variant={config.quality === 'high' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => applyQuality('high')}
-                className={cn(config.quality === 'high' && 'bg-indigo-600 hover:bg-indigo-700')}
+                className={cn(
+                  config.quality === 'high' &&
+                    'bg-indigo-600 hover:bg-indigo-700',
+                )}
               >
                 High
               </Button>
@@ -972,14 +1087,20 @@ function ExportModal({
           </div>
           <div>
             <Label>Codec</Label>
-            <Select value={config.videoCodec} onValueChange={(v) => update({ videoCodec: v })}>
+            <Select
+              value={config.videoCodec}
+              onValueChange={(v) => update({ videoCodec: v })}
+            >
               <SelectTrigger>
                 <SelectValue />
                 {selectedCodec.label}
               </SelectTrigger>
               <SelectContent>
                 {codecs.map((c) => (
-                  <SelectItem key={c.value} value={c.value}>
+                  <SelectItem
+                    key={c.value}
+                    value={c.value}
+                  >
                     {c.label}
                   </SelectItem>
                 ))}
@@ -1001,7 +1122,10 @@ function ExportModal({
               </SelectTrigger>
               <SelectContent>
                 {bitrates.map((b) => (
-                  <SelectItem key={b.value} value={b.value}>
+                  <SelectItem
+                    key={b.value}
+                    value={b.value}
+                  >
                     {b.label}
                   </SelectItem>
                 ))}
@@ -1010,14 +1134,20 @@ function ExportModal({
           </div>
           <div>
             <Label>Audio</Label>
-            <Select value={config.audioCodec} onValueChange={(v) => update({ audioCodec: v })}>
+            <Select
+              value={config.audioCodec}
+              onValueChange={(v) => update({ audioCodec: v })}
+            >
               <SelectTrigger>
                 <SelectValue />
                 {selectedAudioCodec.label}
               </SelectTrigger>
               <SelectContent>
                 {audioCodecs.map((a) => (
-                  <SelectItem key={a.value} value={a.value}>
+                  <SelectItem
+                    key={a.value}
+                    value={a.value}
+                  >
                     {a.label}
                   </SelectItem>
                 ))}
@@ -1026,7 +1156,11 @@ function ExportModal({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={exporting}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={exporting}
+          >
             Cancel
           </Button>
           <Button
@@ -1061,14 +1195,18 @@ function ResultOverlay({
   onDownload: () => void;
 }) {
   return (
-    <div className={`
+    <div
+      className={`
       fixed inset-0 z-50 flex items-center justify-center
       bg-black/70 p-4
-    `}>
-      <div className={`
+    `}
+    >
+      <div
+        className={`
         bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6
         max-h-[90vh] overflow-y-auto
-      `}>
+      `}
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-green-600" />
@@ -1076,23 +1214,41 @@ function ResultOverlay({
               Export Complete
             </h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onContinue}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onContinue}
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <div className={`
+        <div
+          className={`
           bg-black rounded-lg overflow-hidden mb-4 flex
           items-center justify-center h-64
-        `}>
-          <video src={url} controls className="max-h-full max-w-full" />
+        `}
+        >
+          <video
+            src={url}
+            controls
+            className="max-h-full max-w-full"
+          />
         </div>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">{filename}</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+          {filename}
+        </p>
         <div className="flex items-center gap-2">
-          <Button onClick={onDownload} className="bg-indigo-600 hover:bg-indigo-700">
+          <Button
+            onClick={onDownload}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>
-          <Button variant="outline" onClick={onContinue}>
+          <Button
+            variant="outline"
+            onClick={onContinue}
+          >
             Continue Editing
           </Button>
         </div>

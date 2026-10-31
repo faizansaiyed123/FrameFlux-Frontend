@@ -111,14 +111,17 @@ export default function ComparisonsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className={`
+        <h1
+          className={`
           text-3xl font-bold tracking-tight text-zinc-900
           dark:text-zinc-50
-        `}>
+        `}
+        >
           Media Comparisons
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">
-          Compare two media files to see differences in size, quality, and format
+          Compare two media files to see differences in size, quality, and
+          format
         </p>
       </div>
 
@@ -131,13 +134,19 @@ export default function ComparisonsPage() {
             <div className="lg:col-span-1 space-y-4">
               <div className="space-y-2">
                 <Label>File A</Label>
-                <Select value={mediaA} onValueChange={setMediaA}>
+                <Select
+                  value={mediaA}
+                  onValueChange={setMediaA}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select first file" />
                   </SelectTrigger>
                   <SelectContent>
                     {mediaList.map((media) => (
-                      <SelectItem key={media.id} value={media.id}>
+                      <SelectItem
+                        key={media.id}
+                        value={media.id}
+                      >
                         {media.original_filename}
                       </SelectItem>
                     ))}
@@ -146,13 +155,19 @@ export default function ComparisonsPage() {
               </div>
               <div className="space-y-2">
                 <Label>File B</Label>
-                <Select value={mediaB} onValueChange={setMediaB}>
+                <Select
+                  value={mediaB}
+                  onValueChange={setMediaB}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select second file" />
                   </SelectTrigger>
                   <SelectContent>
                     {mediaList.map((media) => (
-                      <SelectItem key={media.id} value={media.id}>
+                      <SelectItem
+                        key={media.id}
+                        value={media.id}
+                      >
                         {media.original_filename}
                       </SelectItem>
                     ))}
@@ -160,7 +175,12 @@ export default function ComparisonsPage() {
                 </Select>
               </div>
               <div className="flex items-center justify-center">
-                <Button variant="ghost" size="icon" onClick={handleSwap} title="Swap files">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleSwap}
+                  title="Swap files"
+                >
                   <RefreshCw className="h-5 w-5" />
                 </Button>
               </div>
@@ -170,11 +190,15 @@ export default function ComparisonsPage() {
               <div className="space-y-2">
                 <Label>File A Details</Label>
                 {mediaAData ? (
-                  <div className={`
+                  <div
+                    className={`
                     p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
                     bg-zinc-50 dark:bg-zinc-900/30 space-y-2
-                  `}>
-                    <p className="text-sm font-medium truncate">{mediaAData.original_filename}</p>
+                  `}
+                  >
+                    <p className="text-sm font-medium truncate">
+                      {mediaAData.original_filename}
+                    </p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {formatFileSize(mediaAData.file_size)}
                     </p>
@@ -201,11 +225,13 @@ export default function ComparisonsPage() {
                     )}
                   </div>
                 ) : (
-                  <div className={`
+                  <div
+                    className={`
                     p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
                     bg-zinc-50 dark:bg-zinc-900/30 text-center text-zinc-500
                     dark:text-zinc-400
-                  `}>
+                  `}
+                  >
                     Select a file
                   </div>
                 )}
@@ -216,11 +242,15 @@ export default function ComparisonsPage() {
               <div className="space-y-2">
                 <Label>File B Details</Label>
                 {mediaBData ? (
-                  <div className={`
+                  <div
+                    className={`
                     p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
                     bg-zinc-50 dark:bg-zinc-900/30 space-y-2
-                  `}>
-                    <p className="text-sm font-medium truncate">{mediaBData.original_filename}</p>
+                  `}
+                  >
+                    <p className="text-sm font-medium truncate">
+                      {mediaBData.original_filename}
+                    </p>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
                       {formatFileSize(mediaBData.file_size)}
                     </p>
@@ -247,11 +277,13 @@ export default function ComparisonsPage() {
                     )}
                   </div>
                 ) : (
-                  <div className={`
+                  <div
+                    className={`
                     p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
                     bg-zinc-50 dark:bg-zinc-900/30 text-center text-zinc-500
                     dark:text-zinc-400
-                  `}>
+                  `}
+                  >
                     Select a file
                   </div>
                 )}
@@ -259,10 +291,12 @@ export default function ComparisonsPage() {
             </div>
           </div>
 
-          <div className={`
+          <div
+            className={`
             flex items-center justify-center gap-4 pt-4 border-t
             border-zinc-200 dark:border-zinc-800
-          `}>
+          `}
+          >
             <Button
               onClick={handleCompare}
               disabled={comparing || !mediaA || !mediaB || mediaA === mediaB}
@@ -281,7 +315,10 @@ export default function ComparisonsPage() {
               )}
             </Button>
             {comparison && (
-              <Button variant="outline" onClick={handleClear}>
+              <Button
+                variant="outline"
+                onClick={handleClear}
+              >
                 Clear
               </Button>
             )}
@@ -306,13 +343,19 @@ export default function ComparisonsPage() {
                     ? `+${formatFileSize(comparison.size_diff)}`
                     : formatFileSize(comparison.size_diff)
                 }
-                description={comparison.size_diff > 0 ? 'A is larger' : 'B is larger'}
+                description={
+                  comparison.size_diff > 0 ? 'A is larger' : 'B is larger'
+                }
                 color={comparison.size_diff > 0 ? 'red' : 'green'}
               />
               <ComparisonCard
                 title="Storage Saved"
                 value={formatFileSize(comparison.storage_saved)}
-                description={comparison.storage_saved > 0 ? 'Potential savings' : 'No savings'}
+                description={
+                  comparison.storage_saved > 0
+                    ? 'Potential savings'
+                    : 'No savings'
+                }
                 color={comparison.storage_saved > 0 ? 'green' : 'gray'}
               />
               <ComparisonCard
@@ -323,9 +366,11 @@ export default function ComparisonsPage() {
                     : 'N/A'
                 }
                 description={
-                  comparison.duration_diff !== null && comparison.duration_diff > 0
+                  comparison.duration_diff !== null &&
+                  comparison.duration_diff > 0
                     ? 'A is longer'
-                    : comparison.duration_diff !== null && comparison.duration_diff < 0
+                    : comparison.duration_diff !== null &&
+                        comparison.duration_diff < 0
                       ? 'B is longer'
                       : 'Same'
                 }
@@ -358,7 +403,10 @@ export default function ComparisonsPage() {
                 label="Video Codec Match"
                 match={comparison.video_codec_match}
                 details={
-                  mediaAData && mediaBData && mediaAData.video_codec && mediaBData.video_codec
+                  mediaAData &&
+                  mediaBData &&
+                  mediaAData.video_codec &&
+                  mediaBData.video_codec
                     ? `${mediaAData.video_codec} vs ${mediaBData.video_codec}`
                     : 'N/A'
                 }
@@ -367,7 +415,10 @@ export default function ComparisonsPage() {
                 label="Audio Codec Match"
                 match={comparison.audio_codec_match}
                 details={
-                  mediaAData && mediaBData && mediaAData.audio_codec && mediaBData.audio_codec
+                  mediaAData &&
+                  mediaBData &&
+                  mediaAData.audio_codec &&
+                  mediaBData.audio_codec
                     ? `${mediaAData.audio_codec} vs ${mediaBData.audio_codec}`
                     : 'N/A'
                 }
@@ -396,8 +447,7 @@ function ComparisonCard({
       bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-900
       text-red-700 dark:text-red-300
     `,
-    green:
-      `
+    green: `
         bg-green-50 dark:bg-green-900/20 border-green-200
         dark:border-green-900 text-green-700 dark:text-green-300
       `,
@@ -409,15 +459,16 @@ function ComparisonCard({
       bg-zinc-50 dark:bg-zinc-900/20 border-zinc-200
       dark:border-zinc-800 text-zinc-700 dark:text-zinc-300
     `,
-    indigo:
-      `
+    indigo: `
         bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200
         dark:border-indigo-900 text-indigo-700 dark:text-indigo-300
       `,
   };
 
   return (
-    <div className={`p-4 rounded-lg border ${colorMap[color] || colorMap.gray}`}>
+    <div
+      className={`p-4 rounded-lg border ${colorMap[color] || colorMap.gray}`}
+    >
       <p className="text-xs font-medium uppercase tracking-wide">{title}</p>
       <p className="text-2xl font-bold mt-1">{value}</p>
       <p className="text-xs mt-1 opacity-70">{description}</p>
@@ -435,10 +486,12 @@ function ComparisonRow({
   details: string;
 }) {
   return (
-    <div className={`
+    <div
+      className={`
       flex items-center justify-between p-4 rounded-lg border
       border-zinc-200 dark:border-zinc-800
-    `}>
+    `}
+    >
       <div className="flex items-center gap-3">
         <div
           className={[
@@ -451,18 +504,25 @@ function ComparisonRow({
           <span
             className={[
               'text-sm font-medium',
-              match ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300',
+              match
+                ? 'text-green-700 dark:text-green-300'
+                : 'text-red-700 dark:text-red-300',
             ].join(' ')}
           >
             {match ? '✓' : '✗'}
           </span>
         </div>
         <div>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-500">{label}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-500">
+            {label}
+          </p>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">{details}</p>
         </div>
       </div>
-      <Badge variant={match ? 'default' : 'destructive'} className="capitalize">
+      <Badge
+        variant={match ? 'default' : 'destructive'}
+        className="capitalize"
+      >
         {match ? 'Match' : 'Mismatch'}
       </Badge>
     </div>
@@ -471,6 +531,8 @@ function ComparisonRow({
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{children}</label>
+    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+      {children}
+    </label>
   );
 }

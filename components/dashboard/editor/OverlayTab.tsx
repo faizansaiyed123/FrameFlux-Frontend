@@ -68,7 +68,9 @@ export function OverlayTab({
   };
 
   const updateOverlay = (id: string, changes: Partial<OverlayItem>) => {
-    setOverlays((prev) => prev.map((o) => (o.id === id ? { ...o, ...changes } : o)));
+    setOverlays((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, ...changes } : o)),
+    );
   };
 
   const handleApply = async () => {
@@ -99,7 +101,9 @@ export function OverlayTab({
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-4">
       <div className="flex items-center justify-between">
-        <Label className="text-[10px] text-zinc-500">Overlays ({overlays.length})</Label>
+        <Label className="text-[10px] text-zinc-500">
+          Overlays ({overlays.length})
+        </Label>
         <div className="flex gap-1">
           <Button
             variant="outline"
@@ -137,13 +141,17 @@ export function OverlayTab({
       {overlays.length === 0 ? (
         <Alert className="border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
           <AlertDescription className="text-[10px]">
-            No overlays added. Click the buttons above to add text, image, or watermark overlays.
+            No overlays added. Click the buttons above to add text, image, or
+            watermark overlays.
           </AlertDescription>
         </Alert>
       ) : (
         <div className="space-y-3 max-h-64 overflow-y-auto">
           {overlays.map((overlay, index) => (
-            <div key={overlay.id} className="rounded-lg border p-2 bg-white dark:bg-zinc-900">
+            <div
+              key={overlay.id}
+              className="rounded-lg border p-2 bg-white dark:bg-zinc-900"
+            >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-medium text-zinc-500 capitalize">
                   {overlay.operation}
@@ -153,7 +161,9 @@ export function OverlayTab({
                     variant="ghost"
                     size="icon"
                     className="h-5 w-5 text-[10px]"
-                    onClick={() => setSelectedIndex(selectedIndex === index ? null : index)}
+                    onClick={() =>
+                      setSelectedIndex(selectedIndex === index ? null : index)
+                    }
                     title="Edit"
                   >
                     <GripVertical className="h-3 w-3" />
@@ -176,18 +186,24 @@ export function OverlayTab({
                       <Label className="text-[10px] text-zinc-500">Text</Label>
                       <Input
                         value={overlay.text || ''}
-                        onChange={(e) => updateOverlay(overlay.id, { text: e.target.value })}
+                        onChange={(e) =>
+                          updateOverlay(overlay.id, { text: e.target.value })
+                        }
                         className="text-xs h-7"
                       />
                     </div>
                   )}
                   {overlay.operation !== 'text' && (
                     <div className="space-y-1">
-                      <Label className="text-[10px] text-zinc-500">Image Filename</Label>
+                      <Label className="text-[10px] text-zinc-500">
+                        Image Filename
+                      </Label>
                       <Input
                         value={overlay.image_filename || ''}
                         onChange={(e) =>
-                          updateOverlay(overlay.id, { image_filename: e.target.value })
+                          updateOverlay(overlay.id, {
+                            image_filename: e.target.value,
+                          })
                         }
                         placeholder="Stored filename"
                         className="text-xs h-7"
@@ -200,7 +216,11 @@ export function OverlayTab({
                       <Input
                         type="number"
                         value={overlay.x}
-                        onChange={(e) => updateOverlay(overlay.id, { x: Number(e.target.value) })}
+                        onChange={(e) =>
+                          updateOverlay(overlay.id, {
+                            x: Number(e.target.value),
+                          })
+                        }
                         className="text-xs h-7"
                       />
                     </div>
@@ -209,25 +229,35 @@ export function OverlayTab({
                       <Input
                         type="number"
                         value={overlay.y}
-                        onChange={(e) => updateOverlay(overlay.id, { y: Number(e.target.value) })}
+                        onChange={(e) =>
+                          updateOverlay(overlay.id, {
+                            y: Number(e.target.value),
+                          })
+                        }
                         className="text-xs h-7"
                       />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
-                      <Label className="text-[10px] text-zinc-500">Font Size</Label>
+                      <Label className="text-[10px] text-zinc-500">
+                        Font Size
+                      </Label>
                       <Input
                         type="number"
                         value={overlay.font_size}
                         onChange={(e) =>
-                          updateOverlay(overlay.id, { font_size: Number(e.target.value) })
+                          updateOverlay(overlay.id, {
+                            font_size: Number(e.target.value),
+                          })
                         }
                         className="text-xs h-7"
                       />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-[10px] text-zinc-500">Opacity</Label>
+                      <Label className="text-[10px] text-zinc-500">
+                        Opacity
+                      </Label>
                       <Input
                         type="number"
                         step="0.1"
@@ -235,7 +265,9 @@ export function OverlayTab({
                         max="1"
                         value={overlay.opacity}
                         onChange={(e) =>
-                          updateOverlay(overlay.id, { opacity: Number(e.target.value) })
+                          updateOverlay(overlay.id, {
+                            opacity: Number(e.target.value),
+                          })
                         }
                         className="text-xs h-7"
                       />
@@ -267,7 +299,8 @@ export function OverlayTab({
       </Button>
       <Alert className="border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50">
         <AlertDescription className="text-[10px]">
-          Click an overlay to edit. Image/watermark overlays require an uploaded image filename.
+          Click an overlay to edit. Image/watermark overlays require an uploaded
+          image filename.
         </AlertDescription>
       </Alert>
     </div>
