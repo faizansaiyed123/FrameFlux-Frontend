@@ -97,7 +97,10 @@ function ResetPasswordForm() {
         <div className="space-y-2">
           <Label htmlFor="password">New Password</Label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <Lock className={`
+              absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+              text-zinc-400
+            `} />
             <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
@@ -127,7 +130,10 @@ function ResetPasswordForm() {
         <div className="space-y-2">
           <Label htmlFor="confirmPassword">Confirm New Password</Label>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+            <Lock className={`
+              absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4
+              text-zinc-400
+            `} />
             <Input
               id="confirmPassword"
               type={showPassword ? 'text' : 'password'}
@@ -192,7 +198,10 @@ export default function ResetPasswordPage() {
             Remember your password?{' '}
             <Link
               href="/auth/login"
-              className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+              className={`
+                text-indigo-600 dark:text-indigo-400 font-medium
+                hover:underline
+              `}
             >
               Sign in
             </Link>
