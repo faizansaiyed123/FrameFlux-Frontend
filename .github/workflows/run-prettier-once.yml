@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies including pinned Prettier
         run: npm install --no-audit --no-fund
 
-      - name: Format tracked project files
+      - name: Format source and project configuration
         run: npm run format
 
       - name: Verify formatting
@@ -45,9 +45,6 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: https://api.example.com
         continue-on-error: true
-
-      - name: Remove one-time formatter workflow
-        run: rm .github/workflows/run-prettier-once.yml
 
       - name: Commit formatting-only changes
         env:
