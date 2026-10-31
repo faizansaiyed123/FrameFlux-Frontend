@@ -72,21 +72,39 @@ export function Sidebar({ className }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'flex h-full flex-col border-r border-zinc-200/80 bg-white dark:border-zinc-800/80 dark:bg-zinc-950',
+        `
+          flex h-full flex-col border-r border-zinc-200/80 bg-white
+          dark:border-zinc-800/80 dark:bg-zinc-950
+        `,
         className,
       )}
     >
-      <div className="flex h-[72px] items-center border-b border-zinc-200/80 px-5 dark:border-zinc-800/80">
+      <div className={`
+        flex h-[72px] items-center border-b border-zinc-200/80 px-5
+        dark:border-zinc-800/80
+      `}>
         <Link
           href="/app/dashboard"
-          className="group flex items-center gap-3 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950"
+          className={`
+            group flex items-center gap-3 rounded-lg outline-none
+            focus-visible:ring-2 focus-visible:ring-indigo-500
+            focus-visible:ring-offset-2
+            dark:focus-visible:ring-offset-zinc-950
+          `}
           aria-label="FrameFlux dashboard"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-950 text-white shadow-sm transition-transform group-hover:scale-[1.02] dark:bg-white dark:text-zinc-950">
+          <span className={`
+            flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-950
+            text-white shadow-sm transition-transform
+            group-hover:scale-[1.02] dark:bg-white dark:text-zinc-950
+          `}>
             <span className="h-3 w-3 rounded-[3px] bg-current" />
           </span>
           <div className="leading-none">
-            <span className="block text-[15px] font-semibold tracking-[-0.02em] text-zinc-950 dark:text-white">
+            <span className={`
+              block text-[15px] font-semibold tracking-[-0.02em] text-zinc-950
+              dark:text-white
+            `}>
               FrameFlux
             </span>
             <span className="mt-1 block text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-400">
@@ -107,10 +125,22 @@ export function Sidebar({ className }: SidebarProps) {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  'group flex cursor-pointer items-center gap-3 rounded-xl px-3.5 py-2.5 text-[13px] font-medium outline-none transition-all focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
+                  `
+                    group flex cursor-pointer items-center gap-3 rounded-xl px-3.5
+                    py-2.5 text-[13px] font-medium outline-none transition-all
+                    focus-visible:ring-2 focus-visible:ring-indigo-500
+                    focus-visible:ring-inset
+                  `,
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700 shadow-[inset_3px_0_0_#6366f1] dark:bg-indigo-950/45 dark:text-indigo-300'
-                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100',
+                    ? `
+                      bg-indigo-50 text-indigo-700 shadow-[inset_3px_0_0_#6366f1]
+                      dark:bg-indigo-950/45 dark:text-indigo-300
+                    `
+                    : `
+                      text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950
+                      dark:text-zinc-400 dark:hover:bg-zinc-900
+                      dark:hover:text-zinc-100
+                    `,
                 )}
               >
                 <item.icon
@@ -133,11 +163,17 @@ export function Sidebar({ className }: SidebarProps) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="h-auto w-full cursor-pointer justify-start gap-3 rounded-xl px-2.5 py-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-900"
+              className={`
+                h-auto w-full cursor-pointer justify-start gap-3 rounded-xl
+                px-2.5 py-2.5 hover:bg-zinc-100 dark:hover:bg-zinc-900
+              `}
             >
               <Avatar className="h-9 w-9 shrink-0 ring-1 ring-zinc-200 dark:ring-zinc-800">
                 <AvatarImage src="" alt={user?.full_name || user?.email || ''} />
-                <AvatarFallback className="bg-zinc-100 text-xs font-semibold text-zinc-700 dark:bg-zinc-900 dark:text-zinc-200">
+                <AvatarFallback className={`
+                  bg-zinc-100 text-xs font-semibold text-zinc-700 dark:bg-zinc-900
+                  dark:text-zinc-200
+                `}>
                   {initials}
                 </AvatarFallback>
               </Avatar>
