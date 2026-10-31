@@ -356,7 +356,10 @@ export default function MediaDetailPage() {
   return (
     <div className="space-y-8">
       {uploadSuccess && (
-        <div className="flex items-center gap-3 rounded-lg border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 p-4">
+        <div className={`
+          flex items-center gap-3 rounded-lg border border-green-200
+          dark:border-green-900 bg-green-50 dark:bg-green-900/20 p-4
+        `}>
           <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
           <p className="text-sm font-medium text-green-700 dark:text-green-300">
             Media uploaded successfully — {media.original_filename}
@@ -378,11 +381,18 @@ export default function MediaDetailPage() {
           </Button>
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+              <div className={`
+                flex h-10 w-10 items-center justify-center rounded-lg
+                bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+                dark:text-indigo-400
+              `}>
                 <Film className="h-5 w-5" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 truncate max-w-[400px]">
+                <h1 className={`
+                  text-2xl font-bold tracking-tight text-zinc-900
+                  dark:text-zinc-50 truncate max-w-[400px]
+                `}>
                   {media.original_filename}
                 </h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -456,7 +466,10 @@ export default function MediaDetailPage() {
               </div>
             </div>
             {status.error && (
-              <div className="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900">
+              <div className={`
+                mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border
+                border-red-200 dark:border-red-900
+              `}>
                 <p className="text-sm text-red-700 dark:text-red-300">{status.error}</p>
               </div>
             )}
@@ -664,7 +677,10 @@ export default function MediaDetailPage() {
                   {versions.map((version) => (
                     <div
                       key={version.id}
-                      className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                      className={`
+                        flex items-center justify-between p-3 rounded-lg border
+                        border-zinc-200 dark:border-zinc-800
+                      `}
                     >
                       <div>
                         <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
@@ -723,7 +739,10 @@ export default function MediaDetailPage() {
                   {shares.map((share) => (
                     <div
                       key={share.id}
-                      className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                      className={`
+                        flex items-center justify-between p-3 rounded-lg border
+                        border-zinc-200 dark:border-zinc-800
+                      `}
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -839,7 +858,10 @@ export default function MediaDetailPage() {
                     Paste this iframe code into your website to embed the player.
                   </p>
                 </div>
-                <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30">
+                <div className={`
+                  p-4 rounded-lg border border-zinc-200 dark:border-zinc-800
+                  bg-zinc-50 dark:bg-zinc-900/30
+                `}>
                   <p className="text-sm font-medium mb-2">Preview:</p>
                   <div style={{ width: '100%', aspectRatio: '16/9' }}>
                     <iframe
