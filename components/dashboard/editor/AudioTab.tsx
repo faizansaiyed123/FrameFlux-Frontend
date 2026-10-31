@@ -352,7 +352,10 @@ export function AudioTab({
 
   return (
     <div className="flex-1 overflow-y-auto p-3 space-y-4">
-      <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+      <div className={`
+        flex items-center gap-2 text-xs text-zinc-500
+        dark:text-zinc-400
+      `}>
         <Music className="h-3.5 w-3.5" />
         <span>Audio: {media.audio_codec || 'Unknown'}</span>
       </div>
@@ -416,7 +419,10 @@ export function AudioTab({
         </Button>
       </div>
 
-      <div className="border-t border-zinc-200 dark:border-zinc-800 pt-4 space-y-3">
+      <div className={`
+        border-t border-zinc-200 dark:border-zinc-800 pt-4
+        space-y-3
+      `}>
         <Label className="text-[10px] text-zinc-500">Edit Audio</Label>
         <div className="grid grid-cols-3 gap-1.5">
           {editOps.map((op) => {
@@ -427,9 +433,15 @@ export function AudioTab({
                 key={op.id}
                 onClick={() => setEditOp(op.id)}
                 className={[
-                  'flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors',
+                  `
+                    flex flex-col items-center gap-1 rounded-md border p-1.5
+                    text-center transition-colors
+                  `,
                   isActive
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                    ? `
+                      border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                      text-indigo-700 dark:text-indigo-300
+                    `
                     : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300',
                 ].join(' ')}
               >
@@ -554,7 +566,10 @@ export function AudioTab({
           Audio to Video
         </Button>
         {atoVideoOpen && (
-          <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <div className={`
+            space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+            dark:border-zinc-800
+          `}>
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Background Color</Label>
               <Input
@@ -689,7 +704,10 @@ export function AudioTab({
             <Volume2 className="mr-2 h-3.5 w-3.5" />
             Volume & Fade
           </Button>
-          <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <div className={`
+            space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+            dark:border-zinc-800
+          `}>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label className="text-[9px] text-zinc-500">Volume (x)</Label>
@@ -799,7 +817,10 @@ export function AudioTab({
             <RotateCcw className="mr-2 h-3.5 w-3.5" />
             Replace Audio
           </Button>
-          <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+          <div className={`
+            space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+            dark:border-zinc-800
+          `}>
             <div className="space-y-1">
               <Label className="text-[9px] text-zinc-500">Audio File (stored filename)</Label>
               <Input
@@ -863,7 +884,10 @@ export function AudioTab({
             Sync External Audio
           </Button>
           {syncAudioOpen && (
-            <div className="space-y-2 mt-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+            <div className={`
+              space-y-2 mt-3 p-3 rounded-lg border border-zinc-200
+              dark:border-zinc-800
+            `}>
               <div className="space-y-1">
                 <Label htmlFor="syncExternalAudioFile" className="text-[9px] text-zinc-500">
                   External Audio File (stored filename)
@@ -1040,7 +1064,10 @@ export function AudioTab({
       </Alert>
 
       {syncPreviewOpen && syncPreviewUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <div className={`
+          fixed inset-0 z-50 flex items-center justify-center
+          bg-black/70 p-4
+        `}>
           <div className={`
             bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6
             max-h-[90vh] overflow-y-auto
@@ -1063,7 +1090,10 @@ export function AudioTab({
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="bg-black rounded-lg overflow-hidden mb-4 flex items-center justify-center h-64">
+            <div className={`
+              bg-black rounded-lg overflow-hidden mb-4 flex
+              items-center justify-center h-64
+            `}>
               <video src={syncPreviewUrl} controls className="max-h-full max-w-full" />
             </div>
             <div className="flex items-center gap-2">
