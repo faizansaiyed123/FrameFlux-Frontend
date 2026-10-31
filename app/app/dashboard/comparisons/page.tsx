@@ -111,7 +111,10 @@ export default function ComparisonsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className={`
+          text-3xl font-bold tracking-tight text-zinc-900
+          dark:text-zinc-50
+        `}>
           Media Comparisons
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">
