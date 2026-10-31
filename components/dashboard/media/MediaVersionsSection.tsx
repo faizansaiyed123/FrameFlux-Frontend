@@ -352,9 +352,16 @@ function VersionRow({
   const statusInfo = statusConfig[version.processing_status] || statusConfig.pending;
 
   return (
-    <div className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+    <div className={`
+      flex items-center justify-between p-3 rounded-lg border
+      border-zinc-200 dark:border-zinc-800
+    `}>
       <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
+        <div className={`
+          flex h-8 w-8 items-center justify-center rounded-lg
+          bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+          dark:text-indigo-400
+        `}>
           <span className="text-sm font-medium">v{version.version_number}</span>
         </div>
         <div>
