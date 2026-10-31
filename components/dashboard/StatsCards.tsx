@@ -50,12 +50,22 @@ export function StatsCards({ overview }: StatsCardsProps) {
       {cards.map((card) => (
         <Card
           key={card.title}
-          className="group rounded-2xl border-zinc-200/80 bg-white/90 shadow-[0_8px_30px_-22px_rgba(24,24,27,.45)] transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-[0_14px_34px_-24px_rgba(24,24,27,.5)] dark:border-zinc-800/80 dark:bg-zinc-900/80 dark:hover:border-zinc-700"
+          className={`
+            group rounded-2xl border-zinc-200/80 bg-white/90
+            shadow-[0_8px_30px_-22px_rgba(24,24,27,.45)] transition-all
+            hover:-translate-y-0.5 hover:border-zinc-300
+            hover:shadow-[0_14px_34px_-24px_rgba(24,24,27,.5)]
+            dark:border-zinc-800/80 dark:bg-zinc-900/80
+            dark:hover:border-zinc-700
+          `}
         >
           <CardContent className="p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-400 dark:text-zinc-500">
+                <p className={`
+                  text-[11px] font-semibold uppercase tracking-[0.12em]
+                  text-zinc-400 dark:text-zinc-500
+                `}>
                   {card.title}
                 </p>
                 <p className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-zinc-950 dark:text-zinc-50">
@@ -64,7 +74,10 @@ export function StatsCards({ overview }: StatsCardsProps) {
               </div>
               <div
                 className={cn(
-                  'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105',
+                  `
+                    flex h-11 w-11 shrink-0 items-center justify-center rounded-xl
+                    transition-transform group-hover:scale-105
+                  `,
                   card.bg,
                   card.color,
                 )}
