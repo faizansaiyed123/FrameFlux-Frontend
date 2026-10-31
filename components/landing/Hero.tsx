@@ -314,12 +314,13 @@ export function Hero() {
                 </div>
               ) : (
                 <div
-                  className={`rounded-xl border-2 border-dashed px-6 py-14 text-center transition-all sm:py-16 ${dragOver ? `
-                    border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/20
-                  ` : `
-                    border-zinc-200 hover:border-zinc-300 dark:border-zinc-800
-                    dark:hover:border-zinc-700
-                  `}`}
+                  className={[
+                    'rounded-xl border-2 border-dashed px-6 py-14',
+                    'text-center transition-all sm:py-16',
+                    dragOver
+                      ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/20'
+                      : 'border-zinc-200 hover:border-zinc-300 dark:border-zinc-800 dark:hover:border-zinc-700',
+                  ].join(' ')}
                   onDrop={(e) => {
                     e.preventDefault();
                     setDragOver(false);
