@@ -60,7 +60,10 @@ export function AudioExtractForm({ mediaId }: Props) {
   return (
     <div className="space-y-4">
       {error && (
-        <Alert className="border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300">
+        <Alert className={`
+          border-red-200 bg-red-50 text-red-700 dark:border-red-900/60
+          dark:bg-red-950/20 dark:text-red-300
+        `}>
           <AlertDescription className="text-xs">{error}</AlertDescription>
         </Alert>
       )}
