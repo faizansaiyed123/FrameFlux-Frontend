@@ -131,7 +131,10 @@ function DropdownMenuCheckboxItem({
       checked={checked}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+      <span className={`
+        pointer-events-none absolute left-2 flex size-3.5
+        items-center justify-center
+      `}>
         <DropdownMenuPrimitive.ItemIndicator>
           <CheckIcon className="size-4" />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -169,7 +172,10 @@ function DropdownMenuRadioItem({
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+      <span className={`
+        pointer-events-none absolute left-2 flex size-3.5
+        items-center justify-center
+      `}>
         <DropdownMenuPrimitive.ItemIndicator>
           <CircleIcon className="size-2 fill-current" />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -210,7 +216,9 @@ function DropdownMenuSeparator({
   return (
     <DropdownMenuPrimitive.Separator
       data-slot="dropdown-menu-separator"
-      className={cn('-mx-0.5 my-1.5 h-px bg-zinc-100 dark:bg-zinc-800', className)}
+      className={cn(`
+        -mx-0.5 my-1.5 h-px bg-zinc-100 dark:bg-zinc-800
+      `, className)}
       {...props}
     />
   );
