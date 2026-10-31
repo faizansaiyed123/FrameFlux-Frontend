@@ -17,7 +17,10 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <footer className={`
+      border-t border-zinc-200 bg-white dark:border-zinc-800
+      dark:bg-zinc-950
+    `}>
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:py-16">
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
           <div className="max-w-sm">
@@ -53,7 +56,10 @@ export function Footer() {
           <div className="grid grid-cols-3 gap-12 sm:gap-20">
             {Object.entries(groups).map(([name, links]) => (
               <div key={name}>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-950 dark:text-white">
+                <h3 className={`
+                  text-xs font-semibold uppercase tracking-wider
+                  text-zinc-950 dark:text-white
+                `}>
                   {name}
                 </h3>
                 <ul className="mt-4 space-y-3">
