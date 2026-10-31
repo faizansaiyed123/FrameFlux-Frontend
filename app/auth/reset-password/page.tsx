@@ -85,7 +85,10 @@ function ResetPasswordForm() {
   return (
     <CardContent className="space-y-4">
       {error && (
-        <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+        <Alert className={`
+          border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+          text-red-700 dark:text-red-300
+        `}>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -109,7 +112,10 @@ function ResetPasswordForm() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+              className={`
+                absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400
+                hover:text-zinc-600 dark:hover:text-zinc-300
+              `}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -152,12 +158,18 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 py-16">
+    <div className={`
+      min-h-screen flex items-center justify-center bg-zinc-50
+      dark:bg-zinc-950 px-4 py-16
+    `}>
       <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-800">
         <CardHeader className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4"
+            className={`
+              inline-flex items-center gap-2 text-xl font-semibold
+              text-zinc-900 dark:text-zinc-50 mb-4
+            `}
           >
             FrameFlux
           </Link>
