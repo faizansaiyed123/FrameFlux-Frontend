@@ -158,7 +158,10 @@ export function Hero() {
           absolute left-1/2 top-24 h-96 w-96 -translate-x-1/2 rounded-full
           bg-indigo-500/10 blur-3xl
         `} />
-        <div className="relative mx-auto max-w-7xl px-5 pb-20 pt-24 sm:px-8 lg:pb-28 lg:pt-28">
+        <div className={`
+          relative mx-auto max-w-7xl px-5 pb-20 pt-24 sm:px-8 lg:pb-28
+          lg:pt-28
+        `}>
           <div className="mx-auto max-w-4xl text-center">
             <div className={`
               mb-7 inline-flex items-center gap-2 rounded-full border
@@ -166,7 +169,9 @@ export function Hero() {
               text-zinc-600 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80
               dark:text-zinc-300
             `}>
-              <Sparkles className="h-3.5 w-3.5 text-indigo-500" /> Professional media processing,
+              <Sparkles className={`
+                h-3.5 w-3.5 text-indigo-500
+              `} /> Professional media processing,
               simplified
             </div>
             <h1 className={`
@@ -215,7 +220,10 @@ export function Hero() {
                     bg-zinc-200 dark:bg-zinc-800
                   `}>
                     <div
-                      className="h-full rounded-full bg-indigo-600 transition-all dark:bg-indigo-500"
+                      className={`
+                        h-full rounded-full bg-indigo-600 transition-all
+                        dark:bg-indigo-500
+                      `}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -255,7 +263,10 @@ export function Hero() {
                   rounded-xl border border-indigo-200 bg-indigo-50/50 px-6 py-10
                   dark:border-indigo-900/60 dark:bg-indigo-950/20
                 `}>
-                  <div className="flex flex-col items-center justify-between gap-6 sm:flex-row sm:text-left">
+                  <div className={`
+                    flex flex-col items-center justify-between gap-6 sm:flex-row
+                    sm:text-left
+                  `}>
                     <div className="flex items-center gap-4">
                       <div className={`
                         flex h-14 w-14 shrink-0 items-center justify-center rounded-xl
@@ -265,13 +276,20 @@ export function Hero() {
                         <file.icon className="h-7 w-7" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                        <p className={`
+                          text-sm font-medium text-indigo-600 dark:text-indigo-400
+                        `}>
                           {file.category} ready
                         </p>
-                        <h3 className="mt-1 max-w-lg truncate font-semibold text-zinc-950 dark:text-white">
+                        <h3 className={`
+                          mt-1 max-w-lg truncate font-semibold text-zinc-950
+                          dark:text-white
+                        `}>
                           {file.file.name}
                         </h3>
-                        <p className="mt-1 text-sm text-zinc-500">{formatSize(file.file.size)}</p>
+                        <p className={`
+                          mt-1 text-sm text-zinc-500
+                        `}>{formatSize(file.file.size)}</p>
                       </div>
                     </div>
                     <div className="flex shrink-0 gap-2">
@@ -286,7 +304,9 @@ export function Hero() {
                         Change
                       </Button>
                       <Button className="cursor-pointer" onClick={startUpload}>
-                        <Upload className="mr-2 h-4 w-4" /> {user ? 'Upload & open' : 'Continue'}
+                        <Upload className={`
+                          mr-2 h-4 w-4
+                        `} /> {user ? 'Upload & open' : 'Continue'}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
@@ -294,7 +314,9 @@ export function Hero() {
                 </div>
               ) : (
                 <div
-                  className={`rounded-xl border-2 border-dashed px-6 py-14 text-center transition-all sm:py-16 ${dragOver ? 'border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/20' : `
+                  className={`rounded-xl border-2 border-dashed px-6 py-14 text-center transition-all sm:py-16 ${dragOver ? `
+                    border-indigo-500 bg-indigo-50/60 dark:bg-indigo-950/20
+                  ` : `
                     border-zinc-200 hover:border-zinc-300 dark:border-zinc-800
                     dark:hover:border-zinc-700
                   `}`}
@@ -316,10 +338,16 @@ export function Hero() {
                   `}>
                     <Upload className="h-6 w-6" />
                   </div>
-                  <h2 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">
+                  <h2 className={`
+                    text-xl font-semibold tracking-tight text-zinc-950
+                    dark:text-white
+                  `}>
                     Drop your media here
                   </h2>
-                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+                  <p className={`
+                    mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-500
+                    dark:text-zinc-400
+                  `}>
                     Video, audio, images, and subtitles. We’ll detect the format automatically.
                   </p>
                   <input
@@ -365,10 +393,16 @@ export function Hero() {
                   mb-3 flex h-7 w-7 items-center justify-center rounded-full
                   bg-zinc-100 dark:bg-zinc-900
                 `}>
-                  <Check className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                  <Check className={`
+                    h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400
+                  `} />
                 </div>
-                <h3 className="text-sm font-semibold text-zinc-950 dark:text-white">{title}</h3>
-                <p className="mt-1.5 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+                <h3 className={`
+                  text-sm font-semibold text-zinc-950 dark:text-white
+                `}>{title}</h3>
+                <p className={`
+                  mt-1.5 text-xs leading-5 text-zinc-500 dark:text-zinc-400
+                `}>
                   {description}
                 </p>
               </div>
@@ -378,7 +412,10 @@ export function Hero() {
             <p className="mt-6 text-center text-xs text-zinc-400">
               <Link
                 href="/app/dashboard/media"
-                className="cursor-pointer font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                className={`
+                  cursor-pointer font-medium text-indigo-600 hover:underline
+                  dark:text-indigo-400
+                `}
               >
                 Browse your media library →
               </Link>
@@ -408,14 +445,22 @@ export function Hero() {
                 `}>
                   <LockKeyhole className="h-4 w-4" />
                 </div>
-                <h2 className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">
+                <h2 className={`
+                  text-xl font-semibold tracking-tight text-zinc-950
+                  dark:text-white
+                `}>
                   {authMode === 'signup' ? 'Create your account' : 'Welcome back'}
                 </h2>
-                <p className="mt-1 text-sm text-zinc-500">Sign in to continue with your upload.</p>
+                <p className={`
+                  mt-1 text-sm text-zinc-500
+                `}>Sign in to continue with your upload.</p>
               </div>
               <button
                 onClick={() => setAuthOpen(false)}
-                className="cursor-pointer text-zinc-400 hover:text-zinc-700 dark:hover:text-white"
+                className={`
+                  cursor-pointer text-zinc-400 hover:text-zinc-700
+                  dark:hover:text-white
+                `}
                 aria-label="Close"
               >
                 <X className="h-5 w-5" />
@@ -434,7 +479,10 @@ export function Hero() {
                 <div className="space-y-2">
                   <Label htmlFor="hero-name">Full name</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                    <User className={`
+                      absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2
+                      text-zinc-400
+                    `} />
                     <Input
                       id="hero-name"
                       value={fullName}
@@ -448,7 +496,10 @@ export function Hero() {
               <div className="space-y-2">
                 <Label htmlFor="hero-email">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <Mail className={`
+                    absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2
+                    text-zinc-400
+                  `} />
                   <Input
                     id="hero-email"
                     type="email"
@@ -475,10 +526,14 @@ export function Hero() {
                   disabled={authLoading}
                 />
               </div>
-              <Button className="h-11 w-full cursor-pointer rounded-lg" disabled={authLoading}>
+              <Button className={`
+                h-11 w-full cursor-pointer rounded-lg
+              `} disabled={authLoading}>
                 {authLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...
+                    <Loader2 className={`
+                      mr-2 h-4 w-4 animate-spin
+                    `} /> Please wait...
                   </>
                 ) : authMode === 'signup' ? (
                   'Create account & upload'
@@ -495,7 +550,10 @@ export function Hero() {
                   setAuthMode(authMode === 'signup' ? 'login' : 'signup');
                   setAuthError('');
                 }}
-                className="cursor-pointer font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                className={`
+                  cursor-pointer font-medium text-indigo-600 hover:underline
+                  dark:text-indigo-400
+                `}
               >
                 {authMode === 'signup' ? 'Sign in' : 'Create account'}
               </button>
