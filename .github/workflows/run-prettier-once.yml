@@ -1,0 +1,64 @@
+name: One-time Prettier formatting
+
+on:
+  push:
+    branches:
+      - formatting/prettier-consistency
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out formatting branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies including pinned Prettier
+        run: npm install --no-audit --no-fund
+
+      - name: Format tracked project files
+        run: npm run format
+
+      - name: Verify formatting
+        run: npm run format:check
+
+      - name: Verify whitespace
+        run: git diff --check
+
+      - name: Run ESLint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Verify production build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://api.example.com
+        continue-on-error: true
+
+      - name: Remove one-time formatter workflow
+        run: rm .github/workflows/run-prettier-once.yml
+
+      - name: Commit formatting-only changes
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes were needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: apply consistent Prettier formatting"
+          git push origin "HEAD:${BRANCH_NAME}"
