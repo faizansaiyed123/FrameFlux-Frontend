@@ -54,7 +54,10 @@ import { formatDistanceToNow } from 'date-fns';
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
   pending: {
     icon: Clock,
-    color: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',
+    color: `
+      bg-zinc-100 text-zinc-700 dark:bg-zinc-800
+      dark:text-zinc-300
+    `,
     label: 'Pending',
   },
   queued: {
@@ -64,12 +67,18 @@ const statusConfig: Record<string, { icon: typeof Clock; color: string; label: s
   },
   processing: {
     icon: Loader2,
-    color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300',
+    color: `
+      bg-amber-50 text-amber-700 dark:bg-amber-950/40
+      dark:text-amber-300
+    `,
     label: 'Processing',
   },
   completed: {
     icon: CheckCircle2,
-    color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300',
+    color: `
+      bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40
+      dark:text-emerald-300
+    `,
     label: 'Completed',
   },
   failed: {
@@ -321,7 +330,10 @@ export default function MediaPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Media Library
           </h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -339,7 +351,10 @@ export default function MediaPage() {
 
   return (
     <div className="space-y-7">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className={`
+        flex flex-col gap-4 sm:flex-row sm:items-end
+        sm:justify-between
+      `}>
         <div>
           <p className={`
             text-xs font-semibold uppercase tracking-[0.16em]
@@ -347,7 +362,10 @@ export default function MediaPage() {
           `}>
             Library
           </p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-zinc-950 dark:text-white">
+          <h1 className={`
+            mt-1 text-3xl font-semibold tracking-[-0.03em]
+            text-zinc-950 dark:text-white
+          `}>
             Media
           </h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -365,7 +383,10 @@ export default function MediaPage() {
       </div>
 
       {error && (
-        <Card className="border-red-200 bg-red-50/80 dark:border-red-900/70 dark:bg-red-950/20">
+        <Card className={`
+          border-red-200 bg-red-50/80 dark:border-red-900/70
+          dark:bg-red-950/20
+        `}>
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
@@ -385,7 +406,10 @@ export default function MediaPage() {
             placeholder="Search media..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-10 border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950"
+            className={`
+              h-10 border-zinc-200 bg-white dark:border-zinc-800
+              dark:bg-zinc-950
+            `}
           />
           <div>
             <Label>Sort</Label>
@@ -544,10 +568,16 @@ export default function MediaPage() {
             `}>
               <Film className="h-7 w-7 text-zinc-400 dark:text-zinc-500" />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">
+            <h3 className={`
+              text-lg font-semibold tracking-tight text-zinc-950
+              dark:text-white
+            `}>
               No media files
             </h3>
-            <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+            <p className={`
+              mt-2 max-w-sm text-sm leading-6 text-zinc-500
+              dark:text-zinc-400
+            `}>
               {search ||
               statusFilter !== 'all' ||
               mediaType !== 'all' ||
@@ -667,9 +697,15 @@ export default function MediaPage() {
           rounded-2xl border-zinc-200 bg-white p-0 shadow-2xl
           dark:border-zinc-800 dark:bg-zinc-950 sm:w-full
         `}>
-          <div className="border-b border-zinc-200/80 px-5 py-5 dark:border-zinc-800/80 sm:px-6">
+          <div className={`
+            border-b border-zinc-200/80 px-5 py-5
+            dark:border-zinc-800/80 sm:px-6
+          `}>
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">
+              <DialogTitle className={`
+                text-xl font-semibold tracking-tight text-zinc-950
+                dark:text-white
+              `}>
                 Upload media
               </DialogTitle>
               <DialogDescription className="mt-1 text-sm leading-5 text-zinc-500 dark:text-zinc-400">
@@ -701,7 +737,10 @@ export default function MediaPage() {
                     </p>
                   </div>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                <div className={`
+                  h-2 w-full overflow-hidden rounded-full bg-zinc-200
+                  dark:bg-zinc-800
+                `}>
                   <div
                     className={`
                       h-full rounded-full bg-indigo-600 transition-all duration-300
@@ -768,7 +807,10 @@ export default function MediaPage() {
             ) : (
               <div
                 className={cn(
-                  'rounded-xl border-2 border-dashed p-6 text-center transition-all sm:p-8',
+                  `
+                    rounded-xl border-2 border-dashed p-6 text-center
+                    transition-all sm:p-8
+                  `,
                   dragActive
                     ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/20'
                     : `
@@ -806,7 +848,10 @@ export default function MediaPage() {
                   `}>
                     <Upload className="h-5 w-5" />
                   </div>
-                  <p className="text-base font-semibold tracking-tight text-zinc-950 dark:text-white">
+                  <p className={`
+                    text-base font-semibold tracking-tight text-zinc-950
+                    dark:text-white
+                  `}>
                     Drag & drop files here
                   </p>
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
