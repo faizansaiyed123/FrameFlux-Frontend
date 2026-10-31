@@ -8,8 +8,14 @@ import { Film, Plus, ArrowUpRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const statusColors: Record<string, string> = {
-  pending: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300',
-  queued: 'bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300',
+  pending: `
+    bg-zinc-100 text-zinc-600 dark:bg-zinc-800
+    dark:text-zinc-300
+  `,
+  queued: `
+    bg-blue-50 text-blue-700 dark:bg-blue-950/50
+    dark:text-blue-300
+  `,
   processing: `
     bg-amber-50 text-amber-700 dark:bg-amber-950/50
     dark:text-amber-300
