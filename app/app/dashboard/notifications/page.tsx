@@ -103,7 +103,11 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-8">
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300">
+        <div className={`
+          rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm
+          text-red-700 dark:border-red-900/60 dark:bg-red-950/20
+          dark:text-red-300
+        `}>
           {error}
         </div>
       )}
@@ -160,7 +164,11 @@ export default function NotificationsPage() {
               className={`border-zinc-200 dark:border-zinc-800 ${!notification.is_read ? 'border-l-4 border-l-indigo-500' : ''}`}
             >
               <CardContent className="flex items-start gap-4 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                <div className={`
+                  flex h-10 w-10 items-center justify-center rounded-lg
+                  bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30
+                  dark:text-indigo-400
+                `}>
                   <Bell className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
