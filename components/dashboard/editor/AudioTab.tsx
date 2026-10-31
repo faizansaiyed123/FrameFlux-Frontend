@@ -428,7 +428,10 @@ export function AudioTab({
                 onClick={() => setEditOp(op.id)}
                 className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
                   isActive
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                    ? `
+                      border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                      text-indigo-700 dark:text-indigo-300
+                    `
                     : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                 }`}
               >
@@ -1022,11 +1025,17 @@ export function AudioTab({
       </div>
 
       {success && (
-        <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+        <Alert className={`
+          border-green-200 dark:border-green-900 bg-green-50
+          dark:bg-green-900/20 text-green-700 dark:text-green-300
+        `}>
           <AlertDescription>{success}</AlertDescription>
         </Alert>
       )}
-      <Alert className="border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400">
+      <Alert className={`
+        border-zinc-200 dark:border-zinc-800 bg-zinc-50
+        dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-400
+      `}>
         <AlertDescription className="text-[10px]">
           Volume and fade controls are available during playback using the main controls.
         </AlertDescription>
@@ -1034,7 +1043,10 @@ export function AudioTab({
 
       {syncPreviewOpen && syncPreviewUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-          <div className="bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div className={`
+            bg-white dark:bg-zinc-900 rounded-xl max-w-2xl w-full p-6
+            max-h-[90vh] overflow-y-auto
+          `}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Film className="h-5 w-5 text-indigo-600" />
