@@ -22,10 +22,15 @@ export function RecentProjects({ projects }: RecentProjectsProps) {
         border-zinc-100 px-5 py-5 dark:border-zinc-800/80 sm:px-6
       `}>
         <div>
-          <CardTitle className="text-base font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+          <CardTitle className={`
+            text-base font-semibold tracking-tight text-zinc-950
+            dark:text-zinc-50
+          `}>
             Recent Projects
           </CardTitle>
-          <p className="mt-1 text-xs text-zinc-400">Your latest project activity</p>
+          <p className={`
+            mt-1 text-xs text-zinc-400
+          `}>Your latest project activity</p>
         </div>
         <Link
           href="/app/dashboard/projects"
@@ -53,11 +58,15 @@ export function RecentProjects({ projects }: RecentProjectsProps) {
             `}>
               <FolderOpen className="h-5 w-5" />
             </div>
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">No projects yet</p>
+            <p className={`
+              text-sm font-medium text-zinc-700 dark:text-zinc-200
+            `}>No projects yet</p>
             <p className="mt-1 max-w-xs text-xs leading-5 text-zinc-400">
               Create a project to keep related media and workflows organized.
             </p>
-            <Button size="sm" className="mt-5 cursor-pointer rounded-lg" asChild>
+            <Button size="sm" className={`
+              mt-5 cursor-pointer rounded-lg
+            `} asChild>
               <Link href="/app/dashboard/projects">
                 <Plus className="mr-2 h-4 w-4" />
                 Create project
@@ -88,15 +97,23 @@ export function RecentProjects({ projects }: RecentProjectsProps) {
                     <FolderOpen className="h-[18px] w-[18px]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+                    <p className={`
+                      truncate text-sm font-semibold text-zinc-900
+                      dark:text-zinc-50
+                    `}>
                       {project.name}
                     </p>
-                    <p className="mt-0.5 truncate text-xs text-zinc-400 dark:text-zinc-500">
+                    <p className={`
+                      mt-0.5 truncate text-xs text-zinc-400 dark:text-zinc-500
+                    `}>
                       {project.description || 'No description'}
                     </p>
                   </div>
                 </div>
-                <span className="shrink-0 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
+                <span className={`
+                  shrink-0 text-[11px] font-medium text-zinc-400
+                  dark:text-zinc-500
+                `}>
                   {new Date(project.updated_at).toLocaleDateString()}
                 </span>
               </Link>
