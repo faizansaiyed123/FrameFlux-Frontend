@@ -4,18 +4,17 @@ import { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { api } from '@/lib/api/client';
 import type { Media } from '@/types/api';
-import {
-  ArrowLeft,
-  RefreshCw,
-  Loader2,
-  AlertCircle,
-  CheckCircle2,
-  Download,
-} from 'lucide-react';
+import { ArrowLeft, RefreshCw, Loader2, AlertCircle, CheckCircle2, Download } from 'lucide-react';
 
 interface ImageWorkspaceProps {
   media: Media;
@@ -37,7 +36,8 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
     let objectUrl: string | null = null;
     setError('');
 
-    api.getMediaFile(media.id)
+    api
+      .getMediaFile(media.id)
       .then((blob) => {
         objectUrl = URL.createObjectURL(blob);
         setImageUrl(objectUrl);
@@ -112,7 +112,11 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
             <Download className="mr-2 h-4 w-4" />
             Download
           </Button>
-          <Button onClick={handleProcess} disabled={processing} className="bg-indigo-600 hover:bg-indigo-700">
+          <Button
+            onClick={handleProcess}
+            disabled={processing}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
             {processing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -147,7 +151,9 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
         <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-3">Transform</h2>
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-3">
+              Transform
+            </h2>
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Operation</Label>
@@ -207,7 +213,9 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
           </div>
 
           <div className="p-4">
-            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-3">Image Info</h3>
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 mb-3">
+              Image Info
+            </h3>
             <div className="space-y-2">
               <div>
                 <Label className="text-xs text-zinc-500 dark:text-zinc-400">Dimensions</Label>

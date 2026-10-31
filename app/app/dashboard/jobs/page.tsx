@@ -20,11 +20,31 @@ import {
 import { cn } from '@/lib/utils';
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
-  queued: { icon: Clock, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', label: 'Queued' },
-  started: { icon: Play, color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', label: 'Started' },
-  running: { icon: Loader2, color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', label: 'Running' },
-  complete: { icon: CheckCircle2, color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300', label: 'Complete' },
-  failed: { icon: XCircle, color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300', label: 'Failed' },
+  queued: {
+    icon: Clock,
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    label: 'Queued',
+  },
+  started: {
+    icon: Play,
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    label: 'Started',
+  },
+  running: {
+    icon: Loader2,
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    label: 'Running',
+  },
+  complete: {
+    icon: CheckCircle2,
+    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    label: 'Complete',
+  },
+  failed: {
+    icon: XCircle,
+    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    label: 'Failed',
+  },
 };
 
 export default function JobsPage() {
@@ -52,7 +72,9 @@ export default function JobsPage() {
   }, [fetchJobs]);
 
   useEffect(() => {
-    const hasActiveJobs = jobs.some((job) => job.status === 'queued' || job.status === 'processing' || job.status === 'running');
+    const hasActiveJobs = jobs.some(
+      (job) => job.status === 'queued' || job.status === 'processing' || job.status === 'running',
+    );
     if (!hasActiveJobs) return;
 
     const interval = setInterval(() => {
@@ -72,8 +94,12 @@ export default function JobsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Jobs</h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-1">Monitor background processing jobs</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Jobs
+          </h1>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+            Monitor background processing jobs
+          </p>
         </div>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
@@ -88,8 +114,12 @@ export default function JobsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Jobs</h1>
-          <p className="text-zinc-600 dark:text-zinc-400 mt-1">Monitor background processing jobs</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Jobs
+          </h1>
+          <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+            Monitor background processing jobs
+          </p>
         </div>
         <Button variant="outline" onClick={fetchJobs}>
           <RefreshCw className="mr-2 h-4 w-4" />
@@ -138,9 +168,13 @@ export default function JobsPage() {
             <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
               <Clock className="h-8 w-8 text-zinc-400" />
             </div>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">No jobs found</h3>
+            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
+              No jobs found
+            </h3>
             <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-sm">
-              {search || filter !== 'all' ? 'Try adjusting your search or filter criteria.' : 'Jobs will appear here when media processing starts.'}
+              {search || filter !== 'all'
+                ? 'Try adjusting your search or filter criteria.'
+                : 'Jobs will appear here when media processing starts.'}
             </p>
           </CardContent>
         </Card>
@@ -158,7 +192,9 @@ export default function JobsPage() {
                         <Badge variant="secondary" className={cn('capitalize', statusInfo.color)}>
                           {statusInfo.label}
                         </Badge>
-                        <span className="text-sm font-mono text-zinc-500 dark:text-zinc-400">{job.job_id}</span>
+                        <span className="text-sm font-mono text-zinc-500 dark:text-zinc-400">
+                          {job.job_id}
+                        </span>
                       </div>
                       <p className="text-sm text-zinc-600 dark:text-zinc-400">{job.stage}</p>
                       <div className="w-64">
@@ -168,7 +204,9 @@ export default function JobsPage() {
                             style={{ width: `${job.progress}%` }}
                           />
                         </div>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{job.progress}%</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                          {job.progress}%
+                        </p>
                       </div>
                     </div>
                   </div>

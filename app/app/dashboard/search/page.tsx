@@ -21,31 +21,38 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setSearched(true);
-    try {
-      const data = await api.searchMedia({
-        q: query || undefined,
-        media_type: mediaType || undefined,
-        folder: folder || undefined,
-        tag: tag || undefined,
-        processing_status: processingStatus || undefined,
-      });
-      setResults(data);
-    } catch (err) {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [query, mediaType, folder, tag, processingStatus]);
+  const handleSearch = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoading(true);
+      setSearched(true);
+      try {
+        const data = await api.searchMedia({
+          q: query || undefined,
+          media_type: mediaType || undefined,
+          folder: folder || undefined,
+          tag: tag || undefined,
+          processing_status: processingStatus || undefined,
+        });
+        setResults(data);
+      } catch (err) {
+        setResults([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [query, mediaType, folder, tag, processingStatus],
+  );
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Search</h1>
-        <p className="text-zinc-600 dark:text-zinc-400 mt-1">Find media files across your library</p>
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          Search
+        </h1>
+        <p className="text-zinc-600 dark:text-zinc-400 mt-1">
+          Find media files across your library
+        </p>
       </div>
 
       <Card className="border-zinc-200 dark:border-zinc-800">
@@ -126,7 +133,9 @@ export default function SearchPage() {
           {results.length === 0 ? (
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardContent className="p-6 text-center">
-                <p className="text-zinc-500 dark:text-zinc-400">No media files match your search criteria.</p>
+                <p className="text-zinc-500 dark:text-zinc-400">
+                  No media files match your search criteria.
+                </p>
               </CardContent>
             </Card>
           ) : (
@@ -138,12 +147,20 @@ export default function SearchPage() {
                       <Film className="h-5 w-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">{item.original_filename}</p>
+                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+                        {item.original_filename}
+                      </p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        {item.media_type} • {item.file_size ? `${(item.file_size / 1024 / 1024).toFixed(1)} MB` : ''} • {item.created_at ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true }) : 'Unknown date'}
+                        {item.media_type} •{' '}
+                        {item.file_size ? `${(item.file_size / 1024 / 1024).toFixed(1)} MB` : ''} •{' '}
+                        {item.created_at
+                          ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true })
+                          : 'Unknown date'}
                       </p>
                     </div>
-                    <Badge variant="secondary" className="capitalize">{item.processing_status}</Badge>
+                    <Badge variant="secondary" className="capitalize">
+                      {item.processing_status}
+                    </Badge>
                   </CardContent>
                 </Card>
               ))}

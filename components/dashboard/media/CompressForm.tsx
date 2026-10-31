@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { api } from '@/lib/api/client';
 import { Loader2 } from 'lucide-react';
 
@@ -104,7 +110,15 @@ export function CompressForm({ mediaId, onProcessed }: Props) {
       </div>
       <div className="space-y-2">
         <Label htmlFor="compress-target-size">Target Size (MB, optional)</Label>
-        <Input id="compress-target-size" aria-label="Target Size (MB, optional)" type="number" value={targetSize} onChange={(e) => setTargetSize(e.target.value)} min="1" placeholder="e.g. 50" />
+        <Input
+          id="compress-target-size"
+          aria-label="Target Size (MB, optional)"
+          type="number"
+          value={targetSize}
+          onChange={(e) => setTargetSize(e.target.value)}
+          min="1"
+          placeholder="e.g. 50"
+        />
       </div>
       <Button onClick={handleCompress} disabled={loading} className="w-full">
         {loading ? (

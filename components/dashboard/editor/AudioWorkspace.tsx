@@ -30,7 +30,13 @@ import {
   Plus,
 } from 'lucide-react';
 import { Timeline } from './Timeline';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import type { Clip } from './EditorWorkspace';
 
 interface AudioWorkspaceProps {
@@ -72,7 +78,8 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
   useEffect(() => {
     let objectUrl: string | null = null;
 
-    api.getMediaFile(media.id)
+    api
+      .getMediaFile(media.id)
       .then((blob) => {
         objectUrl = URL.createObjectURL(blob);
         setAudioUrl(objectUrl);
@@ -207,8 +214,11 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
   useEffect(() => {
     if (activeTool !== 'reorder') return;
-    api.listMedia({ media_type: 'audio' })
-      .then((items) => setReorderMedia(items.filter((item) => !clips.some((clip) => clip.mediaId === item.id))))
+    api
+      .listMedia({ media_type: 'audio' })
+      .then((items) =>
+        setReorderMedia(items.filter((item) => !clips.some((clip) => clip.mediaId === item.id))),
+      )
       .catch(() => setReorderError('Unable to load audio clips.'));
   }, [activeTool, clips]);
 
@@ -294,7 +304,11 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
           <Button variant="ghost" size="icon" onClick={() => {}} disabled>
             <Redo className="h-4 w-4" />
           </Button>
-          <Button onClick={handleProcess} disabled={processing || !activeTool} className="bg-indigo-600 hover:bg-indigo-700">
+          <Button
+            onClick={handleProcess}
+            disabled={processing || !activeTool}
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
             {processing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -319,7 +333,9 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                   <Music className="h-8 w-8" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{media.original_filename}</p>
+                  <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                    {media.original_filename}
+                  </p>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">{media.mime_type}</p>
                 </div>
               </div>
@@ -340,13 +356,21 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
           <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => handleSeek(Math.max(0, currentTime - 5))}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleSeek(Math.max(0, currentTime - 5))}
+              >
                 <SkipBack className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="icon" onClick={handlePlayPause}>
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => handleSeek(Math.min(duration, currentTime + 5))}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleSeek(Math.min(duration, currentTime + 5))}
+              >
                 <SkipForward className="h-4 w-4" />
               </Button>
               <span className="text-xs text-zinc-500 dark:text-zinc-400 font-mono min-w-[100px]">
@@ -387,7 +411,9 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
 
         <div className="w-72 border-l border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-y-auto">
           <div className="p-3 border-b border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">Audio Tools</h2>
+            <h2 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider mb-2">
+              Audio Tools
+            </h2>
             <div className="grid grid-cols-3 gap-1.5">
               {[
                 { id: 'trim', label: 'Trim', icon: Scissors },
@@ -422,7 +448,12 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                   <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
                     Split at playhead: {formatTime(currentTime)}
                   </p>
-                  <Button onClick={handleProcess} disabled={processing} size="sm" className="w-full">
+                  <Button
+                    onClick={handleProcess}
+                    disabled={processing}
+                    size="sm"
+                    className="w-full"
+                  >
                     {processing && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
                     Split Audio
                   </Button>
@@ -436,11 +467,15 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <Label className="text-[10px] text-zinc-500">Start</Label>
-                      <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">{formatTime(selectedClip.start)}</p>
+                      <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">
+                        {formatTime(selectedClip.start)}
+                      </p>
                     </div>
                     <div>
                       <Label className="text-[10px] text-zinc-500">End</Label>
-                      <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">{formatTime(selectedClip.end)}</p>
+                      <p className="text-xs font-mono text-zinc-900 dark:text-zinc-50">
+                        {formatTime(selectedClip.end)}
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -459,11 +494,18 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                         </SelectTrigger>
                         <SelectContent>
                           {reorderMedia.map((item) => (
-                            <SelectItem key={item.id} value={item.id}>{item.original_filename}</SelectItem>
+                            <SelectItem key={item.id} value={item.id}>
+                              {item.original_filename}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <Button size="sm" variant="outline" onClick={addAudioClip} disabled={!selectedAudioToAdd}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={addAudioClip}
+                        disabled={!selectedAudioToAdd}
+                      >
                         <Plus className="mr-1 h-3.5 w-3.5" />
                         Add
                       </Button>
@@ -474,7 +516,9 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                     <Label className="text-[10px] text-zinc-500">Clip order</Label>
                     {clips.map((clip, index) => (
                       <div key={clip.id} className="flex items-center gap-2 rounded border p-2">
-                        <span className="flex-1 truncate text-xs">{index + 1}. {clip.name}</span>
+                        <span className="flex-1 truncate text-xs">
+                          {index + 1}. {clip.name}
+                        </span>
                         <Button
                           size="icon"
                           variant="ghost"
@@ -499,7 +543,11 @@ export function AudioWorkspace({ media, onBack, onProcessed }: AudioWorkspacePro
                     ))}
                   </div>
 
-                  <Button onClick={handleReorderExport} disabled={processing || clips.length < 2} className="w-full">
+                  <Button
+                    onClick={handleReorderExport}
+                    disabled={processing || clips.length < 2}
+                    className="w-full"
+                  >
                     {processing ? 'Exporting...' : 'Reorder & Export'}
                   </Button>
                   {reorderError && <p className="text-[10px] text-red-600">{reorderError}</p>}

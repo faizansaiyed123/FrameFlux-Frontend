@@ -7,12 +7,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
-import type { Media, MediaProcessingStatusResponse, MediaVersion, ShareResponse } from '@/types/api';
+import type {
+  Media,
+  MediaProcessingStatusResponse,
+  MediaVersion,
+  ShareResponse,
+} from '@/types/api';
 import {
   ArrowLeft,
   Film,
@@ -46,11 +57,31 @@ import { GifForm } from '@/components/dashboard/media/GifForm';
 import { MediaInfoSection } from '@/components/dashboard/media/MediaInfoSection';
 
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
-  pending: { icon: Clock, color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', label: 'Pending' },
-  queued: { icon: Clock, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', label: 'Queued' },
-  processing: { icon: Loader2, color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', label: 'Processing' },
-  completed: { icon: CheckCircle2, color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300', label: 'Completed' },
-  failed: { icon: XCircle, color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300', label: 'Failed' },
+  pending: {
+    icon: Clock,
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+    label: 'Pending',
+  },
+  queued: {
+    icon: Clock,
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    label: 'Queued',
+  },
+  processing: {
+    icon: Loader2,
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    label: 'Processing',
+  },
+  completed: {
+    icon: CheckCircle2,
+    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    label: 'Completed',
+  },
+  failed: {
+    icon: XCircle,
+    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    label: 'Failed',
+  },
 };
 
 function formatFileSize(bytes: number): string {
@@ -104,7 +135,11 @@ export default function MediaDetailPage() {
   }, [searchParams]);
   const [shares, setShares] = useState<ShareResponse[]>([]);
   const [shareLoading, setShareLoading] = useState(false);
-  const [selectedShareEmbed, setSelectedShareEmbed] = useState<{ embed_url: string; embed_code: string; media_title: string } | null>(null);
+  const [selectedShareEmbed, setSelectedShareEmbed] = useState<{
+    embed_url: string;
+    embed_code: string;
+    media_title: string;
+  } | null>(null);
 
   const fetchMedia = useCallback(async () => {
     try {
@@ -143,7 +178,10 @@ export default function MediaDetailPage() {
   }, [fetchMedia]);
 
   useEffect(() => {
-    if (!media || media.processing_status !== 'processing' && media.processing_status !== 'queued') {
+    if (
+      !media ||
+      (media.processing_status !== 'processing' && media.processing_status !== 'queued')
+    ) {
       return;
     }
 
@@ -151,8 +189,7 @@ export default function MediaDetailPage() {
       try {
         const progressData = await api.getMediaProgress(mediaId);
         setStatus(progressData);
-      } catch {
-      }
+      } catch {}
     }, 2000);
 
     return () => clearInterval(interval);
@@ -162,7 +199,7 @@ export default function MediaDetailPage() {
     setShareLoading(true);
     try {
       const data = await api.listShares();
-      setShares(data.filter(s => s.media_id === mediaId));
+      setShares(data.filter((s) => s.media_id === mediaId));
     } catch {
     } finally {
       setShareLoading(false);
@@ -236,8 +273,7 @@ export default function MediaDetailPage() {
       setShareAllowedDomains('');
       setShareAllowDownload(true);
       fetchShares();
-    } catch {
-    }
+    } catch {}
   };
 
   const copyShareUrl = async (token: string) => {
@@ -250,24 +286,21 @@ export default function MediaDetailPage() {
       const embed = await api.getEmbed(token);
       await navigator.clipboard.writeText(embed.embed_code);
       setSelectedShareEmbed(embed);
-    } catch {
-    }
+    } catch {}
   };
 
   const disableShare = async (shareId: string) => {
     try {
       await api.disableShare(shareId);
       fetchShares();
-    } catch {
-    }
+    } catch {}
   };
 
   const deleteShare = async (shareId: string) => {
     try {
       await api.deleteShare(shareId);
       fetchShares();
-    } catch {
-    }
+    } catch {}
   };
 
   if (loading) {
@@ -295,7 +328,9 @@ export default function MediaDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Media</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              Media
+            </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mt-1">View and manage your media file</p>
           </div>
         </div>
@@ -311,7 +346,9 @@ export default function MediaDetailPage() {
     );
   }
 
-  const statusInfo = status ? statusConfig[status.status] || statusConfig.pending : statusConfig.pending;
+  const statusInfo = status
+    ? statusConfig[status.status] || statusConfig.pending
+    : statusConfig.pending;
 
   return (
     <div className="space-y-8">
@@ -321,7 +358,12 @@ export default function MediaDetailPage() {
           <p className="text-sm font-medium text-green-700 dark:text-green-300">
             Media uploaded successfully — {media.original_filename}
           </p>
-          <Button variant="ghost" size="sm" onClick={() => setUploadSuccess(false)} className="ml-auto shrink-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setUploadSuccess(false)}
+            className="ml-auto shrink-0"
+          >
             Dismiss
           </Button>
         </div>
@@ -341,14 +383,22 @@ export default function MediaDetailPage() {
                   {media.original_filename}
                 </h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                  {media.mime_type} • {formatFileSize(media.file_size)} • {formatDistanceToNow(new Date(media.created_at), { addSuffix: true })}
+                  {media.mime_type} • {formatFileSize(media.file_size)} •{' '}
+                  {formatDistanceToNow(new Date(media.created_at), { addSuffix: true })}
                 </p>
               </div>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleProcess} disabled={processing || media.processing_status === 'processing' || media.processing_status === 'completed'}>
+          <Button
+            onClick={handleProcess}
+            disabled={
+              processing ||
+              media.processing_status === 'processing' ||
+              media.processing_status === 'completed'
+            }
+          >
             {processing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -373,11 +423,18 @@ export default function MediaDetailPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className={cn('flex h-10 w-10 items-center justify-center rounded-lg', statusInfo.color)}>
+                <div
+                  className={cn(
+                    'flex h-10 w-10 items-center justify-center rounded-lg',
+                    statusInfo.color,
+                  )}
+                >
                   <statusInfo.icon className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-medium text-zinc-900 dark:text-zinc-50">Status: {statusInfo.label}</p>
+                  <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                    Status: {statusInfo.label}
+                  </p>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
                     {status.stage || 'Processing'} • {status.progress}% complete
                   </p>
@@ -423,15 +480,21 @@ export default function MediaDetailPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label className="text-xs text-zinc-500 dark:text-zinc-400">Filename</Label>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">{media.original_filename}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+                      {media.original_filename}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-xs text-zinc-500 dark:text-zinc-400">Type</Label>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{media.mime_type}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {media.mime_type}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-xs text-zinc-500 dark:text-zinc-400">Size</Label>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{formatFileSize(media.file_size)}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {formatFileSize(media.file_size)}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-xs text-zinc-500 dark:text-zinc-400">Status</Label>
@@ -443,7 +506,8 @@ export default function MediaDetailPage() {
                     <div>
                       <Label className="text-xs text-zinc-500 dark:text-zinc-400">Duration</Label>
                       <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
-                        {Math.floor(media.duration / 60)}:{(media.duration % 60).toFixed(0).padStart(2, '0')}
+                        {Math.floor(media.duration / 60)}:
+                        {(media.duration % 60).toFixed(0).padStart(2, '0')}
                       </p>
                     </div>
                   )}
@@ -464,7 +528,12 @@ export default function MediaDetailPage() {
                 <CardTitle>Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline" disabled={media.processing_status !== 'completed' || downloading} onClick={handleDownloadOriginal}>
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  disabled={media.processing_status !== 'completed' || downloading}
+                  onClick={handleDownloadOriginal}
+                >
                   {downloading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -472,7 +541,12 @@ export default function MediaDetailPage() {
                   )}
                   Download Original
                 </Button>
-                <Button className="w-full justify-start" variant="outline" disabled={!media.processed_filename || downloading} onClick={handleDownloadProcessed}>
+                <Button
+                  className="w-full justify-start"
+                  variant="outline"
+                  disabled={!media.processed_filename || downloading}
+                  onClick={handleDownloadProcessed}
+                >
                   {downloading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -494,9 +568,11 @@ export default function MediaDetailPage() {
           {media.mime_type.startsWith('image/') && (
             <ImageWorkspace media={media} onBack={fetchMedia} onProcessed={fetchMedia} />
           )}
-          {!media.mime_type.startsWith('video/') && !media.mime_type.startsWith('audio/') && !media.mime_type.startsWith('image/') && (
-            <MediaProcessing mediaId={mediaId} onProcessed={fetchMedia} />
-          )}
+          {!media.mime_type.startsWith('video/') &&
+            !media.mime_type.startsWith('audio/') &&
+            !media.mime_type.startsWith('image/') && (
+              <MediaProcessing mediaId={mediaId} onProcessed={fetchMedia} />
+            )}
         </TabsContent>
         <TabsContent value="tools" className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
@@ -583,11 +659,17 @@ export default function MediaDetailPage() {
               ) : (
                 <div className="space-y-3">
                   {versions.map((version) => (
-                    <div key={version.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                    <div
+                      key={version.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                    >
                       <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Version {version.version_number}: {version.label}</p>
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                          Version {version.version_number}: {version.label}
+                        </p>
                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {version.processing_status} • {formatDistanceToNow(new Date(version.created_at), { addSuffix: true })}
+                          {version.processing_status} •{' '}
+                          {formatDistanceToNow(new Date(version.created_at), { addSuffix: true })}
                         </p>
                       </div>
                       {version.processing_status === 'completed' && (
@@ -597,9 +679,14 @@ export default function MediaDetailPage() {
                           onClick={async () => {
                             try {
                               const blob = await api.getMediaVersionFile(mediaId, version.id);
-                              downloadBlob(blob, version.original_filename || `version-${version.version_number}`);
+                              downloadBlob(
+                                blob,
+                                version.original_filename || `version-${version.version_number}`,
+                              );
                             } catch (err) {
-                              setError(err instanceof Error ? err.message : 'Failed to download version');
+                              setError(
+                                err instanceof Error ? err.message : 'Failed to download version',
+                              );
                             }
                           }}
                         >
@@ -631,29 +718,68 @@ export default function MediaDetailPage() {
               ) : (
                 <div className="space-y-3">
                   {shares.map((share) => (
-                    <div key={share.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                    <div
+                      key={share.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                    >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50 truncate">{share.token}</p>
-                          <Badge variant={share.is_active ? 'default' : 'secondary'} className="text-xs">{share.is_active ? 'Active' : 'Disabled'}</Badge>
-                          <Badge variant="outline" className="text-xs">{share.allow_download ? 'Download' : 'View Only'}</Badge>
-                          {(share.view_count || 0) > 0 && <Badge variant="outline" className="text-xs">{share.view_count} views</Badge>}
+                          <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50 truncate">
+                            {share.token}
+                          </p>
+                          <Badge
+                            variant={share.is_active ? 'default' : 'secondary'}
+                            className="text-xs"
+                          >
+                            {share.is_active ? 'Active' : 'Disabled'}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            {share.allow_download ? 'Download' : 'View Only'}
+                          </Badge>
+                          {(share.view_count || 0) > 0 && (
+                            <Badge variant="outline" className="text-xs">
+                              {share.view_count} views
+                            </Badge>
+                          )}
                         </div>
                         {share.allowed_domains && (
-                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">Allowed domains: {share.allowed_domains}</p>
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                            Allowed domains: {share.allowed_domains}
+                          </p>
                         )}
                       </div>
                       <div className="flex items-center gap-2 ml-4">
-                        <Button variant="ghost" size="icon" onClick={() => copyShareUrl(share.token)} title="Copy share URL">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyShareUrl(share.token)}
+                          title="Copy share URL"
+                        >
                           <Copy className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => copyEmbedCode(share.token)} title="Copy embed code">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => copyEmbedCode(share.token)}
+                          title="Copy embed code"
+                        >
                           <Code className="h-4 w-4" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => disableShare(share.id)} disabled={!share.is_active} title="Disable">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => disableShare(share.id)}
+                          disabled={!share.is_active}
+                          title="Disable"
+                        >
                           <X className="h-4 w-4 text-red-600" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => deleteShare(share.id)} title="Delete">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteShare(share.id)}
+                          title="Delete"
+                        >
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
                       </div>
@@ -663,7 +789,7 @@ export default function MediaDetailPage() {
               )}
             </CardContent>
           </Card>
-          
+
           {selectedShareEmbed && (
             <Card className="border-zinc-200 dark:border-zinc-800 border-indigo-500/50">
               <CardHeader>
@@ -679,21 +805,47 @@ export default function MediaDetailPage() {
                   <Label className="text-sm">Embed URL</Label>
                   <div className="flex gap-2 mt-1">
                     <Input value={selectedShareEmbed.embed_url} readOnly />
-                    <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(selectedShareEmbed.embed_url)}>Copy</Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigator.clipboard.writeText(selectedShareEmbed.embed_url)}
+                    >
+                      Copy
+                    </Button>
                   </div>
                 </div>
                 <div>
                   <Label className="text-sm">Embed Code (iframe)</Label>
                   <div className="flex gap-2 mt-1">
-                    <Textarea value={selectedShareEmbed.embed_code} readOnly rows={3} className="font-mono text-xs" />
-                    <Button variant="outline" size="sm" onClick={() => navigator.clipboard.writeText(selectedShareEmbed.embed_code)} className="self-end">Copy</Button>
+                    <Textarea
+                      value={selectedShareEmbed.embed_code}
+                      readOnly
+                      rows={3}
+                      className="font-mono text-xs"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigator.clipboard.writeText(selectedShareEmbed.embed_code)}
+                      className="self-end"
+                    >
+                      Copy
+                    </Button>
                   </div>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">Paste this iframe code into your website to embed the player.</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Paste this iframe code into your website to embed the player.
+                  </p>
                 </div>
                 <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/30">
                   <p className="text-sm font-medium mb-2">Preview:</p>
-                  <div style={{width: '100%', aspectRatio: '16/9'}}>
-                    <iframe src={selectedShareEmbed.embed_url} width="100%" height="100%" frameBorder="0" allowFullScreen></iframe>
+                  <div style={{ width: '100%', aspectRatio: '16/9' }}>
+                    <iframe
+                      src={selectedShareEmbed.embed_url}
+                      width="100%"
+                      height="100%"
+                      frameBorder="0"
+                      allowFullScreen
+                    ></iframe>
                   </div>
                 </div>
               </CardContent>
@@ -708,29 +860,41 @@ export default function MediaDetailPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs text-zinc-500 dark:text-zinc-400">Stored Filename</Label>
-                  <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50">{media.stored_filename}</p>
+                  <Label className="text-xs text-zinc-500 dark:text-zinc-400">
+                    Stored Filename
+                  </Label>
+                  <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50">
+                    {media.stored_filename}
+                  </p>
                 </div>
                 <div>
                   <Label className="text-xs text-zinc-500 dark:text-zinc-400">Project ID</Label>
-                  <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50">{media.project_id || 'None'}</p>
+                  <p className="text-sm font-mono text-zinc-900 dark:text-zinc-50">
+                    {media.project_id || 'None'}
+                  </p>
                 </div>
                 {media.video_codec && (
                   <div>
                     <Label className="text-xs text-zinc-500 dark:text-zinc-400">Video Codec</Label>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{media.video_codec}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {media.video_codec}
+                    </p>
                   </div>
                 )}
                 {media.audio_codec && (
                   <div>
                     <Label className="text-xs text-zinc-500 dark:text-zinc-400">Audio Codec</Label>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{media.audio_codec}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {media.audio_codec}
+                    </p>
                   </div>
                 )}
                 {media.fps && (
                   <div>
                     <Label className="text-xs text-zinc-500 dark:text-zinc-400">Frame Rate</Label>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{media.fps} fps</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {media.fps} fps
+                    </p>
                   </div>
                 )}
               </div>
@@ -767,7 +931,9 @@ export default function MediaDetailPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="allowed_domains">Allowed domains for embed (optional, comma-separated)</Label>
+              <Label htmlFor="allowed_domains">
+                Allowed domains for embed (optional, comma-separated)
+              </Label>
               <Input
                 id="allowed_domains"
                 type="text"
@@ -775,7 +941,9 @@ export default function MediaDetailPage() {
                 value={shareAllowedDomains}
                 onChange={(e) => setShareAllowedDomains(e.target.value)}
               />
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">Leave empty to allow embedding on any domain</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Leave empty to allow embedding on any domain
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <input
@@ -785,11 +953,24 @@ export default function MediaDetailPage() {
                 onChange={(e) => setShareAllowDownload(e.target.checked)}
                 className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
               />
-              <Label htmlFor="allow_download" className="mb-0">Allow download</Label>
+              <Label htmlFor="allow_download" className="mb-0">
+                Allow download
+              </Label>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setShareDialogOpen(false); setSharePassword(''); setShareExpiresIn(''); setShareAllowedDomains(''); setShareAllowDownload(true); }}>Cancel</Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShareDialogOpen(false);
+                setSharePassword('');
+                setShareExpiresIn('');
+                setShareAllowedDomains('');
+                setShareAllowDownload(true);
+              }}
+            >
+              Cancel
+            </Button>
             <Button onClick={handleCreateShare}>Create Link</Button>
           </DialogFooter>
         </DialogContent>

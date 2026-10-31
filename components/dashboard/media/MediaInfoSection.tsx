@@ -10,7 +10,16 @@ interface Props {
 }
 
 export function MediaInfoSection({ mediaId }: Props) {
-  interface MediaInfo { file_name: string; file_size: number; duration: number | null; resolution: string | null; fps: string | null; video_codec: string | null; audio_codec: string | null; audio_channels: number | null; }
+  interface MediaInfo {
+    file_name: string;
+    file_size: number;
+    duration: number | null;
+    resolution: string | null;
+    fps: string | null;
+    video_codec: string | null;
+    audio_codec: string | null;
+    audio_channels: number | null;
+  }
   const [info, setInfo] = useState<MediaInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -51,27 +60,41 @@ export function MediaInfoSection({ mediaId }: Props) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">File</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">{info.file_name}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 truncate">
+            {info.file_name}
+          </p>
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Size</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{(info.file_size / 1024 / 1024).toFixed(1)} MB</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {(info.file_size / 1024 / 1024).toFixed(1)} MB
+          </p>
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Duration</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{info.duration ? `${Math.floor(info.duration / 60)}:${(info.duration % 60).toFixed(0).padStart(2, '0')}` : 'N/A'}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {info.duration
+              ? `${Math.floor(info.duration / 60)}:${(info.duration % 60).toFixed(0).padStart(2, '0')}`
+              : 'N/A'}
+          </p>
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Resolution</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{info.resolution || 'N/A'}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {info.resolution || 'N/A'}
+          </p>
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Video Codec</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{info.video_codec || 'N/A'}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {info.video_codec || 'N/A'}
+          </p>
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Audio Codec</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{info.audio_codec || 'N/A'}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {info.audio_codec || 'N/A'}
+          </p>
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Frame Rate</p>
@@ -79,7 +102,9 @@ export function MediaInfoSection({ mediaId }: Props) {
         </div>
         <div>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">Audio Channels</p>
-          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{info.audio_channels || 'N/A'}</p>
+          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+            {info.audio_channels || 'N/A'}
+          </p>
         </div>
       </div>
     </div>

@@ -63,22 +63,21 @@ export function AudioWaveform({ duration, currentTime, onSeek }: AudioWaveformPr
     drawWaveform();
   }, [drawWaveform]);
 
-  const handleClick = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas || duration <= 0) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const time = (x / rect.width) * duration;
-    onSeek(Math.max(0, Math.min(duration, time)));
-  }, [duration, onSeek]);
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      const canvas = canvasRef.current;
+      if (!canvas || duration <= 0) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const time = (x / rect.width) * duration;
+      onSeek(Math.max(0, Math.min(duration, time)));
+    },
+    [duration, onSeek],
+  );
 
   return (
     <div className="w-full h-16 border-t border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800">
-      <canvas
-        ref={canvasRef}
-        className="w-full h-full cursor-pointer"
-        onClick={handleClick}
-      />
+      <canvas ref={canvasRef} className="w-full h-full cursor-pointer" onClick={handleClick} />
     </div>
   );
 }

@@ -5,12 +5,25 @@ import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
-import type { Project, Media, ProjectProcessingStatusResponse, ProjectFolder, ProjectWorkflowSummary, ProjectHistoryEntry } from '@/types/api';
+import type {
+  Project,
+  Media,
+  ProjectProcessingStatusResponse,
+  ProjectFolder,
+  ProjectWorkflowSummary,
+  ProjectHistoryEntry,
+} from '@/types/api';
 import {
   ArrowLeft,
   Loader2,
@@ -27,15 +40,32 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-const statusConfig: Record<
-  string,
-  { icon: typeof Clock; color: string; label: string }
-> = {
-  empty: { icon: Clock, color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300', label: 'Empty' },
-  queued: { icon: Clock, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300', label: 'Queued' },
-  processing: { icon: Loader2, color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300', label: 'Processing' },
-  completed: { icon: CheckCircle2, color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300', label: 'Completed' },
-  failed: { icon: XCircle, color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300', label: 'Failed' },
+const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
+  empty: {
+    icon: Clock,
+    color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+    label: 'Empty',
+  },
+  queued: {
+    icon: Clock,
+    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    label: 'Queued',
+  },
+  processing: {
+    icon: Loader2,
+    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    label: 'Processing',
+  },
+  completed: {
+    icon: CheckCircle2,
+    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    label: 'Completed',
+  },
+  failed: {
+    icon: XCircle,
+    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    label: 'Failed',
+  },
 };
 
 export default function ProjectDetailPage() {
@@ -83,8 +113,7 @@ export default function ProjectDetailPage() {
       setFolders(foldersData);
       setWorkflows(workflowsData);
       setHistory(historyData);
-    } catch {
-    }
+    } catch {}
   }, [projectId]);
 
   useEffect(() => {
@@ -118,8 +147,7 @@ export default function ProjectDetailPage() {
       setFolderDialogOpen(false);
       setFolderName('');
       fetchExtras();
-    } catch {
-    }
+    } catch {}
   };
 
   if (loading) {
@@ -151,7 +179,9 @@ export default function ProjectDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Project</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              Project
+            </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mt-1">View and manage your project</p>
           </div>
         </div>
@@ -159,7 +189,9 @@ export default function ProjectDetailPage() {
           <CardContent className="p-6">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
-              <p className="text-sm text-red-700 dark:text-red-300">{error || 'Project not found'}</p>
+              <p className="text-sm text-red-700 dark:text-red-300">
+                {error || 'Project not found'}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -177,9 +209,12 @@ export default function ProjectDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{project.name}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+              {project.name}
+            </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mt-1">
-              {project.description || 'No description'} • Created {formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}
+              {project.description || 'No description'} • Created{' '}
+              {formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}
             </p>
           </div>
         </div>
@@ -210,14 +245,22 @@ export default function ProjectDetailPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 {statusInfo && (
-                  <div className={cn('flex h-10 w-10 items-center justify-center rounded-lg', statusInfo.color)}>
+                  <div
+                    className={cn(
+                      'flex h-10 w-10 items-center justify-center rounded-lg',
+                      statusInfo.color,
+                    )}
+                  >
                     <statusInfo.icon className="h-5 w-5" />
                   </div>
                 )}
                 <div>
-                  <p className="font-medium text-zinc-900 dark:text-zinc-50">Project Status: {statusInfo?.label || status.status}</p>
+                  <p className="font-medium text-zinc-900 dark:text-zinc-50">
+                    Project Status: {statusInfo?.label || status.status}
+                  </p>
                   <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    {status.total} total • {status.completed} completed • {status.processing} processing • {status.queued} queued • {status.failed} failed
+                    {status.total} total • {status.completed} completed • {status.processing}{' '}
+                    processing • {status.queued} queued • {status.failed} failed
                   </p>
                 </div>
               </div>
@@ -225,11 +268,14 @@ export default function ProjectDetailPage() {
                 <div className="h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all"
-                    style={{ width: `${status.total > 0 ? (status.completed / status.total) * 100 : 0}%` }}
+                    style={{
+                      width: `${status.total > 0 ? (status.completed / status.total) * 100 : 0}%`,
+                    }}
                   />
                 </div>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 text-right">
-                  {status.total > 0 ? Math.round((status.completed / status.total) * 100) : 0}% complete
+                  {status.total > 0 ? Math.round((status.completed / status.total) * 100) : 0}%
+                  complete
                 </p>
               </div>
             </div>
@@ -251,7 +297,9 @@ export default function ProjectDetailPage() {
                 <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800 mb-4">
                   <Film className="h-8 w-8 text-zinc-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">No media files</h3>
+                <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-2">
+                  No media files
+                </h3>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-sm">
                   Upload media files to this project to start processing.
                 </p>
@@ -304,7 +352,9 @@ export default function ProjectDetailPage() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
                       <FolderOpen className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{folder.name}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {folder.name}
+                    </p>
                   </CardContent>
                 </Card>
               ))}
@@ -315,7 +365,9 @@ export default function ProjectDetailPage() {
           {workflows.length === 0 ? (
             <Card className="border-zinc-200 dark:border-zinc-800">
               <CardContent className="p-6 text-center">
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">No workflows linked to this project.</p>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  No workflows linked to this project.
+                </p>
               </CardContent>
             </Card>
           ) : (
@@ -349,9 +401,12 @@ export default function ProjectDetailPage() {
                       <History className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 capitalize">{entry.operation}</p>
+                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 capitalize">
+                        {entry.operation}
+                      </p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                        {entry.status} • {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
+                        {entry.status} •{' '}
+                        {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}
                       </p>
                     </div>
                   </CardContent>
@@ -370,10 +425,17 @@ export default function ProjectDetailPage() {
           <form onSubmit={handleCreateFolder} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="folderName">Folder Name</Label>
-              <Input id="folderName" value={folderName} onChange={(e) => setFolderName(e.target.value)} required />
+              <Input
+                id="folderName"
+                value={folderName}
+                onChange={(e) => setFolderName(e.target.value)}
+                required
+              />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setFolderDialogOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setFolderDialogOpen(false)}>
+                Cancel
+              </Button>
               <Button type="submit">Create</Button>
             </DialogFooter>
           </form>

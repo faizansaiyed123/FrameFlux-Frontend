@@ -3,7 +3,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -104,15 +110,31 @@ export default function NotificationsPage() {
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Notifications</h1>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">View and manage your notifications</p>
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            Notifications
+          </h1>
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+            View and manage your notifications
+          </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">Unread: {unreadCount}</Badge>
-          <Button variant="outline" size="sm" onClick={() => { setPage(1); setUnreadOnly((value) => !value); }}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setPage(1);
+              setUnreadOnly((value) => !value);
+            }}
+          >
             {unreadOnly ? 'Show all' : 'Unread only'}
           </Button>
-          <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={unreadCount === 0}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleMarkAllRead}
+            disabled={unreadCount === 0}
+          >
             Mark all read
           </Button>
           <Button onClick={() => setDialogOpen(true)} className="gap-2">
@@ -143,12 +165,18 @@ export default function NotificationsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">{notification.event}</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
+                      {notification.event}
+                    </p>
                     {!notification.is_read && (
-                      <Badge variant="default" className="text-xs">New</Badge>
+                      <Badge variant="default" className="text-xs">
+                        New
+                      </Badge>
                     )}
                   </div>
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{notification.message}</p>
+                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    {notification.message}
+                  </p>
                   <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
                     {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                   </p>
@@ -171,10 +199,26 @@ export default function NotificationsPage() {
 
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-xs text-zinc-500">Page {page} of {totalPages}</p>
+          <p className="text-xs text-zinc-500">
+            Page {page} of {totalPages}
+          </p>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>Previous</Button>
-            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>Next</Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => setPage((value) => Math.max(1, value - 1))}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => setPage((value) => Math.min(totalPages, value + 1))}
+            >
+              Next
+            </Button>
           </div>
         </div>
       )}
@@ -191,10 +235,17 @@ export default function NotificationsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="message">Message</Label>
-              <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} required />
+              <Textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                required
+              />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                Cancel
+              </Button>
               <Button type="submit">Create</Button>
             </DialogFooter>
           </form>

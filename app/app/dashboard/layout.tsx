@@ -5,11 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Sidebar } from '@/components/dashboard/sidebar/Sidebar';
 import { useAuthStore } from '@/hooks/useAuth';
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const loading = useAuthStore((state) => state.loading);

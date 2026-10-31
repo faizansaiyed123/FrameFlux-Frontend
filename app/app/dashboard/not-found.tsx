@@ -12,7 +12,9 @@ export default function NotFound() {
       <div className="text-center space-y-2">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">404</h1>
         <p className="text-lg text-zinc-500 dark:text-zinc-400">Page not found</p>
-        <p className="text-sm text-zinc-400 dark:text-zinc-500">The page you are looking for does not exist or has been moved.</p>
+        <p className="text-sm text-zinc-400 dark:text-zinc-500">
+          The page you are looking for does not exist or has been moved.
+        </p>
       </div>
       <Link href="/app/dashboard">
         <Button>Back to Dashboard</Button>

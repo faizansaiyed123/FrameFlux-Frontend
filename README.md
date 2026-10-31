@@ -108,9 +108,9 @@ docker compose up --build
 
 ## Environment variables
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | No | Base URL of the separately running FrameFlux backend. |
+| Variable              | Required | Purpose                                               |
+| --------------------- | -------- | ----------------------------------------------------- |
+| `NEXT_PUBLIC_API_URL` | No       | Base URL of the separately running FrameFlux backend. |
 
 No secrets are required by the frontend container itself.
 

@@ -4,7 +4,14 @@ import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -148,25 +155,33 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 px-4 py-16">
       <Card className="w-full max-w-md border-zinc-200 dark:border-zinc-800">
         <CardHeader className="text-center">
-          <Link href="/" className="inline-flex items-center gap-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-xl font-semibold text-zinc-900 dark:text-zinc-50 mb-4"
+          >
             FrameFlux
           </Link>
           <CardTitle className="text-2xl">Set a new password</CardTitle>
           <CardDescription>Create a strong password for your account</CardDescription>
         </CardHeader>
-        <Suspense fallback={
-          <CardContent>
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
-            </div>
-          </CardContent>
-        }>
+        <Suspense
+          fallback={
+            <CardContent>
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-zinc-400" />
+              </div>
+            </CardContent>
+          }
+        >
           <ResetPasswordForm />
         </Suspense>
         <CardFooter className="flex flex-col space-y-4">
           <p className="text-sm text-zinc-600 dark:text-zinc-400 text-center">
             Remember your password?{' '}
-            <Link href="/auth/login" className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
+            <Link
+              href="/auth/login"
+              className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+            >
               Sign in
             </Link>
           </p>
