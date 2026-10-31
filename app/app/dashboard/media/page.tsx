@@ -341,7 +341,10 @@ export default function MediaPage() {
     <div className="space-y-7">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-600 dark:text-indigo-400">
+          <p className={`
+            text-xs font-semibold uppercase tracking-[0.16em]
+            text-indigo-600 dark:text-indigo-400
+          `}>
             Library
           </p>
           <h1 className="mt-1 text-3xl font-semibold tracking-[-0.03em] text-zinc-950 dark:text-white">
@@ -372,7 +375,10 @@ export default function MediaPage() {
         </Card>
       )}
 
-      <div className="rounded-2xl border border-zinc-200/80 bg-white/70 p-3 shadow-sm dark:border-zinc-800/80 dark:bg-zinc-900/50">
+      <div className={`
+        rounded-2xl border border-zinc-200/80 bg-white/70 p-3 shadow-sm
+        dark:border-zinc-800/80 dark:bg-zinc-900/50
+      `}>
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <Input
             aria-label="Search media"
@@ -532,7 +538,10 @@ export default function MediaPage() {
       {filtered.length === 0 ? (
         <Card className="border-zinc-200/80 dark:border-zinc-800/80">
           <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 dark:bg-zinc-900">
+            <div className={`
+              mb-5 flex h-14 w-14 items-center justify-center rounded-2xl
+              bg-zinc-100 dark:bg-zinc-900
+            `}>
               <Film className="h-7 w-7 text-zinc-400 dark:text-zinc-500" />
             </div>
             <h3 className="text-lg font-semibold tracking-tight text-zinc-950 dark:text-white">
@@ -565,11 +574,20 @@ export default function MediaPage() {
             return (
               <Card
                 key={item.id}
-                className="group border-zinc-200/80 bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md dark:border-zinc-800/80 dark:bg-zinc-900 dark:hover:border-zinc-700"
+                className={`
+                  group border-zinc-200/80 bg-white transition-all duration-200
+                  hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-md
+                  dark:border-zinc-800/80 dark:bg-zinc-900
+                  dark:hover:border-zinc-700
+                `}
               >
                 <CardContent className="p-4">
                   <div className="mb-4 flex items-start justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className={`
+                      flex h-10 w-10 items-center justify-center rounded-xl
+                      bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50
+                      dark:text-indigo-400
+                    `}>
                       <MediaIcon className="h-5 w-5" />
                     </div>
                     <DropdownMenu>
@@ -577,7 +595,10 @@ export default function MediaPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-lg text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-white"
+                          className={`
+                            h-8 w-8 rounded-lg text-zinc-400 transition hover:bg-zinc-100
+                            hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-white
+                          `}
                           style={{ cursor: 'pointer' }}
                         >
                           <MoreHorizontal className="h-4 w-4" />
@@ -609,14 +630,20 @@ export default function MediaPage() {
                     >
                       {item.original_filename}
                     </p>
-                    <div className="flex items-center justify-between gap-3 text-xs text-zinc-500 dark:text-zinc-400">
+                    <div className={`
+                      flex items-center justify-between gap-3 text-xs text-zinc-500
+                      dark:text-zinc-400
+                    `}>
                       <span>{formatFileSize(item.file_size)}</span>
                       <span className="truncate">{item.mime_type}</span>
                     </div>
                     <div className="flex items-center justify-between gap-3 pt-1">
                       <span
                         className={cn(
-                          'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium capitalize',
+                          `
+                            inline-flex items-center rounded-full px-2.5 py-1 text-[11px]
+                            font-medium capitalize
+                          `,
                           statusInfo.color,
                         )}
                       >
@@ -635,7 +662,11 @@ export default function MediaPage() {
       )}
 
       <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-        <DialogContent className="w-[calc(100%-2rem)] max-h-[90vh] max-w-lg overflow-y-auto rounded-2xl border-zinc-200 bg-white p-0 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950 sm:w-full">
+        <DialogContent className={`
+          w-[calc(100%-2rem)] max-h-[90vh] max-w-lg overflow-y-auto
+          rounded-2xl border-zinc-200 bg-white p-0 shadow-2xl
+          dark:border-zinc-800 dark:bg-zinc-950 sm:w-full
+        `}>
           <div className="border-b border-zinc-200/80 px-5 py-5 dark:border-zinc-800/80 sm:px-6">
             <DialogHeader>
               <DialogTitle className="text-xl font-semibold tracking-tight text-zinc-950 dark:text-white">
@@ -649,9 +680,16 @@ export default function MediaPage() {
 
           <div className="px-5 py-5 sm:px-6">
             {uploading ? (
-              <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className={`
+                rounded-xl border border-zinc-200 bg-zinc-50 p-5
+                dark:border-zinc-800 dark:bg-zinc-900
+              `}>
                 <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                  <div className={`
+                    flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                    bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50
+                    dark:text-indigo-400
+                  `}>
                     <Loader2 className="h-4 w-4 animate-spin" />
                   </div>
                   <div className="min-w-0">
@@ -665,7 +703,10 @@ export default function MediaPage() {
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
                   <div
-                    className="h-full rounded-full bg-indigo-600 transition-all duration-300 dark:bg-indigo-500"
+                    className={`
+                      h-full rounded-full bg-indigo-600 transition-all duration-300
+                      dark:bg-indigo-500
+                    `}
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -730,7 +771,11 @@ export default function MediaPage() {
                   'rounded-xl border-2 border-dashed p-6 text-center transition-all sm:p-8',
                   dragActive
                     ? 'border-indigo-500 bg-indigo-50/70 dark:bg-indigo-950/20'
-                    : 'border-zinc-200 bg-zinc-50/50 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/40 dark:hover:border-zinc-700',
+                    : `
+                      border-zinc-200 bg-zinc-50/50 hover:border-zinc-300
+                      hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/40
+                      dark:hover:border-zinc-700
+                    `,
                 )}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -754,7 +799,11 @@ export default function MediaPage() {
                   className="block cursor-pointer"
                   onClick={() => document.getElementById('file')?.click()}
                 >
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white text-zinc-700 shadow-sm dark:bg-zinc-900 dark:text-zinc-200">
+                  <div className={`
+                    mx-auto mb-4 flex h-12 w-12 items-center justify-center
+                    rounded-xl bg-white text-zinc-700 shadow-sm dark:bg-zinc-900
+                    dark:text-zinc-200
+                  `}>
                     <Upload className="h-5 w-5" />
                   </div>
                   <p className="text-base font-semibold tracking-tight text-zinc-950 dark:text-white">
@@ -763,7 +812,12 @@ export default function MediaPage() {
                   <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                     or click to browse your computer
                   </p>
-                  <span className="mt-4 inline-flex h-9 items-center rounded-lg border border-zinc-200 bg-white px-3.5 text-xs font-medium text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
+                  <span className={`
+                    mt-4 inline-flex h-9 items-center rounded-lg border
+                    border-zinc-200 bg-white px-3.5 text-xs font-medium
+                    text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-950
+                    dark:text-zinc-200
+                  `}>
                     Choose file(s)
                   </span>
                   <p className="mt-4 text-[11px] text-zinc-400">
@@ -772,8 +826,15 @@ export default function MediaPage() {
                 </label>
 
                 {selectedFiles.length > 0 && (
-                  <div className="mt-5 rounded-xl border border-indigo-200/80 bg-white p-3 text-left shadow-sm dark:border-indigo-900/60 dark:bg-zinc-950">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                  <div className={`
+                    mt-5 rounded-xl border border-indigo-200/80 bg-white p-3
+                    text-left shadow-sm dark:border-indigo-900/60 dark:bg-zinc-950
+                  `}>
+                    <div className={`
+                      flex h-9 w-9 shrink-0 items-center justify-center rounded-lg
+                      bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50
+                      dark:text-indigo-400
+                    `}>
                       <Film className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -797,7 +858,10 @@ export default function MediaPage() {
             )}
           </div>
 
-          <DialogFooter className="flex flex-col-reverse gap-2 border-t border-zinc-200/80 px-5 py-4 dark:border-zinc-800/80 sm:flex-row sm:justify-end sm:px-6">
+          <DialogFooter className={`
+            flex flex-col-reverse gap-2 border-t border-zinc-200/80 px-5
+            py-4 dark:border-zinc-800/80 sm:flex-row sm:justify-end sm:px-6
+          `}>
             <Button
               variant="outline"
               onClick={() => {
@@ -836,7 +900,10 @@ export default function MediaPage() {
       </Dialog>
 
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent className="w-[calc(100%-2rem)] max-w-md rounded-2xl border-zinc-200 dark:border-zinc-800 sm:w-full">
+        <DialogContent className={`
+          w-[calc(100%-2rem)] max-w-md rounded-2xl border-zinc-200
+          dark:border-zinc-800 sm:w-full
+        `}>
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold tracking-tight">Delete media</DialogTitle>
             <DialogDescription className="leading-6">
