@@ -426,14 +426,12 @@ export function AudioTab({
               <button
                 key={op.id}
                 onClick={() => setEditOp(op.id)}
-                className={`flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors ${
+                className={[
+                  'flex flex-col items-center gap-1 rounded-md border p-1.5 text-center transition-colors',
                   isActive
-                    ? `
-                      border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
-                      text-indigo-700 dark:text-indigo-300
-                    `
-                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
-                }`}
+                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300',
+                ].join(' ')}
               >
                 <Icon className="h-3.5 w-3.5" />
                 <span className="text-[9px] font-medium leading-tight">{op.label}</span>
