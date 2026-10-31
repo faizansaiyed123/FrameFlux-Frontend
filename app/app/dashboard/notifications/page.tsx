@@ -167,7 +167,10 @@ export default function NotificationsPage() {
           {notifications.map((notification) => (
             <Card
               key={notification.id}
-              className={`border-zinc-200 dark:border-zinc-800 ${!notification.is_read ? 'border-l-4 border-l-indigo-500' : ''}`}
+              className={[
+                'border-zinc-200 dark:border-zinc-800',
+                !notification.is_read ? 'border-l-4 border-l-indigo-500' : '',
+              ].join(' ')}
             >
               <CardContent className="flex items-start gap-4 p-4">
                 <div className={`
