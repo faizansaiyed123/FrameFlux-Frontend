@@ -47,7 +47,10 @@ export default function LoginPage() {
             className="relative z-10 flex cursor-pointer items-center gap-2.5"
             aria-label="FrameFlux home"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-950">
+            <span className={`
+              flex h-8 w-8 items-center justify-center rounded-lg bg-white
+              text-zinc-950
+            `}>
               <span className="h-2.5 w-2.5 rounded-[3px] bg-current" />
             </span>
             <span className="font-semibold tracking-tight">FrameFlux</span>
@@ -59,7 +62,10 @@ export default function LoginPage() {
             `}>
               <ShieldCheck className="h-3.5 w-3.5" /> Built for modern media workflows
             </div>
-            <h1 className="text-5xl font-semibold leading-[1.05] tracking-[-0.04em] xl:text-6xl">
+            <h1 className={`
+              text-5xl font-semibold leading-[1.05] tracking-[-0.04em]
+              xl:text-6xl
+            `}>
               Your media workspace,
               <br />
               <span className="text-zinc-400">without the busywork.</span>
@@ -73,7 +79,9 @@ export default function LoginPage() {
           </p>
         </section>
 
-        <section className="flex items-center justify-center px-5 py-10 sm:px-8">
+        <section className={`
+          flex items-center justify-center px-5 py-10 sm:px-8
+        `}>
           <div className="w-full max-w-md">
             <Link
               href="/"
@@ -93,10 +101,15 @@ export default function LoginPage() {
               `}>
                 <span className="h-3 w-3 rounded-[3px] bg-current" />
               </div>
-              <h2 className="text-3xl font-semibold tracking-[-0.03em] text-zinc-950 dark:text-white">
+              <h2 className={`
+                text-3xl font-semibold tracking-[-0.03em] text-zinc-950
+                dark:text-white
+              `}>
                 Welcome back
               </h2>
-              <p className="mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400">
+              <p className={`
+                mt-2 text-sm leading-6 text-zinc-500 dark:text-zinc-400
+              `}>
                 Sign in to continue to your FrameFlux workspace.
               </p>
             </div>
@@ -112,7 +125,10 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <Mail className={`
+                    absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2
+                    text-zinc-400
+                  `} />
                   <Input
                     id="email"
                     type="email"
@@ -139,7 +155,10 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                  <Lock className={`
+                    absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2
+                    text-zinc-400
+                  `} />
                   <Input
                     id="password"
                     type={showPassword ? 'text' : 'password'}
@@ -170,34 +189,50 @@ export default function LoginPage() {
               >
                 {loading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in...
+                    <Loader2 className={`
+                      mr-2 h-4 w-4 animate-spin
+                    `} /> Signing in...
                   </>
                 ) : (
                   'Sign in'
                 )}
               </Button>
             </form>
-            <p className="mt-7 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            <p className={`
+              mt-7 text-center text-sm text-zinc-500 dark:text-zinc-400
+            `}>
               New to FrameFlux?{' '}
               <Link
                 href="/auth/signup"
-                className="cursor-pointer font-medium text-zinc-950 hover:underline dark:text-white"
+                className={`
+                  cursor-pointer font-medium text-zinc-950 hover:underline
+                  dark:text-white
+                `}
               >
                 Create an account
               </Link>
             </p>
-            <p className="mt-10 text-center text-[11px] leading-5 text-zinc-400 dark:text-zinc-500">
+            <p className={`
+              mt-10 text-center text-[11px] leading-5 text-zinc-400
+              dark:text-zinc-500
+            `}>
               By continuing, you agree to our{' '}
               <Link
                 href="/terms"
-                className="cursor-pointer hover:text-zinc-600 hover:underline dark:hover:text-zinc-300"
+                className={`
+                  cursor-pointer hover:text-zinc-600 hover:underline
+                  dark:hover:text-zinc-300
+                `}
               >
                 Terms of Service
               </Link>{' '}
               and{' '}
               <Link
                 href="/privacy"
-                className="cursor-pointer hover:text-zinc-600 hover:underline dark:hover:text-zinc-300"
+                className={`
+                  cursor-pointer hover:text-zinc-600 hover:underline
+                  dark:hover:text-zinc-300
+                `}
               >
                 Privacy Policy
               </Link>
