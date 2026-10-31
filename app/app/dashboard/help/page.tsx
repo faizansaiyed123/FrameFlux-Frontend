@@ -39,9 +39,18 @@ export default function HelpPage() {
           <Link
             key={resource.title}
             href={resource.href}
-            className="flex flex-col items-start rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+            className={`
+              flex flex-col items-start rounded-xl border border-zinc-200
+              dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6
+              hover:border-zinc-300 dark:hover:border-zinc-700
+              transition-colors
+            `}
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 mb-4">
+            <div className={`
+              flex h-12 w-12 items-center justify-center rounded-lg
+              bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600
+              dark:text-indigo-400 mb-4
+            `}>
               <resource.icon className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50 mb-1">
