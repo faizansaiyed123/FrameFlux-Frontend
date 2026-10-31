@@ -168,12 +168,18 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
       </CardHeader>
       <CardContent className="space-y-6">
         {error && (
-          <Alert className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
+          <Alert className={`
+            border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20
+            text-red-700 dark:text-red-300
+          `}>
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
         {success && (
-          <Alert className="border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
+          <Alert className={`
+            border-green-200 dark:border-green-900 bg-green-50
+            dark:bg-green-900/20 text-green-700 dark:text-green-300
+          `}>
             <AlertDescription>{success}</AlertDescription>
           </Alert>
         )}
@@ -191,8 +197,14 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
                 }}
                 className={`flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors ${
                   isActive
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
+                    ? `
+                      border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                      text-indigo-700 dark:text-indigo-300
+                    `
+                    : `
+                      border-zinc-200 dark:border-zinc-700 hover:border-zinc-300
+                      dark:hover:border-zinc-600
+                    `
                 }`}
               >
                 <Icon className="h-5 w-5" />
