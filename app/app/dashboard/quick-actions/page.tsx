@@ -11,27 +11,42 @@ import { cn } from '@/lib/utils';
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
   queued: {
     icon: Clock,
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    color: `
+      bg-blue-100 text-blue-700 dark:bg-blue-900/30
+      dark:text-blue-300
+    `,
     label: 'Queued',
   },
   processing: {
     icon: Loader2,
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    color: `
+      bg-amber-100 text-amber-700 dark:bg-amber-900/30
+      dark:text-amber-300
+    `,
     label: 'Processing',
   },
   completed: {
     icon: CheckCircle2,
-    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    color: `
+      bg-green-100 text-green-700 dark:bg-green-900/30
+      dark:text-green-300
+    `,
     label: 'Completed',
   },
   failed: {
     icon: XCircle,
-    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    color: `
+      bg-red-100 text-red-700 dark:bg-red-900/30
+      dark:text-red-300
+    `,
     label: 'Failed',
   },
   direct: {
     icon: Play,
-    color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300',
+    color: `
+      bg-purple-100 text-purple-700 dark:bg-purple-900/30
+      dark:text-purple-300
+    `,
     label: 'Direct API',
   },
 };
@@ -96,7 +111,10 @@ export default function QuickActionsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Quick Actions
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -115,7 +133,10 @@ export default function QuickActionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h1 className={`
+          text-3xl font-bold tracking-tight text-zinc-900
+          dark:text-zinc-50
+        `}>
           Quick Actions
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -198,7 +219,10 @@ export default function QuickActionsPage() {
                             <span>{executionStatus[action.id].status}</span>
                             <span>{executionStatus[action.id].progress}%</span>
                           </div>
-                          <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                          <div className={`
+                            h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
+                            overflow-hidden
+                          `}>
                             <div
                               className={cn(
                                 'h-full transition-all',
@@ -270,7 +294,10 @@ export default function QuickActionsPage() {
                             <span>{executionStatus[action.id].status}</span>
                             <span>{executionStatus[action.id].progress}%</span>
                           </div>
-                          <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                          <div className={`
+                            h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
+                            overflow-hidden
+                          `}>
                             <div
                               className={cn(
                                 'h-full transition-all',
@@ -343,7 +370,10 @@ export default function QuickActionsPage() {
                               <span>{executionStatus[action.id].status}</span>
                               <span>{executionStatus[action.id].progress}%</span>
                             </div>
-                            <div className="h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                            <div className={`
+                              h-1.5 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
+                              overflow-hidden
+                            `}>
                               <div
                                 className={cn(
                                   'h-full transition-all',
