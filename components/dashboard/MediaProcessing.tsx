@@ -196,10 +196,19 @@ export function MediaProcessing({ mediaId, onProcessed }: MediaProcessingProps) 
                   resetForm();
                 }}
                 className={[
-                  'flex flex-col items-center gap-2 rounded-lg border p-4 text-center transition-colors',
+                  `
+                    flex flex-col items-center gap-2 rounded-lg border p-4
+                    text-center transition-colors
+                  `,
                   isActive
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600',
+                    ? `
+                      border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20
+                      text-indigo-700 dark:text-indigo-300
+                    `
+                    : `
+                      border-zinc-200 dark:border-zinc-700
+                      hover:border-zinc-300 dark:hover:border-zinc-600
+                    `,
                 ].join(' ')}
               >
                 <Icon className="h-5 w-5" />
