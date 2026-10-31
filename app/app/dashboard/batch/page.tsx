@@ -141,7 +141,10 @@ export default function BatchPage() {
                 className="pl-10"
               />
             </div>
-            <div className="max-h-64 overflow-y-auto border border-zinc-200 dark:border-zinc-700 rounded-lg p-2">
+            <div className={`
+              max-h-64 overflow-y-auto border border-zinc-200
+              dark:border-zinc-700 rounded-lg p-2
+            `}>
               {mediaLoading ? (
                 <div className="text-center py-4 text-zinc-500 dark:text-zinc-400">Loading...</div>
               ) : availableMedia.length === 0 ? (
@@ -153,7 +156,10 @@ export default function BatchPage() {
                   {availableMedia.map((media) => (
                     <label
                       key={media.id}
-                      className="flex items-center gap-3 p-2 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                      className={`
+                        flex items-center gap-3 p-2 rounded hover:bg-zinc-100
+                        dark:hover:bg-zinc-800 cursor-pointer
+                      `}
                     >
                       <Checkbox
                         checked={mediaIds.includes(media.id)}
@@ -263,7 +269,10 @@ export default function BatchPage() {
               {job.results.map((result, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800"
+                  className={`
+                    flex items-center justify-between p-3 rounded-lg border
+                    border-zinc-200 dark:border-zinc-800
+                  `}
                 >
                   <div>
                     <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50">
