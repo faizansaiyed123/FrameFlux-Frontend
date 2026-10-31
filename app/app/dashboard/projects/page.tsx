@@ -131,7 +131,10 @@ export default function ProjectsPage() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Projects
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your video projects</p>
@@ -149,7 +152,10 @@ export default function ProjectsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          <h1 className={`
+            text-3xl font-bold tracking-tight text-zinc-900
+            dark:text-zinc-50
+          `}>
             Projects
           </h1>
           <p className="text-zinc-600 dark:text-zinc-400 mt-1">Manage your video projects</p>
@@ -161,7 +167,10 @@ export default function ProjectsPage() {
       </div>
 
       {error && (
-        <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20">
+        <Card className={`
+          border-red-200 dark:border-red-900 bg-red-50
+          dark:bg-red-900/20
+        `}>
           <CardContent className="p-6">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
