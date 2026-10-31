@@ -34,19 +34,25 @@ export function ImageWorkspace({ media, onBack, onProcessed }: ImageWorkspacePro
 
   useEffect(() => {
     let objectUrl: string | null = null;
-    setError('');
+    let cancelled = false;
 
     api
       .getMediaFile(media.id)
       .then((blob) => {
+        if (cancelled) return;
+
         objectUrl = URL.createObjectURL(blob);
+        setError('');
         setImageUrl(objectUrl);
       })
       .catch(() => {
-        setError('Unable to load image preview.');
+        if (!cancelled) {
+          setError('Unable to load image preview.');
+        }
       });
 
     return () => {
+      cancelled = true;
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);
       }
