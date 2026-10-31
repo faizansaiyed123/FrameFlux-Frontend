@@ -43,27 +43,42 @@ import { formatDistanceToNow } from 'date-fns';
 const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
   empty: {
     icon: Clock,
-    color: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+    color: `
+      bg-gray-100 text-gray-700 dark:bg-gray-800
+      dark:text-gray-300
+    `,
     label: 'Empty',
   },
   queued: {
     icon: Clock,
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    color: `
+      bg-blue-100 text-blue-700 dark:bg-blue-900/30
+      dark:text-blue-300
+    `,
     label: 'Queued',
   },
   processing: {
     icon: Loader2,
-    color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    color: `
+      bg-amber-100 text-amber-700 dark:bg-amber-900/30
+      dark:text-amber-300
+    `,
     label: 'Processing',
   },
   completed: {
     icon: CheckCircle2,
-    color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    color: `
+      bg-green-100 text-green-700 dark:bg-green-900/30
+      dark:text-green-300
+    `,
     label: 'Completed',
   },
   failed: {
     icon: XCircle,
-    color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+    color: `
+      bg-red-100 text-red-700 dark:bg-red-900/30
+      dark:text-red-300
+    `,
     label: 'Failed',
   },
 };
@@ -162,7 +177,10 @@ export default function ProjectDetailPage() {
           </Button>
           <div>
             <div className="h-8 w-48 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded" />
-            <div className="h-4 w-32 animate-pulse bg-zinc-200 dark:bg-zinc-700 rounded mt-2" />
+            <div className={`
+              h-4 w-32 animate-pulse bg-zinc-200 dark:bg-zinc-700
+              rounded mt-2
+            `} />
           </div>
         </div>
         <div className="grid gap-6 lg:grid-cols-3">
@@ -182,13 +200,19 @@ export default function ProjectDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h1 className={`
+              text-3xl font-bold tracking-tight text-zinc-900
+              dark:text-zinc-50
+            `}>
               Project
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mt-1">View and manage your project</p>
           </div>
         </div>
-        <Card className="border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20">
+        <Card className={`
+          border-red-200 dark:border-red-900 bg-red-50
+          dark:bg-red-900/20
+        `}>
           <CardContent className="p-6">
             <div className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -212,7 +236,10 @@ export default function ProjectDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            <h1 className={`
+              text-3xl font-bold tracking-tight text-zinc-900
+              dark:text-zinc-50
+            `}>
               {project.name}
             </h1>
             <p className="text-zinc-600 dark:text-zinc-400 mt-1">
@@ -268,7 +295,10 @@ export default function ProjectDetailPage() {
                 </div>
               </div>
               <div className="w-32">
-                <div className="h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+                <div className={`
+                  h-2 w-full bg-zinc-200 dark:bg-zinc-700 rounded-full
+                  overflow-hidden
+                `}>
                   <div
                     className="h-full bg-indigo-600 dark:bg-indigo-400 transition-all"
                     style={{
@@ -326,7 +356,10 @@ export default function ProjectDetailPage() {
                           <Film className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className="font-medium text-zinc-900 dark:text-zinc-50 truncate max-w-[200px]">
+                          <p className={`
+                            font-medium text-zinc-900 dark:text-zinc-50 truncate
+                            max-w-[200px]
+                          `}>
                             {item.original_filename}
                           </p>
                           <p className="text-sm text-zinc-500 dark:text-zinc-400">
@@ -423,7 +456,10 @@ export default function ProjectDetailPage() {
                       <History className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-50 capitalize">
+                      <p className={`
+                        text-sm font-medium text-zinc-900 dark:text-zinc-50
+                        capitalize
+                      `}>
                         {entry.operation}
                       </p>
                       <p className="text-xs text-zinc-500 dark:text-zinc-400">
