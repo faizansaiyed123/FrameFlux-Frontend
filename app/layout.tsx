@@ -85,7 +85,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://api.frameflux.io" />
         <link rel="dns-prefetch" href="https://api.frameflux.io" />
       </head>
-      <body className="min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
+      <body className={`
+        min-h-full flex flex-col bg-white dark:bg-zinc-950 text-zinc-900
+        dark:text-zinc-50
+      `}>
         {children}
       </body>
     </html>
