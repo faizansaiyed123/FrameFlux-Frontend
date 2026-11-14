@@ -78,6 +78,32 @@ class ApiClient {
     });
   }
 
+  async createDemoSession() {
+    return this.request<{
+      access_token: string;
+      token_type: string;
+      expires_in: number;
+      demo_session_id: string;
+      expires_at: string;
+      user: User;
+      project: Project;
+      sample_media: Media;
+    }>('/demo/session', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  }
+
+  async endDemoSession() {
+    return this.request<{
+      detail: string;
+      cleanup_state: string;
+    }>('/demo/session/end', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  }
+
   async login(data: { email: string; password: string }) {
     return this.request<{
       access_token: string;
