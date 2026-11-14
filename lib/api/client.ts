@@ -1,3 +1,5 @@
+import type { User, Project, Media } from '@/types/api';
+
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
 const API_BASE_URL =
   configuredApiUrl ||
