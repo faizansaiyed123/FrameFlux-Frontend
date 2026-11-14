@@ -96,7 +96,13 @@ function formatSize(bytes: number) {
 
 export function Hero() {
   const router = useRouter();
-  const { user, login, signup, loading: authLoadingState } = useAuth();
+  const {
+    user,
+    login,
+    signup,
+    startDemo,
+    loading: authLoadingState,
+  } = useAuth();
   const inputRef = useRef<HTMLInputElement>(null);
   const uploaderRef = useRef<ResumableUploader | null>(null);
   const [file, setFile] = useState<DetectedFile | null>(null);
@@ -112,6 +118,7 @@ export function Hero() {
   const [fullName, setFullName] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+  const [startingDemo, setStartingDemo] = useState(false);
 
   const selectFile = useCallback((candidate: File) => {
     setError('');
@@ -159,6 +166,24 @@ export function Hero() {
     }
     upload(file.file);
   };
+  const startInteractiveDemo = async () => {
+    if (startingDemo) return;
+    setError('');
+    setStartingDemo(true);
+    try {
+      const sampleMediaId = await startDemo();
+      router.push(`/app/dashboard/media/${sampleMediaId}`);
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'The recruiter workspace could not be started. Please try again.',
+      );
+    } finally {
+      setStartingDemo(false);
+    }
+  };
+
   const submitAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
@@ -241,6 +266,33 @@ export function Hero() {
           </div>
 
           <div className="mx-auto mt-12 max-w-4xl">
+            {!user && (
+              <div className="mb-4 flex flex-col items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 cursor-pointer rounded-lg border-indigo-300 px-6 font-semibold text-indigo-700 shadow-sm hover:bg-indigo-50 dark:border-indigo-800 dark:text-indigo-300 dark:hover:bg-indigo-950/40"
+                  onClick={startInteractiveDemo}
+                  disabled={startingDemo}
+                >
+                  {startingDemo ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Preparing your workspace…
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4" />
+                      Explore the real product — no account
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+                <p className="text-[11px] text-zinc-400">
+                  Temporary workspace · synthetic sample media · automatically expires
+                </p>
+              </div>
+            )}
             <div
               className={`
               rounded-2xl border border-zinc-200 bg-white p-2
