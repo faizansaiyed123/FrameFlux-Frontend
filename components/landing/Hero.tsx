@@ -26,6 +26,8 @@ import {
 } from 'lucide-react';
 
 type MediaCategory = 'video' | 'audio' | 'image' | 'subtitle';
+const RECRUITER_DEMO_ENABLED = process.env.NEXT_PUBLIC_DEMO_ENABLED === 'true';
+
 interface DetectedFile {
   file: File;
   category: MediaCategory;
@@ -266,7 +268,7 @@ export function Hero() {
           </div>
 
           <div className="mx-auto mt-12 max-w-4xl">
-            {!user && (
+            {!user && RECRUITER_DEMO_ENABLED && (
               <div className="mb-4 flex flex-col items-center gap-2">
                 <Button
                   type="button"
