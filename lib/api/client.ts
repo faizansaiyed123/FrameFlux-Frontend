@@ -1,5 +1,3 @@
-import type { User, Project, Media } from '@/types/api';
-
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
 const API_BASE_URL =
   configuredApiUrl ||
@@ -77,32 +75,6 @@ class ApiClient {
     }>('/auth/signup', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
-  }
-
-  async createDemoSession() {
-    return this.request<{
-      access_token: string;
-      token_type: string;
-      expires_in: number;
-      demo_session_id: string;
-      expires_at: string;
-      user: User;
-      project: Project;
-      sample_media: Media;
-    }>('/demo/session', {
-      method: 'POST',
-      body: JSON.stringify({}),
-    });
-  }
-
-  async endDemoSession() {
-    return this.request<{
-      detail: string;
-      cleanup_state: string;
-    }>('/demo/session/end', {
-      method: 'POST',
-      body: JSON.stringify({}),
     });
   }
 
