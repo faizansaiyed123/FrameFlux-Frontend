@@ -19,7 +19,7 @@ import type { DemoJob, DemoMedia, DemoResumable } from './seed';
 
 const DEMO_ENABLED = process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO !== 'false';
 const DEMO_BACKEND_URL =
-  (process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL?.trim() || '').replace(/\\/+$/, '');
+  (process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL?.trim() || '').replace(/\/+$/, '');
 
 const DEMO_TIMEOUT_MS = 1_250;
 
