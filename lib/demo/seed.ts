@@ -39,6 +39,19 @@ export type DemoResumable = {
   progress: number;
 };
 
+export type DemoShare = {
+  id: string;
+  media_id: string;
+  token: string;
+  has_password: boolean;
+  expires_at: string | null;
+  is_active: boolean;
+  allow_download: boolean;
+  view_count: number;
+  allowed_domains: string | null;
+  created_at: string;
+};
+
 export interface DemoState {
   version: number;
   user: User;
@@ -52,6 +65,13 @@ export interface DemoState {
   presets: PresetResponse[];
   favorites: string[];
   resumables: DemoResumable[];
+  shares: DemoShare[];
+  preferences: Record<string, string>;
+  quickActions: {
+    video: { id: string; label: string; icon: string }[];
+    audio: { id: string; label: string; icon: string }[];
+    image: { id: string; label: string; icon: string }[];
+  };
   last_reset_at: string;
 }
 
@@ -407,6 +427,27 @@ export function createDemoState(): DemoState {
     ],
     favorites: ['demo-media-001', 'demo-media-005'],
     resumables: [],
+    shares: [],
+    preferences: {
+      theme: 'dark',
+      playback_quality: 'auto',
+      compact_mode: 'false',
+    },
+    quickActions: {
+      video: [
+        { id: 'compress', label: 'Compress', icon: 'minimize-2' },
+        { id: 'convert', label: 'Convert', icon: 'repeat-2' },
+        { id: 'thumbnail', label: 'Thumbnail', icon: 'image' },
+      ],
+      audio: [
+        { id: 'extract-audio', label: 'Extract audio', icon: 'audio-lines' },
+        { id: 'convert-audio', label: 'Convert audio', icon: 'refresh-cw' },
+      ],
+      image: [
+        { id: 'resize', label: 'Resize', icon: 'maximize-2' },
+        { id: 'thumbnail', label: 'Preview', icon: 'image' },
+      ],
+    },
     last_reset_at: new Date().toISOString(),
   };
 }
