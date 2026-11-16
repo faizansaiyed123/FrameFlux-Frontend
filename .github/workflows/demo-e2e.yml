@@ -1,0 +1,104 @@
+name: FrameFlux recruiter demo integration
+
+on:
+  push:
+    branches: [demo]
+  pull_request:
+    branches: [demo]
+
+permissions:
+  contents: read
+
+jobs:
+  frontend-backend-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check out frontend demo
+        uses: actions/checkout@v4
+
+      - name: Check out backend demo
+        uses: actions/checkout@v4
+        with:
+          repository: faizansaiyed123/FrameFlux-Backend
+          ref: demo
+          path: FrameFlux-Backend
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install standalone demo backend dependencies
+        run: python -m pip install --upgrade pip && pip install fastapi 'uvicorn[standard]' 'httpx>=0.28.1' pytest pydantic python-multipart
+
+      - name: Run backend demo API tests
+        working-directory: FrameFlux-Backend
+        env:
+          PYTHONPATH: .
+        run: pytest -q tests/test_demo_api.py
+
+      - name: Start backend demo API
+        working-directory: FrameFlux-Backend
+        env:
+          PYTHONPATH: .
+        run: |
+          nohup python -m uvicorn app.demo.main:app --host 127.0.0.1 --port 8000 > /tmp/frameflux-backend.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8000/health; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/frameflux-backend.log
+          exit 1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint frontend
+        run: npm run lint
+
+      - name: Build frontend against demo backend
+        env:
+          NEXT_PUBLIC_FRAMEFLUX_DEMO: 'true'
+          NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL: http://127.0.0.1:8000
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start frontend
+        env:
+          NEXT_PUBLIC_FRAMEFLUX_DEMO: 'true'
+          NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL: http://127.0.0.1:8000
+        run: |
+          nohup npm run start -- --hostname 127.0.0.1 > /tmp/frameflux-frontend.log 2>&1 &
+          for attempt in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:3000 > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/frameflux-frontend.log
+          exit 1
+
+      - name: Run browser integration tests
+        env:
+          CI: 'true'
+          PLAYWRIGHT_BASE_URL: http://127.0.0.1:3000
+        run: npx playwright test
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frameflux-demo-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+            /tmp/frameflux-backend.log
+            /tmp/frameflux-frontend.log
+          if-no-files-found: ignore
