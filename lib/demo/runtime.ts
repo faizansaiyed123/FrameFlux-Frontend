@@ -782,6 +782,23 @@ async function localDemoFetch(input: RequestInfo | URL, init?: RequestInit): Pro
   }
 
   if (path.startsWith('/thumbnails/')) {
+    if (path.includes('/set') && method === 'GET') {
+      const id = path.split('/')[2];
+      const thumb = encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360"><rect width="100%" height="100%" fill="#111827"/><text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="#f8fafc" font-family="Arial" font-size="28">FrameFlux demo thumbnail</text></svg>',
+      );
+      return jsonResponse({
+        thumbnails: [
+          'data:image/svg+xml;charset=UTF-8,' + thumb + '-' + id,
+        ],
+      });
+    }
+    if (path.includes('/crop') && method === 'POST') {
+      return jsonResponse({ path: 'demo://thumbnail/cropped-' + path.split('/')[2] });
+    }
+    if (path.includes('/select') && method === 'POST') {
+      return jsonResponse({ selected: 'demo://thumbnail/selected-' + path.split('/')[2] });
+    }
     if (method === 'GET') {
       return blobResponse(demoSvg('Thumbnail preview'));
     }
@@ -852,19 +869,17 @@ export async function fetchWithDemo(
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), DEMO_TIMEOUT_MS);
     try {
-      return await fetch(
+      const response = await fetch(
         DEMO_BACKEND_URL + parseUrl(input).pathname + parseUrl(input).search,
         {
-          method: request.method,
-          headers: request.headers,
-          body:
-            request.method === 'GET' || request.method === 'HEAD'
-              ? undefined
-              : request.body,
+          ...init,
+          method: init?.method || 'GET',
+          headers: init?.headers,
           credentials: 'include',
           signal: controller.signal,
         },
       );
+      if (response.ok) return response;
     } catch {
       // The deployed recruiter demo remains usable even when its optional API is down.
     } finally {
