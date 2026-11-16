@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { api } from '@/lib/api/client';
 import type { User } from '@/types/api';
+import { DEMO_ENABLED, getDemoUser } from '@/lib/demo/runtime';
 
 interface AuthState {
   user: User | null;
@@ -19,8 +20,8 @@ interface AuthState {
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      user: null,
-      loading: true,
+      user: DEMO_ENABLED ? getDemoUser() : null,
+      loading: !DEMO_ENABLED,
 
       setUser: (user) => set({ user }),
       setLoading: (loading) => set({ loading }),
@@ -63,7 +64,7 @@ export const useAuthStore = create<AuthState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ user: state.user }),
       onRehydrateStorage: () => (state) => {
-        if (state && state.user) {
+        if (state && (state.user || DEMO_ENABLED)) {
           state.refresh();
         } else if (state) {
           state.setLoading(false);
