@@ -21,6 +21,7 @@ import {
   Layers,
   Settings2,
   Zap,
+  RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -34,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
+import { DEMO_ENABLED, resetDemoState } from '@/lib/demo/runtime';
 
 const navItems = [
   { name: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
@@ -248,6 +250,19 @@ export function Sidebar({ className }: SidebarProps) {
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {DEMO_ENABLED && (
+              <DropdownMenuItem
+                onClick={() => {
+                  resetDemoState();
+                  window.location.reload();
+                }}
+                className="cursor-pointer rounded-lg"
+              >
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Reset demo workspace
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={logout}
