@@ -212,7 +212,7 @@ cd C:\Users\saiye\FrameFlux-Backend
 .\.venv\Scripts\python.exe -m uvicorn app.demo.main:app --host 127.0.0.1 --port 8000
 ```
 
-Start the shared gateway once from its own folder with `.`\start-gateway.ps1`. It starts the gateway on port 8787 and creates the single Cloudflare Quick Tunnel. Keep the gateway terminal open while demos are in use.
+Start the shared gateway once from its own folder with `.\start-gateway.ps1`. It starts the gateway on port 8787 and creates the single Cloudflare Quick Tunnel. Keep the gateway terminal open while demos are in use.
 
 After Cloudflare prints the one temporary tunnel address, use this FrameFlux-specific frontend URL (replace the host with the current tunnel host):
 
