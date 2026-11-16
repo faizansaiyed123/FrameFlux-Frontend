@@ -1,21 +1,30 @@
-const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
-const API_BASE_URL =
-  configuredApiUrl ||
-  (process.env.NODE_ENV !== 'production'
-    ? 'http://localhost:8000'
-    : (() => {
-        throw new Error('NEXT_PUBLIC_API_URL must be set in production');
-      })());
-
 class ApiClient {
-  private baseUrl: string;
+  private configuredBaseUrl: string | null;
   private token: string | null = null;
 
-  constructor(baseUrl: string = API_BASE_URL) {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    const configuredApiUrl =
+      baseUrl?.trim() || process.env.NEXT_PUBLIC_API_URL?.trim();
+
+    this.configuredBaseUrl =
+      configuredApiUrl ||
+      (process.env.NODE_ENV !== 'production'
+        ? 'http://localhost:8000'
+        : null);
+
     if (typeof window !== 'undefined') {
       this.token = localStorage.getItem('access_token');
     }
+  }
+
+  private get baseUrl(): string {
+    if (!this.configuredBaseUrl) {
+      throw new Error(
+        'NEXT_PUBLIC_API_URL must be configured in the production environment before making API requests.',
+      );
+    }
+
+    return this.configuredBaseUrl;
   }
 
   setToken(token: string | null) {
