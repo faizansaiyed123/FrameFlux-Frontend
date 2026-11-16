@@ -1212,6 +1212,59 @@ async function localDemoFetch(input: RequestInfo | URL, init?: RequestInit): Pro
     });
   }
 
+
+  if (path.startsWith('/preview/') && method === 'GET') {
+    const mediaId = path.split('/')[2];
+    const media = state.media.find((item) => item.id === mediaId);
+    return blobResponse(media ? demoMediaBlob(media, true) : demoSvg('FrameFlux preview'));
+  }
+
+  if (path.startsWith('/gif/') && method === 'POST') {
+    const mediaId = path.split('/')[2];
+    const media = state.media.find((item) => item.id === mediaId);
+    return blobResponse(media ? demoMediaBlob(media, true) : demoSvg('FrameFlux GIF output'));
+  }
+
+  if (path.startsWith('/subtitles/')) {
+    if (path.endsWith('/tracks') && method === 'GET') {
+      return jsonResponse([
+        {
+          id: 1,
+          codec: 'subrip',
+          language: 'en',
+          title: 'English (demo)',
+          is_default: true,
+          is_forced: false,
+        },
+      ]);
+    }
+    if (path === '/subtitles/upload' && method === 'POST') {
+      return jsonResponse({
+        path: 'demo://subtitle/' + id('uploaded'),
+        filename: 'demo-subtitles.srt',
+      }, 201);
+    }
+    if (path.endsWith('/sync') && method === 'POST') {
+      const body = bodyJson(init);
+      if (body.preview) {
+        return jsonResponse({
+          preview_url: 'demo://subtitle-preview/' + path.split('/')[2],
+          offset: Number(body.offset_seconds || 0),
+          scale: Number(body.scale || 1),
+        });
+      }
+      return blobResponse(demoSvg('Subtitle sync output'));
+    }
+    if (path.endsWith('/edit') && method === 'POST') {
+      return blobResponse(demoSvg('Edited subtitles'));
+    }
+    if (path.includes('/burn') && method === 'POST') {
+      return jsonResponse({ output_filename: 'subtitle-burn-demo.mp4', status: 'completed' });
+    }
+    if (path.includes('/mux') && method === 'POST') {
+      return blobResponse(demoSvg('Muxed subtitles'));
+    }
+  }
   if (path.startsWith('/thumbnails/')) {
     if (path.includes('/set') && method === 'GET') {
       const id = path.split('/')[2];
@@ -1220,7 +1273,7 @@ async function localDemoFetch(input: RequestInfo | URL, init?: RequestInit): Pro
       );
       return jsonResponse({
         thumbnails: [
-          'data:image/svg+xml;charset=UTF-8,' + thumb + '-' + id,
+          'data:image/svg+xml;charset=UTF-8,' + thumb,
         ],
       });
     }
