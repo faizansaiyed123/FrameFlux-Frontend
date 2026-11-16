@@ -30,19 +30,23 @@ let demoBackendFallbackWarningShown = false;
 function normalizeQuickTunnelUrl(rawUrl: string): string | null {
   try {
     const url = new URL(rawUrl.trim());
+    const projectPath = url.pathname.replace(/\/+$/, '');
+    const validProjectPath =
+      projectPath === '' ||
+      /^\/[a-z0-9](?:[a-z0-9-]{0,47}[a-z0-9])?$/.test(projectPath);
     if (
       url.protocol !== 'https:' ||
       url.username ||
       url.password ||
       url.port ||
-      url.pathname !== '/' ||
+      !validProjectPath ||
       url.search ||
       url.hash ||
       !url.hostname.toLowerCase().endsWith('.trycloudflare.com')
     ) {
       return null;
     }
-    return url.origin;
+    return url.origin + projectPath;
   } catch {
     return null;
   }
@@ -64,7 +68,7 @@ function getDemoBackendUrl(): string {
         } else {
           window.sessionStorage.removeItem(DEMO_BACKEND_SESSION_KEY);
           console.warn(
-            'FrameFlux demo backend URL was ignored. Expected an HTTPS Cloudflare Quick Tunnel URL ending in .trycloudflare.com.',
+            'FrameFlux demo backend URL was ignored. Expected an HTTPS Cloudflare Quick Tunnel URL ending in .trycloudflare.com, optionally followed by one project path such as /frameflux.',
           );
         }
       }
