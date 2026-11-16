@@ -23,7 +23,8 @@ const ENV_DEMO_BACKEND_URL =
 const DEMO_BACKEND_SESSION_KEY = 'frameflux-demo-backend-url-v1';
 const DEMO_BACKEND_QUERY_PARAM = 'demoBackend';
 
-const DEMO_TIMEOUT_MS = 5_000;
+const DEMO_TIMEOUT_MS = 2_500;
+let demoBackendFallbackWarningShown = false;
 
 function normalizeQuickTunnelUrl(rawUrl: string): string | null {
   try {
@@ -1410,9 +1411,24 @@ export async function fetchWithDemo(
         credentials: 'include',
         signal: controller.signal,
       });
-      if (response.ok) return response;
-    } catch {
-      // The browser-only recruiter demo remains usable when its optional API is offline.
+      if (response.ok) {
+        demoBackendFallbackWarningShown = false;
+        return response;
+      }
+      if (!demoBackendFallbackWarningShown) {
+        console.warn(
+          `FrameFlux demo API returned HTTP ${response.status}; using the browser-only simulation for this request.`,
+        );
+        demoBackendFallbackWarningShown = true;
+      }
+    } catch (error) {
+      if (!demoBackendFallbackWarningShown) {
+        console.warn(
+          'FrameFlux demo API could not be reached; using the browser-only simulation for this request.',
+          error,
+        );
+        demoBackendFallbackWarningShown = true;
+      }
     } finally {
       window.clearTimeout(timer);
     }
