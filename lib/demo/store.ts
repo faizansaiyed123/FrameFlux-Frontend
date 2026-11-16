@@ -22,14 +22,26 @@ export function loadDemoState(): DemoState {
       return initial;
     }
 
-    const parsed = JSON.parse(raw) as DemoState;
-    if (!parsed || parsed.version !== 1) {
+    const parsed = JSON.parse(raw) as Partial<DemoState>;
+    const defaults = createDemoState();
+    if (!parsed || typeof parsed !== 'object' || (parsed.version ?? 0) > defaults.version) {
       const reset = createDemoState();
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(reset));
       return reset;
     }
 
-    return parsed;
+    const migrated: DemoState = {
+      ...defaults,
+      ...parsed,
+      version: defaults.version,
+      shares: Array.isArray(parsed.shares) ? parsed.shares : defaults.shares,
+      preferences: parsed.preferences && typeof parsed.preferences === 'object'
+        ? { ...defaults.preferences, ...parsed.preferences }
+        : defaults.preferences,
+      quickActions: parsed.quickActions || defaults.quickActions,
+    };
+    saveDemoState(migrated);
+    return migrated;
   } catch {
     return createDemoState();
   }
