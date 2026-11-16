@@ -86,9 +86,89 @@ test('browser-origin processing requests create and complete a demo job', async 
       if (jobStatus === 'completed') break;
     }
 
-    return { httpStatus: created.status, jobStatus, jobId: payload.job_id };
+    const [mediaStatusResponse, versionsResponse] = await Promise.all([
+      fetch(`${url}/media/demo-media-001/status`, { credentials: 'include' }),
+      fetch(`${url}/media/demo-media-001/versions`, { credentials: 'include' }),
+    ]);
+    const mediaStatus = await mediaStatusResponse.json();
+    const versions = await versionsResponse.json();
+
+    return {
+      httpStatus: created.status,
+      jobStatus,
+      jobId: payload.job_id,
+      mediaStatusHasJob: Boolean(mediaStatus.job_id),
+      versionsCount: Array.isArray(versions) ? versions.length : 0,
+    };
   }, backendUrl);
 
   expect(result.httpStatus).toBe(200);
   expect(result.jobStatus).toBe('completed');
+  expect(result.mediaStatusHasJob).toBeTruthy();
+  expect(result.versionsCount).toBeGreaterThan(0);
+});
+
+test('browser-origin batch and workflow operations return frontend response shapes', async ({ page }) => {
+  await page.goto('/app/dashboard');
+
+  const result = await page.evaluate(async (url) => {
+    const createdWorkflow = await fetch(`${url}/workflows`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Browser E2E Workflow',
+        description: 'Created from the frontend browser.',
+        operations: [{ type: 'convert', params: { format: 'webm' } }],
+      }),
+    });
+    const workflow = await createdWorkflow.json();
+    if (!createdWorkflow.ok) return { ok: false, stage: 'create-workflow' };
+
+    const updatedWorkflow = await fetch(`${url}/workflows/${workflow.id}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Updated Browser E2E Workflow' }),
+    });
+    if (!updatedWorkflow.ok) return { ok: false, stage: 'update-workflow' };
+
+    const runWorkflow = await fetch(
+      `${url}/workflows/${workflow.id}/run?media_id=demo-media-001`,
+      { method: 'POST', credentials: 'include' },
+    );
+    const run = await runWorkflow.json();
+
+    const batchResponse = await fetch(`${url}/batch/process`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        media_ids: ['demo-media-001', 'demo-media-005'],
+        operation: 'compress',
+      }),
+    });
+    const batch = await batchResponse.json();
+    if (!batchResponse.ok) return { ok: false, stage: 'batch' };
+
+    const batchStatusResponse = await fetch(
+      `${url}/batch/${batch.job_id}/status`,
+      { credentials: 'include' },
+    );
+    const batchStatus = await batchStatusResponse.json();
+
+    return {
+      ok: runWorkflow.ok && batchStatusResponse.ok,
+      workflowId: run.workflow_id,
+      operationsCount: run.operations_count,
+      batchTotal: batchStatus.total,
+      batchResultCount: batchStatus.results?.length,
+    };
+  }, backendUrl);
+
+  expect(result.ok).toBeTruthy();
+  expect(result.workflowId).toBeTruthy();
+  expect(result.operationsCount).toBe(1);
+  expect(result.batchTotal).toBe(2);
+  expect(result.batchResultCount).toBe(2);
 });
