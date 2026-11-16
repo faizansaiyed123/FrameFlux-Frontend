@@ -633,6 +633,485 @@ async function localDemoFetch(input: RequestInfo | URL, init?: RequestInit): Pro
     });
   }
 
+
+  if (path.startsWith('/media/') && path.includes('/versions')) {
+    const parts = path.split('/');
+    const mediaId = parts[2];
+    const media = state.media.find((item) => item.id === mediaId);
+    if (!media) return jsonResponse({ detail: 'Media not found' }, 404);
+    const versionId = parts[4];
+    const versions = [
+      {
+        id: media.id + '-v1',
+        version_number: 1,
+        label: 'Original demo',
+        stored_filename: media.stored_filename,
+        processing_status: 'completed',
+        created_at: media.created_at,
+      },
+      ...(media.processed_filename
+        ? [{
+            id: media.id + '-v2',
+            version_number: 2,
+            label: 'Latest processed demo',
+            stored_filename: media.processed_filename,
+            processing_status: 'completed',
+            created_at: isoNow(),
+          }]
+        : []),
+    ];
+    if (parts.length === 4 && method === 'GET') return jsonResponse(versions);
+    const version = versions.find((item) => item.id === versionId);
+    if (!version) return jsonResponse({ detail: 'Version not found' }, 404);
+    if (parts[5] === 'download' && method === 'GET') return blobResponse(demoMediaBlob(media, true));
+    if (parts[5] === 'restore' && method === 'POST') {
+      media.processing_status = 'completed';
+      media.processed_filename = version.stored_filename;
+      media.processing_error = null;
+      saveDemoState(state);
+      return jsonResponse(media);
+    }
+    if (parts.length === 5 && method === 'GET') return jsonResponse(version);
+    if (parts.length === 5 && method === 'DELETE') return new Response(null, { status: 204 });
+  }
+
+  if (path === '/batch/upload' && method === 'POST') {
+    const body = bodyJson(init);
+    const files = Array.isArray(body.files) ? body.files.map(String) : [];
+    const job: DemoJob = {
+      job_id: id('batch-job'),
+      media_id: null,
+      project_id: null,
+      operation: 'batch-upload',
+      status: 'completed',
+      progress: 100,
+      stage: 'Completed',
+      result: { files, total_files: files.length },
+      error: null,
+      started_at: Date.now() - 500,
+      created_at: isoNow(),
+    };
+    state.jobs.unshift(job);
+    saveDemoState(state);
+    return jsonResponse({ job_id: job.job_id, total_files: files.length, status: job.status });
+  }
+
+  if (path === '/batch/process' && method === 'POST') {
+    const body = bodyJson(init);
+    const ids = Array.isArray(body.media_ids) ? body.media_ids.map(String) : [];
+    const operation = String(body.operation || 'process');
+    const selected = state.media.filter((item) => ids.includes(item.id));
+    const results = selected.map((item) => {
+      const child = createJob(state, item.id, null, 'batch:' + operation);
+      child.result = { output_filename: mediaOutputName(item, operation) };
+      return { media_id: item.id, filename: mediaOutputName(item, operation), job_id: child.job_id };
+    });
+    const batchJob: DemoJob = {
+      job_id: id('batch-job'),
+      media_id: null,
+      project_id: null,
+      operation,
+      status: results.length ? 'processing' : 'completed',
+      progress: results.length ? 0 : 100,
+      stage: results.length ? 'Queued' : 'Completed',
+      result: { total: results.length, completed: 0, failed: 0, results },
+      error: null,
+      started_at: Date.now(),
+      created_at: isoNow(),
+    };
+    state.jobs.unshift(batchJob);
+    saveDemoState(state);
+    return jsonResponse({
+      job_id: batchJob.job_id,
+      total_items: selected.length,
+      operation,
+      status: batchJob.status,
+      results: results.map(({ media_id, filename }) => ({ media_id, filename })),
+    });
+  }
+
+  const batchStatusMatch = path.match(/^\/batch\/([^/]+)\/status$/);
+  if (batchStatusMatch && method === 'GET') {
+    const job = state.jobs.find((item) => item.job_id === batchStatusMatch[1]);
+    if (!job) return jsonResponse({ detail: 'Batch job not found' }, 404);
+    const result = (job.result || {}) as { results?: { media_id: string; filename: string; job_id?: string }[] };
+    const child = (result.results || []).map((item) => {
+      const childJob = item.job_id ? state.jobs.find((candidate) => candidate.job_id === item.job_id) : null;
+      if (childJob) refreshJob(childJob, state.media);
+      return {
+        media_id: item.media_id,
+        filename: item.filename,
+        status: childJob?.status || 'completed',
+        progress: childJob?.progress ?? 100,
+        error: childJob?.error || undefined,
+        output_filename: childJob?.result && typeof childJob.result === 'object'
+          ? (childJob.result as { output_filename?: string }).output_filename
+          : item.filename,
+      };
+    });
+    const completed = child.filter((item) => item.status === 'completed').length;
+    const failed = child.filter((item) => item.status === 'failed').length;
+    const total = child.length;
+    job.progress = total ? Math.round(child.reduce((sum, item) => sum + item.progress, 0) / total) : 100;
+    job.status = failed ? 'failed' : completed === total ? 'completed' : 'processing';
+    job.stage = job.status === 'completed' ? 'Completed' : 'Processing';
+    saveDemoState(state);
+    return jsonResponse({ job_id: job.job_id, status: job.status, total, completed, failed, results: child });
+  }
+
+  if (path === '/presets' && method === 'GET') return jsonResponse(state.presets);
+  if (path === '/presets' && method === 'POST') {
+    const body = bodyJson(init);
+    const preset = {
+      id: id('preset'),
+      user_id: state.user.id,
+      name: String(body.name || 'Untitled preset'),
+      description: body.description ? String(body.description) : null,
+      is_builtin: false,
+      settings: (body.settings && typeof body.settings === 'object' ? body.settings : {}) as Record<string, unknown>,
+      created_at: isoNow(),
+      updated_at: isoNow(),
+    };
+    state.presets.unshift(preset);
+    saveDemoState(state);
+    return jsonResponse(preset, 201);
+  }
+
+  const presetMatch = path.match(/^\/presets\/([^/]+)$/);
+  if (presetMatch) {
+    const preset = state.presets.find((item) => item.id === presetMatch[1]);
+    if (!preset) return jsonResponse({ detail: 'Preset not found' }, 404);
+    if (method === 'GET') return jsonResponse(preset);
+    if (method === 'PATCH') {
+      const body = bodyJson(init);
+      if (body.name !== undefined) preset.name = String(body.name);
+      if (body.description !== undefined) preset.description = body.description ? String(body.description) : null;
+      if (body.settings && typeof body.settings === 'object') preset.settings = body.settings as Record<string, unknown>;
+      preset.updated_at = isoNow();
+      saveDemoState(state);
+      return jsonResponse(preset);
+    }
+    if (method === 'DELETE') {
+      state.presets = state.presets.filter((item) => item.id !== preset.id);
+      saveDemoState(state);
+      return new Response(null, { status: 204 });
+    }
+  }
+
+  const globalWorkflows = () => state.workflows.__global__ || [];
+  if (path === '/workflows' && method === 'GET') return jsonResponse(globalWorkflows());
+  if (path === '/workflows' && method === 'POST') {
+    const body = bodyJson(init);
+    const workflow = {
+      id: id('workflow'),
+      user_id: state.user.id,
+      name: String(body.name || 'Untitled workflow'),
+      description: body.description ? String(body.description) : null,
+      is_builtin: false,
+      operations: Array.isArray(body.operations)
+        ? body.operations.map((operation) => ({
+            type: String((operation as Record<string, unknown>).type || 'process'),
+            params: ((operation as Record<string, unknown>).params || {}) as Record<string, unknown>,
+          }))
+        : [],
+      created_at: isoNow(),
+      updated_at: isoNow(),
+    };
+    state.workflows.__global__ = [workflow, ...globalWorkflows()];
+    saveDemoState(state);
+    return jsonResponse(workflow, 201);
+  }
+
+  const workflowMatch = path.match(/^\/workflows\/([^/]+)(?:\/run)?$/);
+  if (workflowMatch) {
+    const workflow = globalWorkflows().find((item) => item.id === workflowMatch[1]);
+    if (!workflow) return jsonResponse({ detail: 'Workflow not found' }, 404);
+    if (path.endsWith('/run') && method === 'POST') {
+      const mediaId = url.searchParams.get('media_id');
+      if (mediaId) createJob(state, mediaId, null, 'workflow:' + workflow.id);
+      saveDemoState(state);
+      return jsonResponse({ workflow_id: workflow.id, media_id: mediaId, operations_count: workflow.operations.length, status: 'queued' });
+    }
+    if (method === 'GET') return jsonResponse(workflow);
+    if (method === 'PATCH') {
+      const body = bodyJson(init);
+      if (body.name !== undefined) workflow.name = String(body.name);
+      if (body.description !== undefined) workflow.description = body.description ? String(body.description) : null;
+      if (Array.isArray(body.operations)) {
+        workflow.operations = body.operations.map((operation) => ({
+          type: String((operation as Record<string, unknown>).type || 'process'),
+          params: ((operation as Record<string, unknown>).params || {}) as Record<string, unknown>,
+        }));
+      }
+      workflow.updated_at = isoNow();
+      saveDemoState(state);
+      return jsonResponse(workflow);
+    }
+    if (method === 'DELETE') {
+      state.workflows.__global__ = globalWorkflows().filter((item) => item.id !== workflow.id);
+      saveDemoState(state);
+      return new Response(null, { status: 204 });
+    }
+  }
+
+  if (path === '/storage/usage' && method === 'GET') {
+    const total = state.media.reduce((sum, item) => sum + item.file_size, 0);
+    return jsonResponse({ total_size: total, total_files: state.media.length, user_id: state.user.id });
+  }
+  if (path === '/storage/usage/by-type' && method === 'GET') {
+    const grouped = new Map<string, { total_size: number; count: number }>();
+    state.media.forEach((item) => {
+      const current = grouped.get(item.media_type) || { total_size: 0, count: 0 };
+      current.total_size += item.file_size;
+      current.count += 1;
+      grouped.set(item.media_type, current);
+    });
+    return jsonResponse(Array.from(grouped, ([media_type, value]) => ({ media_type, ...value })));
+  }
+  if (path === '/storage/usage/by-folder' && method === 'GET') {
+    const grouped = new Map<string, { total_size: number; count: number }>();
+    state.media.forEach((item) => {
+      const folder = item.folder || 'Unfiled';
+      const current = grouped.get(folder) || { total_size: 0, count: 0 };
+      current.total_size += item.file_size;
+      current.count += 1;
+      grouped.set(folder, current);
+    });
+    return jsonResponse(Array.from(grouped, ([folder, value]) => ({ folder, ...value })));
+  }
+
+  if (path.startsWith('/search/media')) {
+    const q = (url.searchParams.get('q') || '').toLowerCase();
+    const mediaType = url.searchParams.get('media_type');
+    const folder = url.searchParams.get('folder');
+    const tag = url.searchParams.get('tag');
+    const status = url.searchParams.get('processing_status');
+    const minSize = Number(url.searchParams.get('min_size') || 0);
+    const maxSize = Number(url.searchParams.get('max_size') || Number.MAX_SAFE_INTEGER);
+    const minDuration = Number(url.searchParams.get('min_duration') || 0);
+    const maxDuration = Number(url.searchParams.get('max_duration') || Number.MAX_SAFE_INTEGER);
+    return jsonResponse(
+      state.media
+        .filter((item) => !q || item.original_filename.toLowerCase().includes(q))
+        .filter((item) => !mediaType || item.media_type === mediaType)
+        .filter((item) => !folder || item.folder === folder)
+        .filter((item) => !tag || (item.tags || []).includes(tag))
+        .filter((item) => !status || item.processing_status === status)
+        .filter((item) => item.file_size >= minSize && item.file_size <= maxSize)
+        .filter((item) => item.duration == null || (item.duration >= minDuration && item.duration <= maxDuration))
+        .map((item) => ({
+          id: item.id,
+          original_filename: item.original_filename,
+          media_type: item.media_type,
+          file_size: item.file_size,
+          duration: item.duration,
+          processing_status: item.processing_status,
+          folder: item.folder,
+          tags: item.tags?.join(', ') || null,
+          created_at: item.created_at,
+        })),
+    );
+  }
+
+  if (path === '/history' && method === 'GET') {
+    return jsonResponse(Object.entries(state.history).flatMap(([projectId, entries]) => entries.map((entry) => ({
+      ...entry,
+      media_id: state.media.find((item) => item.project_id === projectId)?.id || null,
+      settings: null,
+      error: null,
+      started_at: entry.created_at,
+      finished_at: entry.status === 'completed' ? entry.created_at : null,
+    }))));
+  }
+  if (path === '/history' && method === 'POST') {
+    const mediaId = url.searchParams.get('media_id');
+    const operation = url.searchParams.get('operation') || 'operation';
+    const historyStatus = url.searchParams.get('status') || 'completed';
+    const entry = { id: id('history'), operation, status: historyStatus, created_at: isoNow() };
+    const projectId = mediaId ? state.media.find((item) => item.id === mediaId)?.project_id : null;
+    if (projectId) state.history[projectId] = [entry, ...(state.history[projectId] || [])];
+    saveDemoState(state);
+    return jsonResponse({ ...entry, media_id: mediaId, settings: null, error: null, started_at: entry.created_at, finished_at: historyStatus === 'completed' ? entry.created_at : null }, 201);
+  }
+
+  if (path.startsWith('/comparisons/') && method === 'GET') {
+    const [, , aId, bId] = path.split('/');
+    const a = state.media.find((item) => item.id === aId);
+    const b = state.media.find((item) => item.id === bId);
+    if (!a || !b) return jsonResponse({ detail: 'Media not found' }, 404);
+    return jsonResponse({
+      media_a_id: a.id,
+      media_b_id: b.id,
+      size_diff: a.file_size - b.file_size,
+      duration_diff: a.duration != null && b.duration != null ? a.duration - b.duration : null,
+      resolution_match: a.width === b.width && a.height === b.height,
+      video_codec_match: a.video_codec === b.video_codec,
+      audio_codec_match: a.audio_codec === b.audio_codec,
+      storage_saved: Math.max(0, b.file_size - a.file_size),
+    });
+  }
+
+  if (path === '/notifications' && method === 'GET') {
+    const page = Number(url.searchParams.get('page') || 1);
+    const pageSize = Number(url.searchParams.get('page_size') || 20);
+    const unreadOnly = url.searchParams.get('unread_only') === 'true';
+    const filtered = unreadOnly ? state.notifications.filter((item) => !item.is_read) : state.notifications;
+    const start = (page - 1) * pageSize;
+    const items = filtered.slice(start, start + pageSize);
+    return jsonResponse({
+      items,
+      page,
+      page_size: pageSize,
+      total: filtered.length,
+      total_pages: Math.max(1, Math.ceil(filtered.length / pageSize)),
+    });
+  }
+  if (path === '/notifications/unread-count' && method === 'GET') {
+    return jsonResponse({ unread_count: state.notifications.filter((item) => !item.is_read).length });
+  }
+  if (path === '/notifications/read-all' && method === 'POST') {
+    state.notifications.forEach((item) => { item.is_read = true; });
+    saveDemoState(state);
+    return new Response(null, { status: 204 });
+  }
+  if (path === '/notifications' && method === 'POST') {
+    const body = bodyJson(init);
+    const notification = {
+      id: id('notification'),
+      event: String(body.event || 'demo.event'),
+      message: String(body.message || 'Demo notification'),
+      is_read: false,
+      created_at: isoNow(),
+    };
+    state.notifications.unshift(notification);
+    saveDemoState(state);
+    return jsonResponse(notification, 201);
+  }
+  const notificationReadMatch = path.match(/^\/notifications\/([^/]+)\/read$/);
+  if (notificationReadMatch && method === 'POST') {
+    const notification = state.notifications.find((item) => item.id === notificationReadMatch[1]);
+    if (!notification) return jsonResponse({ detail: 'Notification not found' }, 404);
+    notification.is_read = true;
+    saveDemoState(state);
+    return jsonResponse(notification);
+  }
+
+  if (path === '/ui/preferences' && method === 'GET') {
+    return jsonResponse(Object.entries(state.preferences).map(([key, value]) => ({ id: 'preference-' + key, key, value, updated_at: isoNow() })));
+  }
+  const preferenceMatch = path.match(/^\/ui\/preferences\/([^/]+)$/);
+  if (preferenceMatch && method === 'PUT') {
+    const key = decodeURIComponent(preferenceMatch[1]);
+    const body = bodyJson(init);
+    state.preferences[key] = String(body.value ?? '');
+    saveDemoState(state);
+    return jsonResponse({ id: 'preference-' + key, key, value: state.preferences[key], updated_at: isoNow() });
+  }
+
+  if (path === '/favorites' && method === 'GET') {
+    return jsonResponse(state.favorites.map((mediaId) => ({ id: 'favorite-' + mediaId, media_id: mediaId, user_id: state.user.id, created_at: isoNow() })));
+  }
+  if (path === '/favorites' && method === 'POST') {
+    const body = bodyJson(init);
+    const mediaId = String(body.media_id || '');
+    if (mediaId && !state.favorites.includes(mediaId)) state.favorites.push(mediaId);
+    saveDemoState(state);
+    return jsonResponse({ id: 'favorite-' + mediaId, media_id: mediaId, user_id: state.user.id, created_at: isoNow() }, 201);
+  }
+  const favoriteMatch = path.match(/^\/favorites\/([^/]+)$/);
+  if (favoriteMatch && method === 'DELETE') {
+    state.favorites = state.favorites.filter((mediaId) => mediaId !== favoriteMatch[1]);
+    saveDemoState(state);
+    return new Response(null, { status: 204 });
+  }
+
+  if (path === '/quick-actions' && method === 'GET') return jsonResponse(state.quickActions);
+  const quickActionMatch = path.match(/^\/quick-actions\/([^/]+)\/execute$/);
+  if (quickActionMatch && method === 'POST') {
+    const mediaId = quickActionMatch[1];
+    const actionId = url.searchParams.get('action_id') || 'process';
+    const media = state.media.find((item) => item.id === mediaId);
+    if (!media) return jsonResponse({ detail: 'Media not found' }, 404);
+    const job = createJob(state, media.id, null, 'quick-action:' + actionId);
+    saveDemoState(state);
+    return jsonResponse({ media_id: media.id, action_id: actionId, status: job.status });
+  }
+
+  if (path === '/sharing' && method === 'GET') return jsonResponse(state.shares);
+  if (path.startsWith('/sharing/embed/') && method === 'GET') {
+    const token = path.split('/')[3];
+    const share = state.shares.find((item) => item.token === token);
+    if (!share) return jsonResponse({ detail: 'Share not found' }, 404);
+    const media = state.media.find((item) => item.id === share.media_id);
+    return jsonResponse({
+      embed_url: 'https://demo.frameflux.local/share/' + share.token,
+      embed_code: '<iframe src="https://demo.frameflux.local/share/' + share.token + '" title="FrameFlux demo share"></iframe>',
+      media_title: media?.original_filename || 'FrameFlux demo media',
+    });
+  }
+  if (path.startsWith('/sharing/') && method === 'GET') {
+    const token = path.split('/')[2];
+    const share = state.shares.find((item) => item.token === token || item.id === token);
+    if (!share) return jsonResponse({ detail: 'Share not found' }, 404);
+    return jsonResponse(share);
+  }
+  if (path === '/sharing' && method === 'POST') {
+    const body = bodyJson(init);
+    const share = {
+      id: id('share'),
+      media_id: String(body.media_id || ''),
+      token: id('share-token').replace('share-token-', ''),
+      has_password: Boolean(body.password),
+      expires_at: body.expires_in_hours ? new Date(Date.now() + Number(body.expires_in_hours) * 3600_000).toISOString() : null,
+      is_active: true,
+      allow_download: body.allow_download !== false,
+      view_count: 0,
+      allowed_domains: body.allowed_domains ? String(body.allowed_domains) : null,
+      created_at: isoNow(),
+    };
+    state.shares.unshift(share);
+    saveDemoState(state);
+    return jsonResponse(share, 201);
+  }
+  const shareMutationMatch = path.match(/^\/sharing\/([^/]+)(?:\/(disable))?$/);
+  if (shareMutationMatch) {
+    const share = state.shares.find((item) => item.id === shareMutationMatch[1] || item.token === shareMutationMatch[1]);
+    if (!share) return jsonResponse({ detail: 'Share not found' }, 404);
+    if (shareMutationMatch[2] === 'disable' && method === 'POST') {
+      share.is_active = false;
+      saveDemoState(state);
+      return jsonResponse(share);
+    }
+    if (method === 'DELETE') {
+      state.shares = state.shares.filter((item) => item.id !== share.id);
+      saveDemoState(state);
+      return new Response(null, { status: 204 });
+    }
+  }
+
+  if (path.startsWith('/media-info/') && method === 'GET') {
+    const mediaId = path.split('/')[2];
+    const media = state.media.find((item) => item.id === mediaId);
+    if (!media) return jsonResponse({ detail: 'Media not found' }, 404);
+    return jsonResponse({
+      file_name: media.original_filename,
+      file_size: media.file_size,
+      duration: media.duration,
+      resolution: media.width && media.height ? media.width + 'x' + media.height : null,
+      fps: media.fps,
+      video_codec: media.video_codec,
+      audio_codec: media.audio_codec,
+      bitrate: null,
+      audio_channels: media.media_type === 'audio' ? 2 : media.audio_codec ? 2 : null,
+      sample_rate: media.media_type === 'audio' ? 48000 : null,
+      container_format: media.original_filename.split('.').pop()?.toLowerCase() || null,
+      audio_tracks: media.audio_codec ? 1 : 0,
+      subtitle_tracks: 1,
+      available_streams: [],
+      metadata: { demo: true, source: 'FrameFlux demo runtime' },
+      creation_metadata: {},
+    });
+  }
   if (path.startsWith('/media/uploads/') && path.endsWith('/progress')) {
     const uploadId = path.split('/')[3];
     const upload = state.resumables.find((item) => item.upload_id === uploadId);
@@ -733,54 +1212,6 @@ async function localDemoFetch(input: RequestInfo | URL, init?: RequestInit): Pro
     });
   }
 
-  if (path === '/jobs' && method === 'GET') {
-    return jsonResponse(state.jobs.map((job) => ({
-      job_id: job.job_id,
-      status: job.status,
-      progress: job.progress,
-      stage: job.stage,
-      result: job.result,
-      error: job.error,
-    })));
-  }
-
-  if (path.startsWith('/notifications')) {
-    return jsonResponse(state.notifications);
-  }
-
-  if (path.startsWith('/favorites')) {
-    if (method === 'GET') {
-      return jsonResponse(
-        state.favorites.map((mediaId) => ({
-          id: id('favorite'),
-          media_id: mediaId,
-          user_id: state.user.id,
-          created_at: isoNow(),
-        })),
-      );
-    }
-    return jsonResponse({ detail: 'Favorite updated in demo workspace.' });
-  }
-
-  if (path.startsWith('/search')) {
-    const q = (url.searchParams.get('q') || url.searchParams.get('search') || '').toLowerCase();
-    return jsonResponse(
-      state.media
-        .filter((item) => !q || item.original_filename.toLowerCase().includes(q))
-        .map((item) => ({
-          id: item.id,
-          original_filename: item.original_filename,
-          media_type: item.media_type,
-          file_size: item.file_size,
-          duration: item.duration,
-          processing_status: item.processing_status,
-          folder: item.folder,
-          tags: item.tags?.join(', ') || null,
-          created_at: item.created_at,
-        })),
-    );
-  }
-
   if (path.startsWith('/thumbnails/')) {
     if (path.includes('/set') && method === 'GET') {
       const id = path.split('/')[2];
@@ -803,19 +1234,6 @@ async function localDemoFetch(input: RequestInfo | URL, init?: RequestInit): Pro
       return blobResponse(demoSvg('Thumbnail preview'));
     }
     return jsonResponse({ path: 'demo://thumbnail/' + path.split('/')[2] });
-  }
-
-  if (path.startsWith('/storage')) {
-    const total = state.media.reduce((sum, item) => sum + item.file_size, 0);
-    return jsonResponse({
-      total_size: total,
-      total_files: state.media.length,
-      user_id: state.user.id,
-    });
-  }
-
-  if (path.startsWith('/presets')) {
-    return jsonResponse(state.presets);
   }
 
   if (
