@@ -581,10 +581,9 @@ async function localDemoFetch(input: RequestInfo | URL, init?: RequestInit): Pro
       ]);
     }
 
-    if (action === 'project' && method === 'PATCH') {
-      const projectId = path.split('/').pop() as string;
+    if (action?.startsWith('project/') && method === 'PATCH') {
+      const projectId = action.split('/')[1];
       media.project_id = projectId;
-      media.updated_at = isoNow();
       saveDemoState(state);
       return jsonResponse(media);
     }
