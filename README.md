@@ -184,7 +184,7 @@ You can run the Backend `demo` branch on your own Windows computer without deplo
 After the script prints its temporary `https://....trycloudflare.com` address, share this form of frontend URL:
 
 ```text
-https://YOUR-FRONTEND-DEMO-HOST/?demoBackend=https%3A%2F%2FYOUR-TUNNEL.trycloudflare.com
+https://frame-flux-demo-git-demo-focus-journals-projects.vercel.app/?demoBackend=https%3A%2F%2FYOUR-TUNNEL.trycloudflare.com
 ```
 
 The frontend validates the tunnel URL, stores it for the current browser tab session, and removes the parameter from the address bar. When the tunnel is stopped or unreachable, the browser-only simulation remains available. When a new tunnel is started, use its new URL to create a new frontend link.
