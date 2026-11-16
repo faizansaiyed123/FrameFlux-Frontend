@@ -195,6 +195,16 @@ For FrameFlux, configure the gateway route as:
 }
 ```
 
+Clone the backend `demo` branch and prepare its isolated Python environment once:
+
+```powershell
+cd C:\Users\saiye
+git clone --branch demo https://github.com/faizansaiyed123/FrameFlux-Backend.git
+cd FrameFlux-Backend
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install fastapi "uvicorn[standard]" pydantic python-multipart
+```
+
 Start the FrameFlux backend API separately on port 8000 (do not start the backend's standalone tunnel script when using the shared gateway):
 
 ```powershell
