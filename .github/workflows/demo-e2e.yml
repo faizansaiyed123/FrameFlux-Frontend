@@ -36,7 +36,7 @@ jobs:
         working-directory: FrameFlux-Backend
         env:
           PYTHONPATH: .
-        run: pytest -q tests/test_demo_api.py
+        run: pytest -q demo_tests/test_demo_api.py
 
       - name: Start backend demo API
         working-directory: FrameFlux-Backend
