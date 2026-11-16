@@ -177,6 +177,22 @@ standalone backend, builds and starts the frontend against it, and runs
 Playwright browser tests for dashboard loading, project creation, resumable
 upload, and processing-job progress.
 
+### Connect a temporarily tunneled local backend
+
+You can run the Backend `demo` branch on your own Windows computer without deploying it. Start the API and Cloudflare Quick Tunnel using the [backend tunnel guide](https://github.com/faizansaiyed123/FrameFlux-Backend/blob/demo/docs/recruiter-demo-tunnel.md).
+
+After the script prints its temporary `https://....trycloudflare.com` address, share this form of frontend URL:
+
+```text
+https://YOUR-FRONTEND-DEMO-HOST/?demoBackend=https%3A%2F%2FYOUR-TUNNEL.trycloudflare.com
+```
+
+The frontend validates the tunnel URL, stores it for the current browser tab session, and removes the parameter from the address bar. When the tunnel is stopped or unreachable, the browser-only simulation remains available. When a new tunnel is started, use its new URL to create a new frontend link.
+
+To switch the current tab back to browser-only simulation, open the frontend with `?demoBackend=local`.
+
+Only use this with the separately deployed Frontend `demo` branch. Do not change or redeploy the production application from `main` to use the demo tunnel.
+
 This demo behavior exists only on the `demo` branch. The production
 application on `main` continues to use `NEXT_PUBLIC_API_URL` and its normal
 backend authentication flow.
