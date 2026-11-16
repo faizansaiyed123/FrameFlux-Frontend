@@ -177,17 +177,46 @@ standalone backend, builds and starts the frontend against it, and runs
 Playwright browser tests for dashboard loading, project creation, resumable
 upload, and processing-job progress.
 
-### Connect a temporarily tunneled local backend
+### Connect through the shared personal-projects tunnel
 
-You can run the Backend `demo` branch on your own Windows computer without deploying it. Start the API and Cloudflare Quick Tunnel using the [backend tunnel guide](https://github.com/faizansaiyed123/FrameFlux-Backend/blob/demo/docs/recruiter-demo-tunnel.md).
+The shared personal-projects gateway lets multiple local demo APIs use **one Cloudflare Quick Tunnel**. Each project gets a path prefix, while its backend keeps its own local port.
 
-After the script prints its temporary `https://....trycloudflare.com` address, share this form of frontend URL:
+For FrameFlux, configure the gateway route as:
 
-```text
-https://frame-flux-demo-git-demo-focus-journals-projects.vercel.app/?demoBackend=https%3A%2F%2FYOUR-TUNNEL.trycloudflare.com
+```json
+"frameflux": {
+  "enabled": true,
+  "description": "FrameFlux recruiter demo API",
+  "upstream": "http://127.0.0.1:8000",
+  "strip_prefix": true,
+  "allowed_origins": [
+    "https://frame-flux-demo-git-demo-focus-journals-projects.vercel.app"
+  ]
+}
 ```
 
-The frontend validates the tunnel URL, stores it for the current browser tab session, and removes the parameter from the address bar. When the tunnel is stopped or unreachable, the browser-only simulation remains available. When a new tunnel is started, use its new URL to create a new frontend link.
+Start the FrameFlux backend API separately on port 8000 (do not start the backend's standalone tunnel script when using the shared gateway):
+
+```powershell
+cd C:\Users\saiye\FrameFlux-Backend
+.\.venv\Scripts\python.exe -m uvicorn app.demo.main:app --host 127.0.0.1 --port 8000
+```
+
+Start the shared gateway once from its own folder with `.`\start-gateway.ps1`. It starts the gateway on port 8787 and creates the single Cloudflare Quick Tunnel. Keep the gateway terminal open while demos are in use.
+
+After Cloudflare prints the one temporary tunnel address, use this FrameFlux-specific frontend URL (replace the host with the current tunnel host):
+
+```text
+https://frame-flux-demo-git-demo-focus-journals-projects.vercel.app/?demoBackend=https%3A%2F%2FYOUR-TUNNEL.trycloudflare.com%2Fframeflux
+```
+
+Other projects use the same tunnel host with their own paths, for example `/agencyos`. Add each project to the gateway's `config.json` with a unique slug, its own localhost port, and its own allowed frontend origin. The gateway strips the project prefix before forwarding each request.
+
+The frontend validates the HTTPS Cloudflare tunnel host and optional single project path, stores it for the current browser tab session, and removes the parameter from the address bar. When the backend or tunnel is unreachable, the browser-only simulation remains available. A new Quick Tunnel run gets a new host, so generate a fresh frontend link after restarting it.
+
+The older backend-specific tunnel launcher remains available for isolated FrameFlux testing, but do not run it alongside the shared gateway: that would create a second tunnel.
+
+Only use this with the separately deployed Frontend `demo` branch. Do not change or redeploy the production application from `main` to use the demo tunnel.
 
 To switch the current tab back to browser-only simulation, open the frontend with `?demoBackend=local`.
 
