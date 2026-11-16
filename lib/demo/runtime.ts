@@ -19,7 +19,7 @@ import type { DemoJob, DemoMedia, DemoResumable } from './seed';
 
 const DEMO_ENABLED = process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO !== 'false';
 const DEMO_BACKEND_URL =
-  process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL?.trim() || '';
+  (process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL?.trim() || '').replace(/\\/+$/, '');
 
 const DEMO_TIMEOUT_MS = 1_250;
 
@@ -1359,6 +1359,24 @@ export async function fetchWithDemo(
   }
 
   return localDemoFetch(input, init);
+}
+
+
+export async function resetDemoWorkspace(): Promise<void> {
+  resetDemoState();
+
+  if (!DEMO_ENABLED || !DEMO_BACKEND_URL) return;
+
+  try {
+    await fetch(DEMO_BACKEND_URL + '/demo/reset', {
+      method: 'POST',
+      credentials: 'include',
+      mode: 'cors',
+    });
+  } catch {
+    // The browser-local workspace has already been reset; the remote demo API
+    // remains optional and will be reset on its next explicit successful call.
+  }
 }
 
 export { DEMO_ENABLED, getDemoUser, resetDemoState };
