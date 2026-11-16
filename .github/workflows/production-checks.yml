@@ -2,9 +2,9 @@ name: Production Checks
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, demo]
   push:
-    branches: [main, prod-reconcile-20261002]
+    branches: [main, demo, prod-reconcile-20261002]
 
 jobs:
   frontend:
@@ -17,4 +17,4 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
-      - run: NEXT_PUBLIC_API_URL=https://api.example.com npm run build
+      - run: npm run build
