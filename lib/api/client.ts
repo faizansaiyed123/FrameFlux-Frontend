@@ -1,10 +1,13 @@
-import { fetchWithDemo } from '@/lib/demo/runtime';
+import { DEMO_ENABLED, fetchWithDemo } from '@/lib/demo/runtime';
 
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+const configuredDemoBackendUrl =
+  process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL?.trim();
 const API_BASE_URL =
   configuredApiUrl ||
-  (process.env.NODE_ENV !== 'production'
-    ? 'http://localhost:8000'
+  configuredDemoBackendUrl ||
+  (process.env.NODE_ENV !== 'production' || DEMO_ENABLED
+    ? 'http://frameflux-demo.local'
     : (() => {
         throw new Error('NEXT_PUBLIC_API_URL must be set in production');
       })());
