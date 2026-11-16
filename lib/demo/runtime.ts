@@ -23,7 +23,8 @@ const ENV_DEMO_BACKEND_URL =
 const DEMO_BACKEND_SESSION_KEY = 'frameflux-demo-backend-url-v1';
 const DEMO_BACKEND_QUERY_PARAM = 'demoBackend';
 
-const DEMO_TIMEOUT_MS = 2_500;
+const DEMO_TIMEOUT_MS = 10_000;
+const DEMO_UPLOAD_TIMEOUT_MS = 90_000;
 let demoBackendFallbackWarningShown = false;
 
 function normalizeQuickTunnelUrl(rawUrl: string): string | null {
@@ -1401,12 +1402,19 @@ export async function fetchWithDemo(
   const backendUrl = getDemoBackendUrl();
   if (backendUrl) {
     const requestUrl = parseUrl(input);
+    const method = (init?.method || 'GET').toUpperCase();
+    const isMediaUpload =
+      method === 'POST' &&
+      (requestUrl.pathname === '/media/upload' ||
+        requestUrl.pathname === '/media/upload-multiple' ||
+        /^\/media\/resumable\/[^/]+\/(?:chunk\/\d+|retry)$/.test(requestUrl.pathname));
+    const timeoutMs = isMediaUpload ? DEMO_UPLOAD_TIMEOUT_MS : DEMO_TIMEOUT_MS;
     const controller = new AbortController();
-    const timer = window.setTimeout(() => controller.abort(), DEMO_TIMEOUT_MS);
+    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
     try {
       const response = await fetch(backendUrl + requestUrl.pathname + requestUrl.search, {
         ...init,
-        method: init?.method || 'GET',
+        method,
         headers: init?.headers,
         credentials: 'include',
         signal: controller.signal,
