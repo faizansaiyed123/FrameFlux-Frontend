@@ -890,4 +890,4 @@ export async function fetchWithDemo(
   return localDemoFetch(input, init);
 }
 
-export { DEMO_ENABLED, resetDemoState };
+export { DEMO_ENABLED, getDemoUser, resetDemoState };
