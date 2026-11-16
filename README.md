@@ -141,18 +141,41 @@ By default, the browser uses a local API-compatible runtime with seeded projects
 media, jobs, notifications, folders, workflows, and processing state. Mutations
 persist in the browser so the workspace remains interactive across page reloads.
 
-The demo can also use a deployed FrameFlux API when one is available:
+The demo can also use the standalone recruiter API in the
+[FrameFlux-Backend `demo` branch](https://github.com/faizansaiyed123/FrameFlux-Backend/tree/demo):
 
 ```text
-NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL=https://your-demo-api.example.com
+NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL=http://localhost:8000
 ```
 
-When that URL is reachable, the frontend sends the same API requests to the
-FrameFlux backend. When it is not reachable, the browser-local runtime keeps the
-demo usable without requiring a backend deployment.
+Start that API from the backend repository:
 
-Use the profile menu inside the dashboard to reset the browser demo workspace
-back to its original seeded state.
+```bash
+python -m pip install fastapi "uvicorn[standard]" python-multipart
+uvicorn app.demo.main:app --host 127.0.0.1 --port 8000
+```
+
+Then start this frontend with the demo API configured:
+
+```bash
+NEXT_PUBLIC_FRAMEFLUX_DEMO=true NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL=http://127.0.0.1:8000 npm run dev
+```
+
+The backend demo is an **in-memory simulation**, not the production media
+processing stack. It does not use PostgreSQL, Redis, or FFmpeg. Project and media
+actions, uploads, and job progress are interactive, but generated media files
+are representative placeholders rather than actual transcoded exports. Backend
+state resets when that demo server process restarts. The browser-only mode
+remains available as a fallback and persists its workspace in browser storage.
+
+Use the profile menu inside the dashboard to reset the workspace. When the
+standalone API is connected, the reset action resets both the browser workspace
+and backend demo state.
+
+The `demo` branch also includes an automated full-stack check: it starts the
+standalone backend, builds and starts the frontend against it, and runs
+Playwright browser tests for dashboard loading, project creation, resumable
+upload, and processing-job progress.
 
 This demo behavior exists only on the `demo` branch. The production
 application on `main` continues to use `NEXT_PUBLIC_API_URL` and its normal
