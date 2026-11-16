@@ -324,7 +324,7 @@ const jobs: DemoJob[] = [
 
 export function createDemoState(): DemoState {
   return {
-    version: 1,
+    version: 2,
     user: structuredClone(user),
     projects: structuredClone(projects),
     media: structuredClone(media),
