@@ -35,7 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAuth } from '@/hooks/useAuth';
-import { DEMO_ENABLED, resetDemoState } from '@/lib/demo/runtime';
+import { DEMO_ENABLED, resetDemoWorkspace } from '@/lib/demo/runtime';
 
 const navItems = [
   { name: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
@@ -254,8 +254,9 @@ export function Sidebar({ className }: SidebarProps) {
             {DEMO_ENABLED && (
               <DropdownMenuItem
                 onClick={() => {
-                  resetDemoState();
-                  window.location.reload();
+                  void resetDemoWorkspace().finally(() => {
+                    window.location.reload();
+                  });
                 }}
                 className="cursor-pointer rounded-lg"
               >
