@@ -131,3 +131,29 @@ python run.py
 
 Then start the frontend from this repository with either `npm run dev` or Docker
 Compose.
+
+
+## Demo mode
+
+The `demo` branch is designed to run as a standalone recruiter-facing workspace.
+
+By default, the browser uses a local API-compatible runtime with seeded projects,
+media, jobs, notifications, folders, workflows, and processing state. Mutations
+persist in the browser so the workspace remains interactive across page reloads.
+
+The demo can also use a deployed FrameFlux API when one is available:
+
+```text
+NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL=https://your-demo-api.example.com
+```
+
+When that URL is reachable, the frontend sends the same API requests to the
+FrameFlux backend. When it is not reachable, the browser-local runtime keeps the
+demo usable without requiring a backend deployment.
+
+Use the profile menu inside the dashboard to reset the browser demo workspace
+back to its original seeded state.
+
+This demo behavior exists only on the `demo` branch. The production
+application on `main` continues to use `NEXT_PUBLIC_API_URL` and its normal
+backend authentication flow.
