@@ -1,3 +1,5 @@
+import { fetchWithDemo } from '@/lib/demo/runtime';
+
 const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
 const API_BASE_URL =
   configuredApiUrl ||
@@ -46,7 +48,7 @@ class ApiClient {
         `Bearer ${this.token}`;
     }
 
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    const response = await fetchWithDemo(`${this.baseUrl}${endpoint}`, {
       ...options,
       headers,
       credentials: 'include',
@@ -462,7 +464,7 @@ class ApiClient {
   }
 
   async getMediaFile(id: string) {
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/media/${id}/download?download_type=original`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -473,7 +475,7 @@ class ApiClient {
   }
 
   async getProcessedMedia(id: string, downloadType: string = 'processed') {
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/media/${id}/download?download_type=${encodeURIComponent(downloadType)}`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -964,7 +966,7 @@ class ApiClient {
     if (data.channels) query.set('channels', String(data.channels));
     if (data.quality_preset) query.set('quality_preset', data.quality_preset);
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/audio/${mediaId}/extract${qs ? `?${qs}` : ''}`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -1083,7 +1085,7 @@ class ApiClient {
     if (data.channels) query.set('channels', String(data.channels));
     if (data.quality) query.set('quality', data.quality);
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/audio/${mediaId}/convert${qs ? `?${qs}` : ''}`,
       {
         method: 'POST',
@@ -1134,7 +1136,7 @@ class ApiClient {
       output_format?: string;
     },
   ) {
-    const response = await fetch(`${this.baseUrl}/audio/${mediaId}/to-video`, {
+    const response = await fetchWithDemo(`${this.baseUrl}/audio/${mediaId}/to-video`, {
       method: 'POST',
       body: JSON.stringify(data),
       headers: {
@@ -1159,7 +1161,7 @@ class ApiClient {
     if (height !== undefined) query.set('height', String(height));
     if (fmt) query.set('fmt', fmt);
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/thumbnails/${mediaId}${qs ? `?${qs}` : ''}`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -1228,7 +1230,7 @@ class ApiClient {
     if (data.font) query.set('font', data.font);
     if (data.alignment) query.set('alignment', data.alignment);
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/subtitles/${mediaId}/burn?${qs}`,
       {
         method: 'POST',
@@ -1243,7 +1245,7 @@ class ApiClient {
   }
 
   async uploadSubtitleFile(formData: FormData) {
-    const response = await fetch(`${this.baseUrl}/subtitles/upload`, {
+    const response = await fetchWithDemo(`${this.baseUrl}/subtitles/upload`, {
       method: 'POST',
       headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
       body: formData,
@@ -1269,7 +1271,7 @@ class ApiClient {
     if (data.is_forced !== undefined)
       query.set('is_forced', String(data.is_forced));
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/subtitles/${mediaId}/mux?${qs}`,
       {
         method: 'POST',
@@ -1310,7 +1312,7 @@ class ApiClient {
       end?: number;
     },
   ) {
-    const response = await fetch(
+    const response = await fetchWithDemo(
       this.baseUrl + '/subtitles/' + mediaId + '/edit',
       {
         method: 'POST',
@@ -1338,7 +1340,7 @@ class ApiClient {
       preview?: boolean;
     },
   ): Promise<Blob | { preview_url: string; offset: number; scale: number }> {
-    const response = await fetch(`${this.baseUrl}/subtitles/${mediaId}/sync`, {
+    const response = await fetchWithDemo(`${this.baseUrl}/subtitles/${mediaId}/sync`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1374,7 +1376,7 @@ class ApiClient {
     if (data.width) query.set('width', String(data.width));
     if (data.fps) query.set('fps', String(data.fps));
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/preview/${mediaId}/video${qs ? `?${qs}` : ''}`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -1401,7 +1403,7 @@ class ApiClient {
     if (data.fps) query.set('fps', String(data.fps));
     if (data.quality) query.set('quality', String(data.quality));
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/preview/${mediaId}/gif${qs ? `?${qs}` : ''}`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -1427,7 +1429,7 @@ class ApiClient {
     if (data.height !== undefined) query.set('height', String(data.height));
     if (data.fmt) query.set('fmt', data.fmt);
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/preview/${mediaId}/thumbnail${qs ? `?${qs}` : ''}`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
@@ -1457,7 +1459,7 @@ class ApiClient {
     if (data.fps) query.set('fps', String(data.fps));
     if (data.quality !== undefined) query.set('quality', String(data.quality));
     const qs = query.toString();
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/gif/${mediaId}/generate${qs ? `?${qs}` : ''}`,
       {
         method: 'POST',
@@ -1706,7 +1708,7 @@ class ApiClient {
   }
 
   async getMediaVersionFile(mediaId: string, versionId: string) {
-    const response = await fetch(
+    const response = await fetchWithDemo(
       `${this.baseUrl}/media/${mediaId}/versions/${versionId}/download`,
       {
         headers: this.token ? { Authorization: `Bearer ${this.token}` } : {},
