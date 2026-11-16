@@ -18,10 +18,72 @@ import {
 import type { DemoJob, DemoMedia, DemoResumable } from './seed';
 
 const DEMO_ENABLED = process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO !== 'false';
-const DEMO_BACKEND_URL =
+const ENV_DEMO_BACKEND_URL =
   (process.env.NEXT_PUBLIC_FRAMEFLUX_DEMO_BACKEND_URL?.trim() || '').replace(/\/+$/, '');
+const DEMO_BACKEND_SESSION_KEY = 'frameflux-demo-backend-url-v1';
+const DEMO_BACKEND_QUERY_PARAM = 'demoBackend';
 
-const DEMO_TIMEOUT_MS = 1_250;
+const DEMO_TIMEOUT_MS = 5_000;
+
+function normalizeQuickTunnelUrl(rawUrl: string): string | null {
+  try {
+    const url = new URL(rawUrl.trim());
+    if (
+      url.protocol !== 'https:' ||
+      url.username ||
+      url.password ||
+      url.port ||
+      url.pathname !== '/' ||
+      url.search ||
+      url.hash ||
+      !url.hostname.toLowerCase().endsWith('.trycloudflare.com')
+    ) {
+      return null;
+    }
+    return url.origin;
+  } catch {
+    return null;
+  }
+}
+
+function getDemoBackendUrl(): string {
+  if (typeof window === 'undefined') return ENV_DEMO_BACKEND_URL;
+
+  try {
+    const pageUrl = new URL(window.location.href);
+    if (pageUrl.searchParams.has(DEMO_BACKEND_QUERY_PARAM)) {
+      const suppliedUrl = pageUrl.searchParams.get(DEMO_BACKEND_QUERY_PARAM) || '';
+      if (suppliedUrl.toLowerCase() === 'local') {
+        window.sessionStorage.setItem(DEMO_BACKEND_SESSION_KEY, 'local');
+      } else {
+        const tunnelUrl = normalizeQuickTunnelUrl(suppliedUrl);
+        if (tunnelUrl) {
+          window.sessionStorage.setItem(DEMO_BACKEND_SESSION_KEY, tunnelUrl);
+        } else {
+          window.sessionStorage.removeItem(DEMO_BACKEND_SESSION_KEY);
+          console.warn(
+            'FrameFlux demo backend URL was ignored. Expected an HTTPS Cloudflare Quick Tunnel URL ending in .trycloudflare.com.',
+          );
+        }
+      }
+
+      pageUrl.searchParams.delete(DEMO_BACKEND_QUERY_PARAM);
+      window.history.replaceState(
+        window.history.state,
+        '',
+        pageUrl.pathname + pageUrl.search + pageUrl.hash,
+      );
+    }
+
+    const storedUrl = window.sessionStorage.getItem(DEMO_BACKEND_SESSION_KEY);
+    if (storedUrl === 'local') return '';
+    if (storedUrl) return storedUrl;
+  } catch {
+    // Private browsing or restrictive storage settings should not break the demo.
+  }
+
+  return ENV_DEMO_BACKEND_URL;
+}
 
 function jsonResponse(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -1335,24 +1397,22 @@ export async function fetchWithDemo(
 ): Promise<Response> {
   if (!DEMO_ENABLED) return fetch(input, init);
 
-  if (DEMO_BACKEND_URL) {
-    const request = new Request(input, init);
+  const backendUrl = getDemoBackendUrl();
+  if (backendUrl) {
+    const requestUrl = parseUrl(input);
     const controller = new AbortController();
     const timer = window.setTimeout(() => controller.abort(), DEMO_TIMEOUT_MS);
     try {
-      const response = await fetch(
-        DEMO_BACKEND_URL + parseUrl(input).pathname + parseUrl(input).search,
-        {
-          ...init,
-          method: init?.method || 'GET',
-          headers: init?.headers,
-          credentials: 'include',
-          signal: controller.signal,
-        },
-      );
+      const response = await fetch(backendUrl + requestUrl.pathname + requestUrl.search, {
+        ...init,
+        method: init?.method || 'GET',
+        headers: init?.headers,
+        credentials: 'include',
+        signal: controller.signal,
+      });
       if (response.ok) return response;
     } catch {
-      // The deployed recruiter demo remains usable even when its optional API is down.
+      // The browser-only recruiter demo remains usable when its optional API is offline.
     } finally {
       window.clearTimeout(timer);
     }
@@ -1365,10 +1425,11 @@ export async function fetchWithDemo(
 export async function resetDemoWorkspace(): Promise<void> {
   resetDemoState();
 
-  if (!DEMO_ENABLED || !DEMO_BACKEND_URL) return;
+  const backendUrl = getDemoBackendUrl();
+  if (!DEMO_ENABLED || !backendUrl) return;
 
   try {
-    await fetch(DEMO_BACKEND_URL + '/demo/reset', {
+    await fetch(backendUrl + '/demo/reset', {
       method: 'POST',
       credentials: 'include',
       mode: 'cors',
